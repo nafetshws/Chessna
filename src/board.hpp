@@ -9,8 +9,10 @@ struct Board {
     Bitboard blackPawns, blackRooks, blackKnights, blackBishops, blackQueen, blackKing;
 
     void initBoard();
-
     void initBoard(std::string fen);
+    Bitboard getOccupied();
+    Bitboard getOccupiedByWhite();
+    Bitboard getOccupiedByBlack();
 };
 
 #endif
