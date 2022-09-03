@@ -1,2 +1,5 @@
 *.un*
 *.swp*
+*.obj
+*.lib
+build/
