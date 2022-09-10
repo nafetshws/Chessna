@@ -13,6 +13,9 @@ struct Board {
     Bitboard getOccupied();
     Bitboard getOccupiedByWhite();
     Bitboard getOccupiedByBlack();
+
+    void printBoard(Bitboard board); 
+
 };
 
 #endif

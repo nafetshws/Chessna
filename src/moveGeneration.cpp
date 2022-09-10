@@ -1,5 +1,8 @@
-#include "MoveGeneration.hpp"
+#include <vector>
+#include "moveGeneration.hpp"
 #include "board.hpp"
+#include "move.hpp"
+#include "types.hpp"
 
 MoveGeneration::MoveGeneration(Board board) {
     this->board = board;
@@ -155,4 +158,36 @@ Bitboard MoveGeneration::East(Square square) {
 
     return attacks;
 
+}
+
+void MoveGeneration::generateRookMoves(Bitboard rooks) {
+    //if default value -> use rooks on board
+    if(rooks == (0UL-1)) rooks = this->board.blackRooks;
+
+}
+
+Bitboard MoveGeneration::generatePawnPushes() {
+    Bitboard pawns = board.blackPawns;
+    //single push
+    Bitboard pawnSinglePushes = (pawns >> SOUTH) & (~board.getOccupied());
+    //double push
+    Bitboard pawnDoublePushes = ((pawns & RANK_7) >> 2*SOUTH) & (~board.getOccupied());
+
+    Bitboard pushes = pawnSinglePushes | pawnDoublePushes;
+    return pushes;
+}
+
+Bitboard MoveGeneration::generatePawnAttacks() {
+    Bitboard pawns = board.blackPawns;
+    //SouthWest
+    Bitboard swAttacks = ((pawns & ~FILE_A) >> SOUTH_WEST) & board.getOccupiedByWhite();
+    //SouthEast
+    Bitboard seAttacks = ((pawns & ~ FILE_H) >> SOUTH_EAST) & board.getOccupiedByWhite();
+
+    Bitboard attacks = swAttacks | seAttacks;
+    return attacks;
+}
+
+Bitboard MoveGeneration::generatePawnMoves() {
+    return generatePawnAttacks() | generatePawnPushes();
 }

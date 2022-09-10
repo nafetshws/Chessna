@@ -18,8 +18,10 @@ enum Direction {
 
 };
 
-const Bitboard A_FILE = 0x101010101010101;
-const Bitboard H_FILE = 0x8080808080808080;
+const Bitboard FILE_A = 0x101010101010101;
+const Bitboard FILE_H = 0x8080808080808080;
 const Bitboard EMPTY = 0x0;
+const Bitboard RANK_5 = 0xff00000000;
+const Bitboard RANK_7 = 0xff000000000000;
 
 #endif

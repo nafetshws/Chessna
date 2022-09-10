@@ -1,5 +1,6 @@
-#include "board.hpp"
+#include <iostream>
 #include <string>
+#include "board.hpp"
 
 void Board::initBoard(){
     whitePawns = 0xff00;
@@ -18,7 +19,36 @@ void Board::initBoard(){
 }
 
 void Board::initBoard(std::string fen){
+    //initBoard();
+
+    std::string delimiter = " ";
+    int pos = 0;
+
+    std::string piecePlacement = fen.substr(pos, fen.find(delimiter, pos));
+    pos += piecePlacement.length()+1;
+    std::string sideToMove = fen.substr(pos, fen.find(delimiter, pos)-pos);
+    pos += sideToMove.length()+1;
+    std::string castlingAbillity = fen.substr(pos, fen.find(delimiter, pos)-pos);
+    pos += castlingAbillity.length()+1;
+    std::string enPassentTargetSquare = fen.substr(pos, fen.find(delimiter, pos)-pos);
+    pos += enPassentTargetSquare.length()+1;
+    std::string halfMoveClock = fen.substr(pos, fen.find(delimiter, pos)-pos);
+    pos += halfMoveClock.length()+1;
+    std::string fullMoveCounter = fen.substr(pos, fen.find(delimiter, pos)-pos);
+
+    std::cout << "PiecePlacement: " << piecePlacement << std::endl;
+    std::cout << "sideToMove    : " << sideToMove << std::endl;
+    std::cout << "castlingAbillity: " << castlingAbillity << std::endl;
+    std::cout << "en passent: " << enPassentTargetSquare << std::endl;
+    std::cout << "halfMoveClock: " << halfMoveClock << std::endl;
+    std::cout << "fullMoveCounter: " << fullMoveCounter << std::endl;
+
     initBoard();
+}
+
+void Board::printBoard(Bitboard board) {
+    std::string boardAsString = std::to_string(board);
+    std::cout << "Board: " << boardAsString << std::endl;
 }
 
 Bitboard Board::getOccupiedByWhite() {

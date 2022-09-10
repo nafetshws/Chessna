@@ -1,11 +1,10 @@
 #include <iostream>
-#include "MoveGeneration.hpp"
+#include <string>
 #include "board.hpp"
+#include "moveGeneration.hpp"
 
 int main(){
     Board board;
-    board.initBoard();
-    MoveGeneration moveGeneration(board);
-    Bitboard res = moveGeneration.Southwest(63);
-    std::cout << res << std::endl;
+    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    board.initBoard(fen);
 }
