@@ -30,6 +30,8 @@ class MoveGeneration {
 
         Bitboard generateKnightMoves();
 
+        Bitboard generateKingMoves();
+
        
     private:
         Board board;

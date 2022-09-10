@@ -216,3 +216,19 @@ Bitboard MoveGeneration::generateKnightMoves() {
     Bitboard moves = (attacks & ~this->board.getOccupiedByBlack());
     return moves;
 }
+
+Bitboard MoveGeneration::generateKingMoves() {
+    Bitboard king = this->board.blackKing;
+    //north
+    Bitboard northAttack = ((king & ~(RANK_8)) << NORTH);
+    //west
+    Bitboard westAttack = ((king & ~(FILE_A)) << WEST);
+    //south
+    Bitboard southAttack = ((king & ~(RANK_1)) >> SOUTH);
+    //east
+    Bitboard eastAttack = ((king & ~(FILE_H)) >> EAST);
+
+    Bitboard attacks = northAttack | westAttack | southAttack | eastAttack;
+    Bitboard moves = (attacks & ~this->board.getOccupiedByBlack());
+    return moves;
+}

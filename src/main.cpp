@@ -6,10 +6,10 @@
 
 int main(){
     Board board;
-    std::string fen = "r1bqkb1r/pppppppp/8/5n2/2n5/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; 
+    std::string fen = "rnbqkbnr/pppp1ppp/8/4p3/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; 
     board.initBoard(fen);
     
     MoveGeneration moveGeneration(board);
-    Bitboard moves = moveGeneration.generateKnightMoves();
+    Bitboard moves = moveGeneration.generateKingMoves();
     board.printBoard(moves);
 }
