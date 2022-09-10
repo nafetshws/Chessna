@@ -167,7 +167,7 @@ void MoveGeneration::generateRookMoves(Bitboard rooks) {
 }
 
 Bitboard MoveGeneration::generatePawnPushes() {
-    Bitboard pawns = board.blackPawns;
+    Bitboard pawns = this->board.blackPawns;
     //single push
     Bitboard pawnSinglePushes = (pawns >> SOUTH) & (~board.getOccupied());
     //double push
@@ -178,7 +178,7 @@ Bitboard MoveGeneration::generatePawnPushes() {
 }
 
 Bitboard MoveGeneration::generatePawnAttacks() {
-    Bitboard pawns = board.blackPawns;
+    Bitboard pawns = this->board.blackPawns;
     //SouthWest
     Bitboard swAttacks = ((pawns & ~FILE_A) >> SOUTH_WEST) & board.getOccupiedByWhite();
     //SouthEast
@@ -190,4 +190,29 @@ Bitboard MoveGeneration::generatePawnAttacks() {
 
 Bitboard MoveGeneration::generatePawnMoves() {
     return generatePawnAttacks() | generatePawnPushes();
+}
+
+Bitboard MoveGeneration::generateKnightMoves() {
+    Bitboard knights = this->board.blackKnights;
+
+    //noNoEa
+    Bitboard noNoEaAttacks = ((knights & ~(RANK_7 | RANK_8 | FILE_H)) << NORTH_NORTH_EAST);
+    //noEaEa
+    Bitboard noEaEaAttacks = ((knights & ~(RANK_8 | FILE_G | FILE_H)) << NORTH_EAST_EAST);
+    //soEaEa
+    Bitboard soEaEaAttacks = ((knights & ~(RANK_1 | FILE_G | FILE_H)) >> SOUTH_EAST_EAST);
+    //soSoEa
+    Bitboard soSoEaAttacks = ((knights & ~(RANK_1 | RANK_2 | FILE_H)) >> SOUTH_SOUTH_EAST);
+    //soSoWe
+    Bitboard soSoWeAttacks = ((knights & ~(RANK_1 | RANK_2 | FILE_A)) >> SOUTH_SOUTH_WEST);
+    //soWeWe
+    Bitboard SoWeWeAttacks = ((knights & ~(RANK_1 | FILE_A | FILE_B)) >> SOUTH_WEST_WEST);
+    //noWeWe
+    Bitboard noWeWeAttacks = ((knights & ~(RANK_8 | FILE_A | FILE_B)) << NORTH_WEST_WEST);
+    //noNoWe
+    Bitboard noNoWeAttacks = ((knights & ~(RANK_7 | RANK_8 | FILE_A)) << NORTH_NORTH_WEST);
+
+    Bitboard attacks = noNoEaAttacks | noEaEaAttacks | soEaEaAttacks | soSoEaAttacks | soSoWeAttacks | SoWeWeAttacks | noWeWeAttacks | noNoWeAttacks;
+    Bitboard moves = (attacks & ~this->board.getOccupiedByBlack());
+    return moves;
 }

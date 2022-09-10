@@ -26,8 +26,9 @@ class MoveGeneration {
 
         Bitboard generatePawnPushes();
         Bitboard generatePawnAttacks();
-
         Bitboard generatePawnMoves();
+
+        Bitboard generateKnightMoves();
 
        
     private:

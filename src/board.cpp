@@ -1,22 +1,8 @@
 #include <iostream>
 #include <string>
 #include "board.hpp"
+#include "types.hpp"
 
-void Board::initBoard(){
-    whitePawns = 0xff00;
-    whiteRooks = 0x81;
-    whiteKnights = 0x42;
-    whiteBishops = 0x24;
-    whiteQueen = 0x8;
-    whiteKing = 0x10;
-
-    blackPawns = 0xff000000000000;
-    blackRooks = 0x8100000000000000;
-    blackKnights = 0x4200000000000000;
-    blackBishops = 0x2400000000000000;
-    blackQueen = 0x800000000000000;
-    blackKing = 0x1000000000000000;
-}
 
 void Board::initBoard(std::string fen){
     //initBoard();
@@ -38,6 +24,7 @@ void Board::initBoard(std::string fen){
     pos += halfMoveClock.length()+1;
     std::string fullMoveCounter = fen.substr(pos, fen.find(delimiter, pos)-pos);
 
+    //set bitboards to 0 - somehow necessary
     this->whitePawns = 0ULL; 
     this->whiteRooks = 0ULL; 
     this->whiteKnights = 0ULL; 
@@ -145,6 +132,7 @@ void Board::initBoard(std::string fen){
         }
     }
 
+    //init rest of board state
     this->sideToMove = sideToMove;
     this->castlingAbillity = castlingAbillity;
     this->enPassentTargetSquare = enPassentTargetSquare;
