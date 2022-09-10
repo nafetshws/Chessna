@@ -24,13 +24,12 @@ class MoveGeneration {
         void generateRookMoves(Bitboard rooks = 0UL-1);
         std::vector<Move> generatBishopfMoves(Bitboard bishops);
 
-        Bitboard generatePawnPushes();
-        Bitboard generatePawnAttacks();
-        Bitboard generatePawnMoves();
+        Bitboard generatePawnMovesBlack();
+        Bitboard generatePawnMovesWhite();
 
-        Bitboard generateKnightMoves();
+        Bitboard generateKnightMoves(Bitboard knights);
 
-        Bitboard generateKingMoves();
+        Bitboard generateKingMoves(Bitboard king);
 
        
     private:

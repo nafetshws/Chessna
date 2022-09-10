@@ -10,6 +10,7 @@ int main(){
     board.initBoard(fen);
     
     MoveGeneration moveGeneration(board);
-    Bitboard moves = moveGeneration.generateKingMoves();
+    Bitboard king = board.blackKing;
+    Bitboard moves = moveGeneration.generateKingMoves(king);
     board.printBoard(moves);
 }

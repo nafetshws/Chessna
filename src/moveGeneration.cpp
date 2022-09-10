@@ -166,34 +166,43 @@ void MoveGeneration::generateRookMoves(Bitboard rooks) {
 
 }
 
-Bitboard MoveGeneration::generatePawnPushes() {
+Bitboard MoveGeneration::generatePawnMovesBlack() {
+    //pawn pushes
     Bitboard pawns = this->board.blackPawns;
     //single push
     Bitboard pawnSinglePushes = (pawns >> SOUTH) & (~board.getOccupied());
     //double push
     Bitboard pawnDoublePushes = ((pawns & RANK_7) >> 2*SOUTH) & (~board.getOccupied());
+    Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
 
-    Bitboard pushes = pawnSinglePushes | pawnDoublePushes;
-    return pushes;
-}
-
-Bitboard MoveGeneration::generatePawnAttacks() {
-    Bitboard pawns = this->board.blackPawns;
     //SouthWest
     Bitboard swAttacks = ((pawns & ~FILE_A) >> SOUTH_WEST) & board.getOccupiedByWhite();
     //SouthEast
     Bitboard seAttacks = ((pawns & ~ FILE_H) >> SOUTH_EAST) & board.getOccupiedByWhite();
-
     Bitboard attacks = swAttacks | seAttacks;
-    return attacks;
+
+    return (pushes | attacks);
 }
 
-Bitboard MoveGeneration::generatePawnMoves() {
-    return generatePawnAttacks() | generatePawnPushes();
+Bitboard MoveGeneration::generatePawnMovesWhite() {
+    //pawn pushes
+    Bitboard pawns = this->board.whitePawns;
+    //single push
+    Bitboard pawnSinglePushes = (pawns << NORTH) & (~board.getOccupied());
+    //double push
+    Bitboard pawnDoublePushes = ((pawns & RANK_2) >> 2*NORTH) & (~board.getOccupied());
+    Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
+
+    //SouthWest
+    Bitboard swAttacks = ((pawns & ~FILE_A) << NORTH_WEST) & board.getOccupiedByBlack();
+    //SouthEast
+    Bitboard seAttacks = ((pawns & ~ FILE_H) << NORTH_EAST) & board.getOccupiedByBlack();
+    Bitboard attacks = swAttacks | seAttacks;
+
+    return (pushes | attacks);
 }
 
-Bitboard MoveGeneration::generateKnightMoves() {
-    Bitboard knights = this->board.blackKnights;
+Bitboard MoveGeneration::generateKnightMoves(Bitboard knights) {
 
     //noNoEa
     Bitboard noNoEaAttacks = ((knights & ~(RANK_7 | RANK_8 | FILE_H)) << NORTH_NORTH_EAST);
@@ -217,8 +226,7 @@ Bitboard MoveGeneration::generateKnightMoves() {
     return moves;
 }
 
-Bitboard MoveGeneration::generateKingMoves() {
-    Bitboard king = this->board.blackKing;
+Bitboard MoveGeneration::generateKingMoves(Bitboard king) {
     //north
     Bitboard northAttack = ((king & ~(RANK_8)) << NORTH);
     //west
