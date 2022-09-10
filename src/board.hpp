@@ -8,6 +8,12 @@ struct Board {
     Bitboard whitePawns, whiteRooks, whiteKnights, whiteBishops, whiteQueen, whiteKing;
     Bitboard blackPawns, blackRooks, blackKnights, blackBishops, blackQueen, blackKing;
 
+    std::string sideToMove;
+    std::string castlingAbillity;
+    std::string enPassentTargetSquare;
+    int halfMoveClock;
+    int fullMoveCounter;
+
     void initBoard();
     void initBoard(std::string fen);
     Bitboard getOccupied();

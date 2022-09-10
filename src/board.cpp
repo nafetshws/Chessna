@@ -24,6 +24,8 @@ void Board::initBoard(std::string fen){
     std::string delimiter = " ";
     int pos = 0;
 
+    //sepertes fen string by delimiter
+    //position has to be update by the length of the previous token +1 (white space)
     std::string piecePlacement = fen.substr(pos, fen.find(delimiter, pos));
     pos += piecePlacement.length()+1;
     std::string sideToMove = fen.substr(pos, fen.find(delimiter, pos)-pos);
@@ -36,14 +38,118 @@ void Board::initBoard(std::string fen){
     pos += halfMoveClock.length()+1;
     std::string fullMoveCounter = fen.substr(pos, fen.find(delimiter, pos)-pos);
 
-    std::cout << "PiecePlacement: " << piecePlacement << std::endl;
-    std::cout << "sideToMove    : " << sideToMove << std::endl;
-    std::cout << "castlingAbillity: " << castlingAbillity << std::endl;
-    std::cout << "en passent: " << enPassentTargetSquare << std::endl;
-    std::cout << "halfMoveClock: " << halfMoveClock << std::endl;
-    std::cout << "fullMoveCounter: " << fullMoveCounter << std::endl;
+    this->whitePawns = 0ULL; 
+    this->whiteRooks = 0ULL; 
+    this->whiteKnights = 0ULL; 
+    this->whiteBishops = 0ULL; 
+    this->whiteQueen = 0ULL; 
+    this->whiteKing = 0ULL;
 
-    initBoard();
+    this->blackPawns = 0ULL; 
+    this->blackRooks = 0ULL; 
+    this->blackKnights = 0ULL;
+    this->blackBishops = 0ULL;
+    this->blackQueen = 0ULL; 
+    this->blackKing = 0ULL;
+
+    //convert piece placement string to bitboards
+    int file = 1;
+    int rank = 8;
+    for(int i = 0; i < piecePlacement.length(); i++) {
+        int currentChar = piecePlacement.at(i);
+        Bitboard piece = 1ULL << ((rank-1)*8 + (file-1));
+
+        switch(currentChar) {
+            case 'r':
+                this->blackRooks = (this->blackRooks ^ piece);
+                file++;
+                break;
+            case 'n':
+                this->blackKnights = (this->blackKnights ^ piece);
+                file++;
+                break;
+            case 'b':
+                this->blackBishops = (this->blackBishops ^ piece);
+                file++;
+                break;
+            case 'q':
+                this->blackQueen = (this->blackQueen ^ piece);
+                file++;
+                break;
+            case 'k':
+                this->blackKing = (this->blackKing ^ piece);
+                file++;
+                break;
+            case 'p':
+                this->blackPawns = (this->blackPawns ^ piece);
+                file++;
+                break;
+
+            case 'R':
+                this->whiteRooks = (this->whiteRooks ^ piece);
+                file++;
+                break;
+            case 'N':
+                this->whiteKnights = (this->whiteKnights ^ piece);
+                file++;
+                break;
+            case 'B':
+                this->whiteBishops = (this->whiteBishops ^ piece);
+                file++;
+                break;
+            case 'Q':
+                this->whiteQueen = (this->whiteQueen ^ piece);
+                file++;
+                break;
+            case 'K':
+                this->whiteKing = (this->whiteKing ^ piece);
+                file++;
+                break;
+            case 'P':
+                this->whitePawns = (this->whitePawns ^ piece);
+                file++;
+                break;
+
+            case '1':
+                file += 1;
+                break;
+            case '2':
+                file += 2;
+                break;
+            case '3':
+                file += 3;
+                break;
+            case '4':
+                file += 4;
+                break;
+            case '5':
+                file += 5;
+                break;
+            case '6':
+                file += 6;
+                break;
+            case '7':
+                file += 7;
+                break;
+            case '8':
+                file += 8;
+                break;
+            
+            case '/':
+                rank--;
+                file = 1;
+                break;
+            default:
+                break;
+            
+        }
+    }
+
+    this->sideToMove = sideToMove;
+    this->castlingAbillity = castlingAbillity;
+    this->enPassentTargetSquare = enPassentTargetSquare;
+    this->halfMoveClock = stoi(halfMoveClock);
+    this->fullMoveCounter = stoi(fullMoveCounter);
 }
 
 void Board::printBoard(Bitboard board) {
