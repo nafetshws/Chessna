@@ -21,7 +21,9 @@ class MoveGeneration {
         Bitboard East(Square square);
         Bitboard West(Square square);
 
-        void generateRookMoves(Bitboard rooks = 0UL-1);
+        Bitboard generateRookMoves(Bitboard rooks = 0ULL-1);
+        Bitboard generateBishopMoves(Bitboard bishops = 0ULL-1);
+        Bitboard generateQueenMoves(Bitboard queens = 0ULL-1);
         std::vector<Move> generatBishopfMoves(Bitboard bishops);
 
         Bitboard generatePawnMovesBlack();
@@ -30,7 +32,6 @@ class MoveGeneration {
         Bitboard generateKnightMoves(Bitboard knights);
 
         Bitboard generateKingMoves(Bitboard king);
-
        
     private:
         Board board;

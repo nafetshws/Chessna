@@ -14,7 +14,7 @@ Bitboard MoveGeneration::North(Square square) {
 
     if(rank == 7) return attacks;
 
-    attacks = (1 << (square + Direction::NORTH));
+    attacks = (1ULL << (square + Direction::NORTH));
     rank++;
 
     while(rank < 7) {
@@ -32,7 +32,7 @@ Bitboard MoveGeneration::Northeast(Square square) {
 
     if(rank == 7 || file == 7) return attacks;
 
-    attacks = (1 << (square + Direction::NORTH_EAST));
+    attacks = (1ULL << (square + Direction::NORTH_EAST));
     rank++;
     file++;
 
@@ -52,7 +52,7 @@ Bitboard MoveGeneration::Northwest(Square square) {
 
     if(rank == 7 || file == 0) return attacks;
 
-    attacks = (1UL << (square + Direction::NORTH_WEST));
+    attacks = (1ULL << (square + Direction::NORTH_WEST));
     rank++;
     file--;
 
@@ -72,7 +72,7 @@ Bitboard MoveGeneration::South(Square square) {
 
     if(rank == 0) return attacks;
 
-    attacks = (1UL << (square - Direction::SOUTH));
+    attacks = (1ULL << (square - Direction::SOUTH));
     rank--;
 
     while(rank > 0) {
@@ -90,7 +90,7 @@ Bitboard MoveGeneration::Southeast(Square square) {
 
     if(rank == 0 || file == 7) return attacks;
 
-    attacks = (1UL << (square - Direction::SOUTH_EAST));
+    attacks = (1ULL << (square - Direction::SOUTH_EAST));
     rank--;
     file++;
 
@@ -110,7 +110,7 @@ Bitboard MoveGeneration::Southwest(Square square) {
 
     if(rank == 0 || file == 0) return attacks;
 
-    attacks = (1UL << (square - Direction::SOUTH_WEST));
+    attacks = (1ULL << (square - Direction::SOUTH_WEST));
     rank--;
     file--;
 
@@ -130,7 +130,7 @@ Bitboard MoveGeneration::West(Square square) {
 
     if(file == 0) return attacks;
 
-    attacks = (1UL << (square - Direction::WEST));
+    attacks = (1ULL << (square - Direction::WEST));
     file--;
 
     while(file > 0) {
@@ -148,7 +148,7 @@ Bitboard MoveGeneration::East(Square square) {
 
     if(file == 7) return attacks;
 
-    attacks = (1UL << (square + Direction::EAST));
+    attacks = (1ULL << (square + Direction::EAST));
     file++;
 
     while(file < 7) {
@@ -160,10 +160,199 @@ Bitboard MoveGeneration::East(Square square) {
 
 }
 
-void MoveGeneration::generateRookMoves(Bitboard rooks) {
-    //if default value -> use rooks on board
-    if(rooks == (0UL-1)) rooks = this->board.blackRooks;
 
+Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops) {
+    if(bishops == (0ULL-1)) bishops = this->board.blackBishops;
+
+    Bitboard allSinlgeMoves = EMPTY;
+    Bitboard totalMoves = EMPTY;
+
+    while(bishops > 0) {
+        Bitboard finalNorthWestMoves = EMPTY;
+        Bitboard finalNorthEastMoves = EMPTY;
+        Bitboard finalSouthWestMoves  = EMPTY;
+        Bitboard finalSouthEastMoves  = EMPTY;
+
+        //clzll returns the number of leading zeros
+        int index = 63 - __builtin_clzll(bishops);
+        //Bitboard moves = MoveGeneration::northWest(index) | MoveGeneration::South(index) | MoveGeneration::East(index) | MoveGeneration::West(index);
+        Bitboard northWestAttacks = MoveGeneration::Northwest(index);
+        if(northWestAttacks != 0ULL) {
+            Bitboard northWestBlockers = (northWestAttacks & this->board.getOccupied());
+            if(northWestBlockers != 0ULL) {
+                //ctzll returns the number of trailing zeros
+                int northWestFirstBlockerIndex = __builtin_ctzll(northWestBlockers);
+                Bitboard blockedMoves = MoveGeneration::Northwest(northWestFirstBlockerIndex);
+                //if the first blocker is of the same color
+                if((1ULL << northWestFirstBlockerIndex) == ((1ULL << northWestFirstBlockerIndex) & this->board.getOccupiedByBlack())) {
+                    blockedMoves = (blockedMoves | (1ULL << northWestFirstBlockerIndex));
+                }
+                finalNorthWestMoves = (northWestAttacks ^ blockedMoves);
+            } else {
+                finalNorthWestMoves = northWestAttacks;
+            }
+        }
+
+        Bitboard northEastAttacks = MoveGeneration::Northeast(index);
+        if(northEastAttacks!= 0ULL) {
+            Bitboard northEastBlockers = (northEastAttacks & this->board.getOccupied());
+            if(northEastBlockers != 0ULL) {
+                //ctzll returns the number of leading zeros
+                int northEastFirstBlockerIndex = __builtin_ctzll(northEastBlockers);
+                Bitboard blockedMoves = MoveGeneration::Northeast(northEastFirstBlockerIndex);
+                //if the first blocker is of the same color
+                if((1ULL << northEastFirstBlockerIndex) == ((1ULL << northEastFirstBlockerIndex) & this->board.getOccupiedByBlack())) {
+                    blockedMoves = (blockedMoves | (1ULL << northEastFirstBlockerIndex));
+                }
+                finalNorthEastMoves = (northEastAttacks ^ blockedMoves);
+            } else {
+                finalNorthEastMoves = northEastAttacks;
+            }
+        }
+
+        Bitboard southWestAttacks = MoveGeneration::Southwest(index);
+        if(southWestAttacks != 0ULL) {
+            Bitboard southWestBlockers = (southWestAttacks & this->board.getOccupied());
+            if(southWestBlockers != 0ULL) {
+                //ctzll returns the number of trailing zeros
+                int southWestFirstBlockerIndex = 63 -__builtin_clzll(southWestBlockers);
+                Bitboard blockedMoves = MoveGeneration::Southwest(southWestFirstBlockerIndex);
+                //if the first blocker is of the same color
+                if((1ULL << southWestFirstBlockerIndex) == ((1ULL << southWestFirstBlockerIndex) & this->board.getOccupiedByBlack())) {
+                    blockedMoves = (blockedMoves | (1ULL << southWestFirstBlockerIndex));
+                }
+                finalSouthWestMoves = (southWestAttacks ^ blockedMoves);
+            } else {
+                finalSouthWestMoves = southWestAttacks;
+            }
+        }
+
+        Bitboard southEastAttacks = MoveGeneration::Southeast(index);
+        if(southEastAttacks!= 0ULL) {
+            Bitboard southEastBlockers = (southEastAttacks & this->board.getOccupied());
+            if(southEastBlockers != 0ULL) {
+                //ctzll returns the number of leading zeros
+                int southEastFirstBlockerIndex = 63 - __builtin_clzll(southEastBlockers);
+                Bitboard blockedMoves = MoveGeneration::Southeast(southEastFirstBlockerIndex);
+                //if the first blocker is of the same color
+                if((1ULL << southEastFirstBlockerIndex) == ((1ULL << southEastFirstBlockerIndex) & this->board.getOccupiedByBlack())) {
+                    blockedMoves = (blockedMoves | (1ULL << southEastFirstBlockerIndex));
+                }
+                finalSouthEastMoves = (southEastAttacks ^ blockedMoves);
+            } else {
+                finalSouthEastMoves = southEastAttacks;
+            }
+        }
+
+        allSinlgeMoves = finalNorthWestMoves | finalNorthEastMoves | finalSouthWestMoves | finalSouthEastMoves;
+        totalMoves = (totalMoves | allSinlgeMoves);
+        //erase bishop
+        bishops = ((1ULL << index) ^ bishops);
+    }
+
+    return totalMoves;
+}
+
+Bitboard MoveGeneration::generateRookMoves(Bitboard rooks) {
+    if(rooks == (0ULL-1)) rooks = this->board.blackRooks;
+
+    Bitboard allSinlgeMoves = EMPTY;
+    Bitboard totalMoves = EMPTY;
+
+    while(rooks > 0) {
+        Bitboard finalNorthMoves = EMPTY;
+        Bitboard finalSouthMoves = EMPTY;
+        Bitboard finalWestMoves  = EMPTY;
+        Bitboard finalEastMoves  = EMPTY;
+
+        //clzll returns the number of leading zeros
+        int index = 63 - __builtin_clzll(rooks);
+        //Bitboard moves = MoveGeneration::North(index) | MoveGeneration::South(index) | MoveGeneration::East(index) | MoveGeneration::West(index);
+        Bitboard northAttacks = MoveGeneration::North(index);
+        if(northAttacks != 0ULL) {
+            Bitboard northBlockers = (northAttacks & this->board.getOccupied());
+            if(northBlockers != 0ULL) {
+                //ctzll returns the number of trailing zeros
+                int northFirstBlockerIndex = __builtin_ctzll(northBlockers);
+                Bitboard blockedMoves = MoveGeneration::North(northFirstBlockerIndex);
+                //if the first blocker is of the same color
+                if((1ULL << northFirstBlockerIndex) == ((1ULL << northFirstBlockerIndex) & this->board.getOccupiedByBlack())) {
+                    blockedMoves = (blockedMoves | (1ULL << northFirstBlockerIndex));
+                }
+                finalNorthMoves = (northAttacks ^ blockedMoves);
+            } else {
+                finalNorthMoves = northAttacks;
+            }
+        }
+
+        Bitboard southAttacks = MoveGeneration::South(index);
+        if(southAttacks!= 0ULL) {
+            Bitboard southBlockers = (southAttacks & this->board.getOccupied());
+            if(southBlockers != 0ULL) {
+                //ctzll returns the number of leading zeros
+                int southFirstBlockerIndex = 63 - __builtin_clzll(southBlockers);
+                Bitboard blockedMoves = MoveGeneration::South(southFirstBlockerIndex);
+                //if the first blocker is of the same color
+                if((1ULL << southFirstBlockerIndex) == ((1ULL << southFirstBlockerIndex) & this->board.getOccupiedByBlack())) {
+                    blockedMoves = (blockedMoves | (1ULL << southFirstBlockerIndex));
+                }
+                finalSouthMoves = (southAttacks ^ blockedMoves);
+            } else {
+                finalSouthMoves = southAttacks;
+            }
+        }
+
+        Bitboard westAttacks = MoveGeneration::West(index);
+        if(westAttacks != 0ULL) {
+            Bitboard westBlockers = (westAttacks & this->board.getOccupied());
+            if(westBlockers != 0ULL) {
+                //ctzll returns the number of trailing zeros
+                int westFirstBlockerIndex = 63 -__builtin_clzll(westBlockers);
+                Bitboard blockedMoves = MoveGeneration::West(westFirstBlockerIndex);
+                //if the first blocker is of the same color
+                if((1ULL << westFirstBlockerIndex) == ((1ULL << westFirstBlockerIndex) & this->board.getOccupiedByBlack())) {
+                    blockedMoves = (blockedMoves | (1ULL << westFirstBlockerIndex));
+                }
+                finalWestMoves = (westAttacks ^ blockedMoves);
+            } else {
+                finalWestMoves = westAttacks;
+            }
+
+        }
+
+        Bitboard eastAttacks = MoveGeneration::East(index);
+        if(eastAttacks!= 0ULL) {
+            Bitboard eastBlockers = (eastAttacks & this->board.getOccupied());
+            if(eastBlockers != 0ULL) {
+                //ctzll returns the number of leading zeros
+                int eastFirstBlockerIndex = __builtin_ctzll(eastBlockers);
+                std::cout << "index: " << eastFirstBlockerIndex << std::endl;
+                Bitboard blockedMoves = MoveGeneration::East(eastFirstBlockerIndex);
+                std::cout << "blockedMoves: " << blockedMoves << std::endl;
+                //if the first blocker is of the same color
+                if((1ULL << eastFirstBlockerIndex) == ((1ULL << eastFirstBlockerIndex) & this->board.getOccupiedByBlack())) {
+                    blockedMoves = (blockedMoves | (1ULL << eastFirstBlockerIndex));
+                }
+                finalEastMoves = (eastAttacks ^ blockedMoves);
+            } else {
+                finalEastMoves = eastAttacks;
+            }
+        }
+
+        allSinlgeMoves = finalNorthMoves | finalSouthMoves | finalWestMoves | finalEastMoves;
+        totalMoves = (totalMoves | allSinlgeMoves);
+        //erase rook
+        rooks = ((1ULL << index) ^ rooks);
+    }
+
+    return totalMoves;
+}
+
+Bitboard MoveGeneration::generateQueenMoves(Bitboard queens) {
+    if(queens == (0ULL-1)) queens = this->board.blackQueen;
+    std::cout << "bishop moves: " << generateBishopMoves(queens) << std::endl;
+    std::cout << "rook moves: " << generateRookMoves(queens) << std::endl;
+    return (generateBishopMoves(queens) | generateRookMoves(queens));
 }
 
 Bitboard MoveGeneration::generatePawnMovesBlack() {
