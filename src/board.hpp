@@ -10,7 +10,7 @@ struct Board {
 
     std::string sideToMove;
     std::string castlingAbillity;
-    std::string enPassentTargetSquare;
+    int enPassentTargetSquare;
     int halfMoveClock;
     int fullMoveCounter;
 

@@ -132,10 +132,42 @@ void Board::initBoard(std::string fen){
         }
     }
 
+    switch (enPassentTargetSquare.at(0)) {
+        case 'a':
+            this->enPassentTargetSquare = (std::stoi(std::string(1, enPassentTargetSquare.at(1)))-1) * 8 + 0;
+            break;
+        case 'b':
+            this->enPassentTargetSquare = (std::stoi(std::string(1, enPassentTargetSquare.at(1)))-1) * 8 + 1;
+            break;
+        case 'c':
+            this->enPassentTargetSquare = (std::stoi(std::string(1, enPassentTargetSquare.at(1)))-1) * 8 + 2;
+            break;
+        case 'd':
+            this->enPassentTargetSquare = (std::stoi(std::string(1, enPassentTargetSquare.at(1)))-1) * 8 + 3;
+            break;
+        case 'e':
+            this->enPassentTargetSquare = (std::stoi(std::string(1, enPassentTargetSquare.at(1)))-1) * 8 + 4;
+            break;
+        case 'f':
+            this->enPassentTargetSquare = (std::stoi(std::string(1, enPassentTargetSquare.at(1)))-1) * 8 + 5;
+            break;
+        case 'g':
+            this->enPassentTargetSquare = (std::stoi(std::string(1, enPassentTargetSquare.at(1)))-1) * 8 + 6;
+            break;
+        case 'h':
+            this->enPassentTargetSquare = (std::stoi(std::string(1, enPassentTargetSquare.at(1)))-1) * 8 + 7;
+            break;
+        default:
+            //no en passent
+            this->enPassentTargetSquare = -1;
+            break;
+    }
+
+    std::cout << "en passent target square: " << this->enPassentTargetSquare << std::endl;
+
     //init rest of board state
     this->sideToMove = sideToMove;
     this->castlingAbillity = castlingAbillity;
-    this->enPassentTargetSquare = enPassentTargetSquare;
     this->halfMoveClock = stoi(halfMoveClock);
     this->fullMoveCounter = stoi(fullMoveCounter);
 }

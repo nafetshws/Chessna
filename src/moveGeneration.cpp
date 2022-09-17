@@ -21,7 +21,6 @@ Bitboard MoveGeneration::North(Square square) {
         attacks = attacks | (attacks << Direction::NORTH); 
         rank++;
     }
-
     return attacks;
 }
 
@@ -41,7 +40,6 @@ Bitboard MoveGeneration::Northeast(Square square) {
         rank++;
         file++;
     }
-
     return attacks;
 }
 
@@ -61,7 +59,6 @@ Bitboard MoveGeneration::Northwest(Square square) {
         rank++;
         file--;
     }
-
     return attacks;
 }
 
@@ -79,7 +76,6 @@ Bitboard MoveGeneration::South(Square square) {
         attacks = attacks | (attacks >> Direction::SOUTH); 
         rank--;
     }
-
     return attacks;
 }
 
@@ -99,7 +95,6 @@ Bitboard MoveGeneration::Southeast(Square square) {
         rank--;
         file++;
     }
-
     return attacks;
 }
 
@@ -119,12 +114,10 @@ Bitboard MoveGeneration::Southwest(Square square) {
         rank--;
         file--;
     }
-
     return attacks;
 }
 
 Bitboard MoveGeneration::West(Square square) {
-    
     int file = square % 8;
     Bitboard attacks = EMPTY; 
 
@@ -139,7 +132,6 @@ Bitboard MoveGeneration::West(Square square) {
     }
 
     return attacks;
-
 }
 
 Bitboard MoveGeneration::East(Square square) {
@@ -155,9 +147,7 @@ Bitboard MoveGeneration::East(Square square) {
         attacks = attacks | (attacks << Direction::EAST);
         file++;
     }
-
     return attacks;
-
 }
 
 
@@ -249,7 +239,6 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops) {
         //erase bishop
         bishops = ((1ULL << index) ^ bishops);
     }
-
     return totalMoves;
 }
 
@@ -317,7 +306,6 @@ Bitboard MoveGeneration::generateRookMoves(Bitboard rooks) {
             } else {
                 finalWestMoves = westAttacks;
             }
-
         }
 
         Bitboard eastAttacks = MoveGeneration::East(index);
@@ -338,13 +326,11 @@ Bitboard MoveGeneration::generateRookMoves(Bitboard rooks) {
                 finalEastMoves = eastAttacks;
             }
         }
-
         allSinlgeMoves = finalNorthMoves | finalSouthMoves | finalWestMoves | finalEastMoves;
         totalMoves = (totalMoves | allSinlgeMoves);
         //erase rook
         rooks = ((1ULL << index) ^ rooks);
     }
-
     return totalMoves;
 }
 
