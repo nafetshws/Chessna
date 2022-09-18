@@ -163,8 +163,6 @@ void Board::initBoard(std::string fen){
             break;
     }
 
-    std::cout << "en passent target square: " << this->enPassentTargetSquare << std::endl;
-
     //init rest of board state
     this->sideToMove = sideToMove;
     this->castlingAbillity = castlingAbillity;

@@ -43,4 +43,9 @@ const Bitboard RANK_8 = 0xff00000000000000;
 
 const std::string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
+enum Color {
+    WHITE,
+    BLACK
+};
+
 #endif

@@ -21,17 +21,13 @@ class MoveGeneration {
         Bitboard East(Square square);
         Bitboard West(Square square);
 
-        Bitboard generateRookMoves(Bitboard rooks = 0ULL-1);
-        Bitboard generateBishopMoves(Bitboard bishops = 0ULL-1);
-        Bitboard generateQueenMoves(Bitboard queens = 0ULL-1);
-        std::vector<Move> generatBishopfMoves(Bitboard bishops);
+        Bitboard generateRookMoves(Bitboard rooks = 0ULL-1, Color color = BLACK);
+        Bitboard generateBishopMoves(Bitboard bishops = 0ULL-1, Color color = BLACK);
+        Bitboard generateQueenMoves(Bitboard queens = 0ULL-1, Color color = BLACK);
 
-        Bitboard generatePawnMovesBlack();
-        Bitboard generatePawnMovesWhite();
-
-        Bitboard generateKnightMoves(Bitboard knights);
-
-        Bitboard generateKingMoves(Bitboard king);
+        Bitboard generatePawnMoves(Bitboard pawns = 0ULL-1, Color color = BLACK);
+        Bitboard generateKnightMoves(Bitboard knights = 0ULL-1, Color color = BLACK);
+        Bitboard generateKingMoves(Bitboard king = 0ULL-1, Color color = BLACK);
        
     private:
         Board board;
