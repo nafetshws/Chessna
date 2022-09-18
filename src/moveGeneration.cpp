@@ -414,7 +414,38 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     //east
     Bitboard eastAttack = ((king & ~(FILE_H)) >> EAST);
 
-    Bitboard attacks = northAttack | westAttack | southAttack | eastAttack;
+    Bitboard castle = EMPTY;
+
+    //castling
+    if(color == WHITE) {
+        if(this->board.castlingAbillity.find('K') != std::string::npos) {
+            if((~this->board.getOccupied() & WHITE_CASTLE_KING_MASK) == WHITE_CASTLE_KING_MASK) {
+                //castleKingSide(color);
+                castle = castle | (this->board.whiteKing << 2);
+            }
+        } 
+        if(this->board.castlingAbillity.find('Q') != std::string::npos) {
+            if((~this->board.getOccupied() & WHITE_CASTLE_QUEEN_MASK) == WHITE_CASTLE_QUEEN_MASK) {
+                //castleQueenSide(color);
+                castle = castle | (this->board.whiteKing >> 2);
+            }
+        } 
+    } else {
+        if(this->board.castlingAbillity.find('k') != std::string::npos) {
+            if((~this->board.getOccupied() & BLACK_CASTLE_KING_MASK) == BLACK_CASTLE_KING_MASK) {
+                //castleKingSide(color);
+                castle = castle | (this->board.whiteKing << 2);
+            }
+        } 
+        if(this->board.castlingAbillity.find('q') != std::string::npos) {
+            if((~this->board.getOccupied() & BLACK_CASTLE_QUEEN_MASK) == BLACK_CASTLE_QUEEN_MASK) {
+                //castleQueenSide(color);
+                castle = castle | (this->board.whiteKing >> 2);
+            }
+        } 
+    }
+
+    Bitboard attacks = northAttack | westAttack | southAttack | eastAttack | castle;
 
     Bitboard moves;
     if(color == BLACK) {
@@ -424,4 +455,33 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     }
 
     return moves;
+}
+
+
+void MoveGeneration::castleKingSide(Color color) {
+    if(color == WHITE) {
+        //move king
+        this->board.whiteKing = (this->board.whiteKing << 2);
+        //move rook
+        this->board.whiteRooks = (((~(1ULL << 7)) & this->board.whiteRooks) | (1ULL << 5));
+    } else {
+        //move king
+        this->board.blackKing = (this->board.blackKing << 2);
+        //move rook
+        this->board.whiteRooks = (((~(1ULL << 63)) & this->board.whiteRooks) | (1ULL << 61));
+    }
+}
+
+void MoveGeneration::castleQueenSide(Color color) {
+    if(color == WHITE) {
+        //move king
+        this->board.whiteKing = (this->board.whiteKing >> 2);
+        //move rook
+        this->board.whiteRooks = (((~(1ULL)) & this->board.whiteRooks) | (1ULL << 3));
+    } else {
+        //move king
+        this->board.blackKing = (this->board.blackKing >> 2);
+        //move rook
+        this->board.whiteRooks = (((~(1ULL << 56)) & this->board.whiteRooks) | (1ULL << 59));
+    }
 }

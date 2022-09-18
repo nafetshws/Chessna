@@ -9,7 +9,23 @@
 
 class MoveGeneration {
     public:
+        Board board;
+
         MoveGeneration(Board board);
+
+        Bitboard generateRookMoves(Bitboard rooks = 0ULL-1, Color color = BLACK);
+        Bitboard generateBishopMoves(Bitboard bishops = 0ULL-1, Color color = BLACK);
+        Bitboard generateQueenMoves(Bitboard queens = 0ULL-1, Color color = BLACK);
+
+        Bitboard generatePawnMoves(Bitboard pawns = 0ULL-1, Color color = BLACK);
+        Bitboard generateKnightMoves(Bitboard knights = 0ULL-1, Color color = BLACK);
+        Bitboard generateKingMoves(Bitboard king = 0ULL-1, Color color = BLACK);
+
+        void castleKingSide(Color color);
+        void castleQueenSide(Color color);
+       
+    private:
+
         Bitboard Northwest(Square square);
         Bitboard Northeast(Square square);
         Bitboard North(Square square);
@@ -21,16 +37,6 @@ class MoveGeneration {
         Bitboard East(Square square);
         Bitboard West(Square square);
 
-        Bitboard generateRookMoves(Bitboard rooks = 0ULL-1, Color color = BLACK);
-        Bitboard generateBishopMoves(Bitboard bishops = 0ULL-1, Color color = BLACK);
-        Bitboard generateQueenMoves(Bitboard queens = 0ULL-1, Color color = BLACK);
-
-        Bitboard generatePawnMoves(Bitboard pawns = 0ULL-1, Color color = BLACK);
-        Bitboard generateKnightMoves(Bitboard knights = 0ULL-1, Color color = BLACK);
-        Bitboard generateKingMoves(Bitboard king = 0ULL-1, Color color = BLACK);
-       
-    private:
-        Board board;
 };
 
 #endif

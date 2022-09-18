@@ -41,6 +41,11 @@ const Bitboard RANK_5 = 0xff00000000;
 const Bitboard RANK_7 = 0xff000000000000;
 const Bitboard RANK_8 = 0xff00000000000000;
 
+const Bitboard WHITE_CASTLE_KING_MASK = 0x60;
+const Bitboard WHITE_CASTLE_QUEEN_MASK= 0x60;
+const Bitboard BLACK_CASTLE_KING_MASK = 0x6000000000000000;
+const Bitboard BLACK_CASTLE_QUEEN_MASK= 0xe00000000000000;
+
 const std::string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 enum Color {
