@@ -344,14 +344,26 @@ Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
         //single push
         Bitboard pawnSinglePushes = (pawns << NORTH) & (~board.getOccupied());
         //double push
-        Bitboard pawnDoublePushes = ((pawns & RANK_2) >> 2*NORTH) & (~board.getOccupied());
+        Bitboard pawnDoublePushes = ((pawns & RANK_2) << 2*NORTH) & (~board.getOccupied());
         Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
 
         //SouthWest
         Bitboard swAttacks = ((pawns & ~FILE_A) << NORTH_WEST) & board.getOccupiedByBlack();
         //SouthEast
         Bitboard seAttacks = ((pawns & ~ FILE_H) << NORTH_EAST) & board.getOccupiedByBlack();
+        //en passent
+        bool enPassentPossible = false;
+        Bitboard enPassentSquare = EMPTY;
+        if(this->board.enPassentTargetSquare != -1) {
+            enPassentSquare = (1ULL << this->board.enPassentTargetSquare);
+            if(((((pawns & ~FILE_A) << NORTH_WEST) | ((pawns & ~ FILE_H) << NORTH_EAST)) & enPassentSquare) == enPassentSquare) {
+                enPassentPossible = true;
+            }
+        }
+
         Bitboard attacks = swAttacks | seAttacks;
+        
+        if(enPassentPossible) attacks = attacks | enPassentSquare;
 
         return (pushes | attacks);
     } else {
@@ -367,7 +379,18 @@ Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
         Bitboard swAttacks = ((pawns & ~FILE_A) >> SOUTH_WEST) & board.getOccupiedByWhite();
         //SouthEast
         Bitboard seAttacks = ((pawns & ~ FILE_H) >> SOUTH_EAST) & board.getOccupiedByWhite();
+
+        //en passent
+        bool enPassentPossible = false;
+        Bitboard enPassentSquare = EMPTY;
+        if(this->board.enPassentTargetSquare != -1) {
+            enPassentSquare = (1ULL << this->board.enPassentTargetSquare);
+            if(((((pawns & ~FILE_A) >> SOUTH_WEST) | ((pawns & ~ FILE_H) >> SOUTH_EAST)) & enPassentSquare) == enPassentSquare) {
+                enPassentPossible = true;
+            }
+        }
         Bitboard attacks = swAttacks | seAttacks;
+        if(enPassentPossible) attacks = attacks | enPassentSquare;
 
         return (pushes | attacks);
     }

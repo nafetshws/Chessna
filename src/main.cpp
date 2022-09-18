@@ -6,15 +6,10 @@
 
 int main(){
     Board board;
-    std::string fen = "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"; 
+    std::string fen = "rnbqkbnr/ppp1pppp/8/8/3pP3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq e3 0 3"; 
     board.initBoard(fen);
     
     MoveGeneration moveGeneration(board);
-    Bitboard moves = moveGeneration.generateKingMoves(board.whiteKing, WHITE);
-    moveGeneration.castleKingSide(WHITE);
+    Bitboard moves = moveGeneration.generatePawnMoves();
     std::cout << "Moves: " << moves << std::endl;
-
-    std::cout << "Occupied: " << moveGeneration.board.getOccupied() << std::endl;
-    std::cout << "rooks: " << moveGeneration.board.whiteRooks << std::endl;
-    std::cout << "king: " << moveGeneration.board.whiteKing << std::endl;
 }
