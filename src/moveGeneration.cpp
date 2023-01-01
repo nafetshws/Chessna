@@ -152,7 +152,7 @@ Bitboard MoveGeneration::East(Square square) {
 
 
 Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
-    if(bishops == (0ULL-1)) bishops = (color == BLACK) ? this->board.blackBishops : this->board.whiteBishops;
+    if(bishops == (CURRENT_POSITION)) bishops = (color == BLACK) ? this->board.blackBishops : this->board.whiteBishops;
 
     Bitboard allSinlgeMoves = EMPTY;
     Bitboard totalMoves = EMPTY;
@@ -227,11 +227,6 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
             }
         }
 
-        std::cout << "north west moves: " << finalNorthWestMoves << std::endl;
-        std::cout << "north east moves: " << finalNorthEastMoves << std::endl;
-        std::cout << "south west moves: " << finalSouthWestMoves << std::endl;
-        std::cout << "south east moves: " << finalSouthEastMoves << std::endl;
-
         allSinlgeMoves = finalNorthWestMoves | finalNorthEastMoves | finalSouthWestMoves | finalSouthEastMoves;
         totalMoves = (totalMoves | allSinlgeMoves);
         //erase bishop
@@ -241,7 +236,7 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
 }
 
 Bitboard MoveGeneration::generateRookMoves(Bitboard rooks, Color color) {
-    if(rooks == (0ULL-1)) rooks = this->board.blackRooks;
+    if(rooks == (CURRENT_POSITION)) rooks = (color == WHITE) ? this->board.whiteRooks : this->board.blackRooks;
 
     Bitboard allSinlgeMoves = EMPTY;
     Bitboard totalMoves = EMPTY;
@@ -331,26 +326,17 @@ Bitboard MoveGeneration::generateRookMoves(Bitboard rooks, Color color) {
 }
 
 Bitboard MoveGeneration::generateQueenMoves(Bitboard queens, Color color) {
-    if(queens == (0ULL-1)) queens = (color == BLACK) ? this->board.blackQueen : this->board.whiteQueen;
-    //std::cout << "rook moves: " << generateRookMoves(queens, color) << std::endl;
-    //std::cout << "bishop moves: " << generateBishopMoves(queens, color) << std::endl;
+    if(queens == (CURRENT_POSITION)) queens = (color == BLACK) ? this->board.blackQueen : this->board.whiteQueen;
     return (generateBishopMoves(queens, color) | generateRookMoves(queens, color));
 }
 
-Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
+Bitboard MoveGeneration::generatePawnAttacks(Bitboard pawns, Color color) {
+    if(pawns == (CURRENT_POSITION)) pawns = (color == WHITE) ? this->board.whitePawns : this->board.blackPawns;
     if(color == WHITE) {
-        //pawn pushes
-        pawns = (pawns == 0ULL-1) ? this->board.whitePawns : pawns;
-        //single push
-        Bitboard pawnSinglePushes = (pawns << NORTH) & (~board.getOccupied());
-        //double push
-        Bitboard pawnDoublePushes = ((pawns & RANK_2) << 2*NORTH) & (~board.getOccupied());
-        Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
-
         //SouthWest
-        Bitboard swAttacks = ((pawns & ~FILE_A) << NORTH_WEST) & board.getOccupiedByBlack();
+        Bitboard swAttacks = ((pawns & ~FILE_A) << NORTH_WEST); 
         //SouthEast
-        Bitboard seAttacks = ((pawns & ~ FILE_H) << NORTH_EAST) & board.getOccupiedByBlack();
+        Bitboard seAttacks = ((pawns & ~ FILE_H) << NORTH_EAST);
         //en passent
         bool enPassentPossible = false;
         Bitboard enPassentSquare = EMPTY;
@@ -365,20 +351,12 @@ Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
         
         if(enPassentPossible) attacks = attacks | enPassentSquare;
 
-        return (pushes | attacks);
+        return attacks;
     } else {
-        //pawn pushes
-        pawns = (pawns == 0ULL-1) ? this->board.blackPawns : pawns;
-        //single push
-        Bitboard pawnSinglePushes = (pawns >> SOUTH) & (~board.getOccupied());
-        //double push
-        Bitboard pawnDoublePushes = ((pawns & RANK_7) >> 2*SOUTH) & (~board.getOccupied());
-        Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
-
         //SouthWest
-        Bitboard swAttacks = ((pawns & ~FILE_A) >> SOUTH_WEST) & board.getOccupiedByWhite();
+        Bitboard swAttacks = ((pawns & ~FILE_A) >> SOUTH_WEST);
         //SouthEast
-        Bitboard seAttacks = ((pawns & ~ FILE_H) >> SOUTH_EAST) & board.getOccupiedByWhite();
+        Bitboard seAttacks = ((pawns & ~ FILE_H) >> SOUTH_EAST);
 
         //en passent
         bool enPassentPossible = false;
@@ -392,12 +370,43 @@ Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
         Bitboard attacks = swAttacks | seAttacks;
         if(enPassentPossible) attacks = attacks | enPassentSquare;
 
+        return attacks;
+    }
+}
+
+Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
+    if(pawns == (CURRENT_POSITION)) pawns = (color == WHITE) ? this->board.whitePawns : this->board.blackPawns;
+    if(color == WHITE) {
+        //pawn pushes
+        pawns = (pawns == CURRENT_POSITION) ? this->board.whitePawns : pawns;
+        //single push
+        Bitboard pawnSinglePushes = (pawns << NORTH) & (~board.getOccupied());
+        //double push
+        Bitboard pawnDoublePushes = ((pawns & RANK_2) << 2*NORTH) & (~board.getOccupied());
+        Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
+
+        Bitboard attacks = (generatePawnAttacks(pawns, color) & this->board.getOccupiedByBlack()); 
+
+        
+
+        return (pushes | attacks);
+    } else {
+        //pawn pushes
+        pawns = (pawns == CURRENT_POSITION) ? this->board.blackPawns : pawns;
+        //single push
+        Bitboard pawnSinglePushes = (pawns >> SOUTH) & (~board.getOccupied());
+        //double push
+        Bitboard pawnDoublePushes = ((pawns & RANK_7) >> 2*SOUTH) & (~board.getOccupied());
+        Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
+
+        Bitboard attacks = (generatePawnAttacks(pawns, color) & this->board.getOccupiedByWhite());
+
         return (pushes | attacks);
     }
 }
 
 Bitboard MoveGeneration::generateKnightMoves(Bitboard knights, Color color) {
-
+    if(knights == (CURRENT_POSITION)) knights = (color == WHITE) ? this->board.whiteKnights : this->board.blackKnights;
     //noNoEa
     Bitboard noNoEaAttacks = ((knights & ~(RANK_7 | RANK_8 | FILE_H)) << NORTH_NORTH_EAST);
     //noEaEa
@@ -428,6 +437,7 @@ Bitboard MoveGeneration::generateKnightMoves(Bitboard knights, Color color) {
 }
 
 Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
+    if(king == (CURRENT_POSITION)) king = (color == WHITE) ? this->board.whiteKing : this->board.blackKing;
     //north
     Bitboard northAttack = ((king & ~(RANK_8)) << NORTH);
     //west
@@ -507,4 +517,9 @@ void MoveGeneration::castleQueenSide(Color color) {
         //move rook
         this->board.whiteRooks = (((~(1ULL << 56)) & this->board.whiteRooks) | (1ULL << 59));
     }
+}
+
+Bitboard MoveGeneration::generateAttackedSquares(Color color) {
+    Bitboard attackedSquares = generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generateKingMoves(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
+    return attackedSquares;
 }

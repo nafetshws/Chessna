@@ -30,6 +30,11 @@ enum Direction {
 
 };
 
+enum Color {
+    WHITE,
+    BLACK
+};
+
 const Bitboard FILE_A = 0x101010101010101;
 const Bitboard FILE_B = 0x202020202020202;
 const Bitboard FILE_G = 0x4040404040404040;
@@ -48,9 +53,7 @@ const Bitboard BLACK_CASTLE_QUEEN_MASK= 0xe00000000000000;
 
 const std::string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-enum Color {
-    WHITE,
-    BLACK
-};
+const unsigned long long CURRENT_POSITION = 0ULL-1;
+
 
 #endif

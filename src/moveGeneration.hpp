@@ -18,8 +18,11 @@ class MoveGeneration {
         Bitboard generateQueenMoves(Bitboard queens = 0ULL-1, Color color = BLACK);
 
         Bitboard generatePawnMoves(Bitboard pawns = 0ULL-1, Color color = BLACK);
+        Bitboard generatePawnAttacks(Bitboard pawns = 0ULL-1, Color color = BLACK);
         Bitboard generateKnightMoves(Bitboard knights = 0ULL-1, Color color = BLACK);
         Bitboard generateKingMoves(Bitboard king = 0ULL-1, Color color = BLACK);
+
+        Bitboard generateAttackedSquares(Color color = BLACK);
 
         void castleKingSide(Color color);
         void castleQueenSide(Color color);
