@@ -170,6 +170,35 @@ void Board::initBoard(std::string fen){
     this->fullMoveCounter = stoi(fullMoveCounter);
 }
 
+
+void Board::castleKingSide(Color color) {
+    if(color == WHITE) {
+        //move king
+        this->whiteKing = (this->whiteKing << 2);
+        //move rook
+        this->whiteRooks -= (1ULL << 7) - (1ULL << 5);
+    } else {
+        //move king
+        this->blackKing = (this->blackKing << 2);
+        //move rook
+        this->blackRooks -= (1ULL << 63) - (1ULL << 61);
+    }
+}
+
+void Board::castleQueenSide(Color color) {
+    if(color == WHITE) {
+        //move king
+        this->whiteKing = (this->whiteKing >> 2);
+        //move rook
+        this->whiteRooks += (1ULL << 3)-1;
+    } else {
+        //move king
+        this->blackKing = (this->blackKing >> 2);
+        //move rook
+        this->blackRooks += (1ULL << 59) - (1ULL << 56);
+    }
+}
+
 void Board::printBoard(Bitboard board) {
     std::string boardAsString = std::to_string(board);
     std::cout << "Board: " << boardAsString << std::endl;

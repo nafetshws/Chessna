@@ -6,10 +6,15 @@
 
 int main(){
     Board board;
-    std::string fen = "rnbqkbnr/ppp1pppp/8/8/3pP3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq e3 0 3"; 
-    board.initBoard();
+    std::string fen = "r3k2r/pppppppp/2n1b3/3q1bn1/8/1NBQ1NP1/PPPPPPBP/R3K2R w KQkq - 0 1";
+    board.initBoard(fen);
     
     MoveGeneration moveGeneration(board);
     Bitboard moves = moveGeneration.generateAttackedSquares();
-    std::cout << "Moves: " << moves << std::endl;
+
+    std::cout << "board before: " << board.getOccupiedByWhite() << std::endl;
+    board.castleQueenSide(WHITE);
+    std::cout << "board after: " << board.getOccupiedByWhite() << std::endl;
+    
+    //std::cout << "Moves: " << moves << std::endl;
 }

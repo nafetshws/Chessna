@@ -19,6 +19,9 @@ struct Board {
     Bitboard getOccupiedByWhite();
     Bitboard getOccupiedByBlack();
 
+    void castleKingSide(Color color = BLACK);
+    void castleQueenSide(Color color = BLACK);
+
     void printBoard(Bitboard board); 
 
 };

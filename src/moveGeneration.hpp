@@ -23,9 +23,6 @@ class MoveGeneration {
         Bitboard generateKingMoves(Bitboard king = 0ULL-1, Color color = BLACK);
 
         Bitboard generateAttackedSquares(Color color = BLACK);
-
-        void castleKingSide(Color color);
-        void castleQueenSide(Color color);
        
     private:
 

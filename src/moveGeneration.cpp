@@ -491,34 +491,6 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
 }
 
 
-void MoveGeneration::castleKingSide(Color color) {
-    if(color == WHITE) {
-        //move king
-        this->board.whiteKing = (this->board.whiteKing << 2);
-        //move rook
-        this->board.whiteRooks = (((~(1ULL << 7)) & this->board.whiteRooks) | (1ULL << 5));
-    } else {
-        //move king
-        this->board.blackKing = (this->board.blackKing << 2);
-        //move rook
-        this->board.whiteRooks = (((~(1ULL << 63)) & this->board.whiteRooks) | (1ULL << 61));
-    }
-}
-
-void MoveGeneration::castleQueenSide(Color color) {
-    if(color == WHITE) {
-        //move king
-        this->board.whiteKing = (this->board.whiteKing >> 2);
-        //move rook
-        this->board.whiteRooks = (((~(1ULL)) & this->board.whiteRooks) | (1ULL << 3));
-    } else {
-        //move king
-        this->board.blackKing = (this->board.blackKing >> 2);
-        //move rook
-        this->board.whiteRooks = (((~(1ULL << 56)) & this->board.whiteRooks) | (1ULL << 59));
-    }
-}
-
 Bitboard MoveGeneration::generateAttackedSquares(Color color) {
     Bitboard attackedSquares = generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generateKingMoves(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
     return attackedSquares;
