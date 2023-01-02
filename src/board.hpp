@@ -23,6 +23,7 @@ struct Board {
     void castleQueenSide(Color color = BLACK);
 
     void printBoard(Bitboard board); 
+    void prettyPrintBoard();
 
 };
 

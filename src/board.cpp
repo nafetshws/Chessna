@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 #include "board.hpp"
 #include "types.hpp"
 
@@ -202,6 +203,43 @@ void Board::castleQueenSide(Color color) {
 void Board::printBoard(Bitboard board) {
     std::string boardAsString = std::to_string(board);
     std::cout << "Board: " << boardAsString << std::endl;
+}
+
+void Board::prettyPrintBoard() {
+    std::vector<std::vector<char>> board (8, std::vector<char>(8, '0'));
+    board[0][0] = 'b';
+
+    //convert bitboards to 2d array
+    for(int row = 0; row < 8; row++){
+        for(int col = 0; col < 8; col++) {
+            int index = row * 8 + col;
+            Bitboard b = (1ULL << index);
+
+            if(this->whitePawns & b) board[row][col] = 'P';
+            else if(this->whiteRooks & b) board[row][col] = 'R';
+            else if(this->whiteKnights & b) board[row][col] = 'N';
+            else if(this->whiteBishops & b) board[row][col] = 'B';
+            else if(this->whiteQueen & b) board[row][col] = 'Q';
+            else if(this->whiteKing & b) board[row][col] = 'K';
+
+            if(this->blackPawns & b) board[row][col] = 'p';
+            else if(this->blackRooks & b) board[row][col] = 'r';
+            else if(this->blackKnights & b) board[row][col] = 'n';
+            else if(this->blackBishops & b) board[row][col] = 'b';
+            else if(this->blackQueen & b) board[row][col] = 'q';
+            else if(this->blackKing & b) board[row][col] = 'k';
+        }
+    }
+
+    //print board
+    for(int row = 7; row >= 0; row--) {
+        std::cout << row+1 << "  ";
+        for(int col = 0; col < 8; col++) {
+            std::cout << board[row][col] << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl << "   " << "a b c d e f g h" << std::endl;
 }
 
 Bitboard Board::getOccupiedByWhite() {
