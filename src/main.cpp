@@ -6,13 +6,13 @@
 
 int main(){
     Board board;
-    std::string fen = "r3k2r/pppppppp/2n1b3/3q1bn1/8/1NBQ1NP1/PPPPPPBP/R3K2R w KQkq - 0 1";
-    board.initBoard();
+    std::string fen = "r1bqkbnr/ppp1pppp/2n5/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
+    board.initBoard(fen);
     
     MoveGeneration moveGeneration(board);
-    Bitboard moves = moveGeneration.generateAttackedSquares();
+    Bitboard moves = moveGeneration.generatePawnMoves(CURRENT_POSITION, WHITE);
 
-    //board.castleQueenSide(WHITE);
-    board.prettyPrintBoard();
+    std::cout << "Moves: " << moves << std::endl;
+
     
 }

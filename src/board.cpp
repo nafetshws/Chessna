@@ -171,14 +171,17 @@ void Board::initBoard(std::string fen){
     this->fullMoveCounter = stoi(fullMoveCounter);
 }
 
-
 void Board::castleKingSide(Color color) {
     if(color == WHITE) {
+        //check if castling is still available
+        if(this->castlingAbillity.find('K') != std::string::npos) return;
         //move king
         this->whiteKing = (this->whiteKing << 2);
         //move rook
         this->whiteRooks -= (1ULL << 7) - (1ULL << 5);
     } else {
+        //check if castling is still available
+        if(this->castlingAbillity.find('k') != std::string::npos) return;
         //move king
         this->blackKing = (this->blackKing << 2);
         //move rook
@@ -188,11 +191,15 @@ void Board::castleKingSide(Color color) {
 
 void Board::castleQueenSide(Color color) {
     if(color == WHITE) {
+        //check if castling is still available
+        if(this->castlingAbillity.find('Q') != std::string::npos) return;
         //move king
         this->whiteKing = (this->whiteKing >> 2);
         //move rook
         this->whiteRooks += (1ULL << 3)-1;
     } else {
+        //check if castling is still available
+        if(this->castlingAbillity.find('q') != std::string::npos) return;
         //move king
         this->blackKing = (this->blackKing >> 2);
         //move rook
@@ -206,6 +213,7 @@ void Board::printBoard(Bitboard board) {
 }
 
 void Board::prettyPrintBoard() {
+    //initialize 2d vector filled with char 0
     std::vector<std::vector<char>> board (8, std::vector<char>(8, '0'));
     board[0][0] = 'b';
 
