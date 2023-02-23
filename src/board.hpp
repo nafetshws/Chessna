@@ -14,6 +14,9 @@ struct Board {
     int halfMoveClock;
     int fullMoveCounter;
 
+
+    Board(std::string fen);
+    Board();
     void initBoard(std::string fen = DEFAULT_FEN);
     Bitboard getOccupied();
     Bitboard getOccupiedByWhite();

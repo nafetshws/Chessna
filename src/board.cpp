@@ -5,6 +5,13 @@
 #include "types.hpp"
 
 
+Board::Board(std::string fen) {
+    initBoard(fen);
+}
+
+Board::Board() {
+}
+
 void Board::initBoard(std::string fen){
     //initBoard();
 
