@@ -13,14 +13,16 @@ class MoveGeneration {
 
         MoveGeneration(Board board);
 
-        Bitboard generateRookMoves(Bitboard rooks = 0ULL-1, Color color = BLACK);
-        Bitboard generateBishopMoves(Bitboard bishops = 0ULL-1, Color color = BLACK);
-        Bitboard generateQueenMoves(Bitboard queens = 0ULL-1, Color color = BLACK);
+        Bitboard generateRookMoves(Bitboard rooks = CURRENT_POSITION, Color color = BLACK);
+        Bitboard generateBishopMoves(Bitboard bishops = CURRENT_POSITION, Color color = BLACK);
+        Bitboard generateQueenMoves(Bitboard queens = CURRENT_POSITION, Color color = BLACK);
 
-        Bitboard generatePawnMoves(Bitboard pawns = 0ULL-1, Color color = BLACK);
-        Bitboard generatePawnAttacks(Bitboard pawns = 0ULL-1, Color color = BLACK);
-        Bitboard generateKnightMoves(Bitboard knights = 0ULL-1, Color color = BLACK);
-        Bitboard generateKingMoves(Bitboard king = 0ULL-1, Color color = BLACK);
+        Bitboard generatePawnMoves(Bitboard pawns = CURRENT_POSITION, Color color = BLACK);
+        Bitboard generatePawnAttacks(Bitboard pawns = CURRENT_POSITION, Color color = BLACK);
+        Bitboard generateEnPassentMoves(Bitboard pawns = CURRENT_POSITION, Color color = BLACK);
+
+        Bitboard generateKnightMoves(Bitboard knights = CURRENT_POSITION, Color color = BLACK);
+        Bitboard generateKingMoves(Bitboard king = CURRENT_POSITION, Color color = BLACK);
 
         Bitboard generateAttackedSquares(Color color = BLACK);
        

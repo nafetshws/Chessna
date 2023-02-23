@@ -337,6 +337,25 @@ Bitboard MoveGeneration::generatePawnAttacks(Bitboard pawns, Color color) {
         Bitboard swAttacks = ((pawns & ~FILE_A) << NORTH_WEST); 
         //SouthEast
         Bitboard seAttacks = ((pawns & ~ FILE_H) << NORTH_EAST);
+
+        Bitboard attacks = swAttacks | seAttacks;
+        
+        return attacks;
+    } else {
+        //SouthWest
+        Bitboard swAttacks = ((pawns & ~FILE_A) >> SOUTH_WEST);
+        //SouthEast
+        Bitboard seAttacks = ((pawns & ~ FILE_H) >> SOUTH_EAST);
+
+        Bitboard attacks = swAttacks | seAttacks;
+
+        return attacks;
+    }
+}
+
+Bitboard MoveGeneration::generateEnPassentMoves(Bitboard pawns, Color color) {
+    if(pawns == (CURRENT_POSITION)) pawns = (color == WHITE) ? this->board.whitePawns : this->board.blackPawns;
+    if(color == WHITE) {
         //en passent
         bool enPassentPossible = false;
         Bitboard enPassentSquare = EMPTY;
@@ -346,18 +365,9 @@ Bitboard MoveGeneration::generatePawnAttacks(Bitboard pawns, Color color) {
                 enPassentPossible = true;
             }
         }
-
-        Bitboard attacks = swAttacks | seAttacks;
-        
-        if(enPassentPossible) attacks = attacks | enPassentSquare;
-
-        return attacks;
+        if(enPassentPossible) return enPassentSquare;
+        return 0ULL;
     } else {
-        //SouthWest
-        Bitboard swAttacks = ((pawns & ~FILE_A) >> SOUTH_WEST);
-        //SouthEast
-        Bitboard seAttacks = ((pawns & ~ FILE_H) >> SOUTH_EAST);
-
         //en passent
         bool enPassentPossible = false;
         Bitboard enPassentSquare = EMPTY;
@@ -367,10 +377,8 @@ Bitboard MoveGeneration::generatePawnAttacks(Bitboard pawns, Color color) {
                 enPassentPossible = true;
             }
         }
-        Bitboard attacks = swAttacks | seAttacks;
-        if(enPassentPossible) attacks = attacks | enPassentSquare;
-
-        return attacks;
+        if(enPassentPossible) return enPassentSquare;
+        return 0ULL;
     }
 }
 
@@ -385,9 +393,7 @@ Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
         Bitboard pawnDoublePushes = ((pawns & RANK_2) << 2*NORTH) & (~board.getOccupied());
         Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
 
-        Bitboard attacks = (generatePawnAttacks(pawns, color) & this->board.getOccupiedByBlack()); 
-
-        
+        Bitboard attacks = (generatePawnAttacks(pawns, color) & this->board.getOccupiedByBlack()) | generateEnPassentMoves(pawns, color); 
 
         return (pushes | attacks);
     } else {
@@ -399,7 +405,7 @@ Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
         Bitboard pawnDoublePushes = ((pawns & RANK_7) >> 2*SOUTH) & (~board.getOccupied());
         Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
 
-        Bitboard attacks = (generatePawnAttacks(pawns, color) & this->board.getOccupiedByWhite());
+        Bitboard attacks = (generatePawnAttacks(pawns, color) & this->board.getOccupiedByWhite()) | generateEnPassentMoves(pawns, color);
 
         return (pushes | attacks);
     }
