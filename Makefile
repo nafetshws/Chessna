@@ -1,6 +1,16 @@
+CC = g++
+
+TEST_FILES = test/test.cpp src/board.cpp src/moveGeneration.cpp
+FILES = src/main.cpp src/board.cpp src/moveGeneration.cpp 
+
+TEST_OUT = build/test.obj
+OUT = build/main.obj
+
 main:
-	g++ -o build/main.obj src/main.cpp src/board.cpp src/moveGeneration.cpp 
+	g++ -o $(OUT) $(FILES) 
 tests:
-	g++ -o build/test.obj test/test.cpp src/board.cpp src/moveGeneration.cpp
+	g++ -o $(OUT) $(TEST_FILES) 
+
+.PHONY: clean
 clean:
-	rm -rf build/main.obj build/test.obj
+	rm -rf $(OUT) $(TEST_OUT)

@@ -6,11 +6,11 @@
 
 int main(){
     Board board;
-    std::string fen = "r1bqkbnr/ppp1pppp/2n5/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
+    std::string fen = "rnbqkbnr/pppppppp/8/8/2B1P3/N2PBN2/PPP1QPPP/R3K2R w KQkq - 0 1";
     board.initBoard(fen);
     
     MoveGeneration moveGeneration(board);
-    Bitboard moves = moveGeneration.generatePawnMoves(CURRENT_POSITION, WHITE);
+    Bitboard moves = moveGeneration.generateKingMoves(CURRENT_POSITION, WHITE);
 
     std::cout << "Moves: " << moves << std::endl;
 

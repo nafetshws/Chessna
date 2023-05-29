@@ -8,6 +8,7 @@ MoveGeneration::MoveGeneration(Board board) {
     this->board = board;
 }
 
+//returns all squares that are north to the current square
 Bitboard MoveGeneration::North(Square square) {
     int rank = square / 8;
     Bitboard attacks = EMPTY;
@@ -453,6 +454,15 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     //east
     Bitboard eastAttack = ((king & ~(FILE_H)) >> EAST);
 
+    //Northeast
+    Bitboard northeastAttack = (king & ~RANK_8 & ~FILE_H) << NORTH_EAST; 
+    //Northwest
+    Bitboard northwestAttack = (king & ~RANK_8 & ~FILE_A) << NORTH_WEST;
+    //Southeast
+    Bitboard southeastAttack = (king & ~RANK_1 & ~FILE_H) >> SOUTH_EAST;
+    //Southwest
+    Bitboard southwestAttack = (king & ~RANK_1 & ~FILE_A) >> SOUTH_EAST;
+
     Bitboard castle = EMPTY;
 
     //castling
@@ -484,7 +494,7 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
         } 
     }
 
-    Bitboard attacks = northAttack | westAttack | southAttack | eastAttack | castle;
+    Bitboard attacks = (northAttack | westAttack | southAttack | eastAttack | northeastAttack | northwestAttack | southeastAttack | southwestAttack | castle); 
 
     Bitboard moves;
     if(color == BLACK) {
