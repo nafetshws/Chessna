@@ -9,7 +9,7 @@ OUT = build/main.obj
 main:
 	g++ -o $(OUT) $(FILES) 
 tests:
-	g++ -o $(OUT) $(TEST_FILES) 
+	g++ -o $(TEST_OUT) $(TEST_FILES) 
 
 .PHONY: clean
 clean:
