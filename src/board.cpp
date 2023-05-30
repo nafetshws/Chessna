@@ -10,15 +10,15 @@ Board::Board(std::string fen) {
 }
 
 Board::Board() {
+    initBoard(DEFAULT_FEN);
 }
 
 void Board::initBoard(std::string fen){
-    //initBoard();
 
     std::string delimiter = " ";
     int pos = 0;
 
-    //sepertes fen string by delimiter
+    //seperates fen string by delimiter
     //position has to be update by the length of the previous token +1 (white space)
     std::string piecePlacement = fen.substr(pos, fen.find(delimiter, pos));
     pos += piecePlacement.length()+1;

@@ -48,7 +48,6 @@ int counter = 1;
 
 //Move Generation
 
-
 void test_generateRookMoves() {
     MoveGeneration moveGeneration(Board("rnbqkb1r/ppp1p1pp/2n2p2/3p4/1R1N4/5R2/PPPPPPPP/2BQKBN1 w kq - 0 1"));
     IS_EQUAL(moveGeneration.generateRookMoves(CURRENT_POSITION, WHITE), 600480013025280);
@@ -74,7 +73,7 @@ void test_generateKnightMoves() {
 }
 void test_generateKingMoves() {
     MoveGeneration moveGeneration(Board("rnbqkbnr/pppppppp/8/8/2B1P3/N2PBN2/PPP1QPPP/R3K2R w KQkq - 0 1"));
-    IS_EQUAL(moveGeneration.generateKnightMoves(CURRENT_POSITION, WHITE), 2156);
+    IS_EQUAL(moveGeneration.generateKingMoves(CURRENT_POSITION, WHITE), 2156);
 }
 
 
