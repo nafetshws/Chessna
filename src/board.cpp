@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "board.hpp"
-#include "types.hpp"
+#include "../include/board.hpp"
+#include "../include/types.hpp"
 
 
 Board::Board(std::string fen) {

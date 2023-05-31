@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
-#include "../src/board.hpp"
-#include "../src/moveGeneration.hpp"
-#include "../src/types.hpp"
+#include "../include/board.hpp"
+#include "../include/moveGeneration.hpp"
+#include "../include/types.hpp"
 
 #define GREEN "\033[32m"
 #define RED   "\033[31m"

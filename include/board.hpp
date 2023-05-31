@@ -1,7 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "types.hpp"
+#include "../include/types.hpp"
 #include <string>
 
 struct Board {

@@ -2,9 +2,9 @@
 #define MOVE_GENERATION_H
 
 #include <iostream>
-#include "types.hpp"
-#include "board.hpp"
-#include "move.hpp"
+#include "../include/types.hpp"
+#include "../include/board.hpp"
+#include "../include/move.hpp"
 #include <vector>
 
 class MoveGeneration {

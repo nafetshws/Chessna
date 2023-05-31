@@ -1,8 +1,8 @@
 #include <vector>
-#include "moveGeneration.hpp"
-#include "board.hpp"
-#include "move.hpp"
-#include "types.hpp"
+#include "../include/moveGeneration.hpp"
+#include "../include/board.hpp"
+#include "../include/move.hpp"
+#include "../include/types.hpp"
 
 MoveGeneration::MoveGeneration(Board board) {
     this->board = board;
