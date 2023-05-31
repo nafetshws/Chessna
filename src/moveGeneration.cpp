@@ -158,6 +158,8 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
     Bitboard allSinlgeMoves = EMPTY;
     Bitboard totalMoves = EMPTY;
 
+    std::cout << "Bishops: " << bishops << std::endl;
+
     while(bishops > 0) {
         Bitboard finalNorthWestMoves = EMPTY;
         Bitboard finalNorthEastMoves = EMPTY;
@@ -168,13 +170,18 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
         int index = 63 - __builtin_clzll(bishops);
         Bitboard northWestAttacks = MoveGeneration::Northwest(index);
         if(northWestAttacks != 0ULL) {
-            Bitboard northWestBlockers = (northWestAttacks & this->board.getOccupied());
+            //LEGAL MOVE GENERATION: Remove King 
+            //Bitboard northWestBlockers = (northWestAttacks & this->board.getOccupiedWithoutWhiteKing());
+            Bitboard northWestBlockers = (color == WHITE) ? (northWestAttacks & this->board.getOccupiedWithoutBlackKing())
+                : (northWestAttacks & this->board.getOccupiedWithoutWhiteKing());
+
             if(northWestBlockers != 0ULL) {
                 //ctzll returns the number of trailing zeros
                 int northWestFirstBlockerIndex = __builtin_ctzll(northWestBlockers);
                 Bitboard blockedMoves = MoveGeneration::Northwest(northWestFirstBlockerIndex);
                 //if the first blocker is of the same color
                 if((1ULL << northWestFirstBlockerIndex) == ((1ULL << northWestFirstBlockerIndex) & (color == BLACK ? this->board.getOccupiedByBlack() : this->board.getOccupiedByWhite()))) {
+                    //add first blocker as a blocked moves (different color -> capture)
                     blockedMoves = (blockedMoves | (1ULL << northWestFirstBlockerIndex));
                 }
                 finalNorthWestMoves = (northWestAttacks ^ blockedMoves);
@@ -185,7 +192,11 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
 
         Bitboard northEastAttacks = MoveGeneration::Northeast(index);
         if(northEastAttacks!= 0ULL) {
-            Bitboard northEastBlockers = (northEastAttacks & this->board.getOccupied());
+            //Bitboard northEastBlockers = (northEastAttacks & this->board.getOccupied());
+            //LEGAL MOVE GENERATION: Remove King 
+            Bitboard northEastBlockers = (color == WHITE) ? (northEastAttacks & this->board.getOccupiedWithoutBlackKing())
+                : (northEastAttacks & this->board.getOccupiedWithoutWhiteKing());
+
             if(northEastBlockers != 0ULL) {
                 int northEastFirstBlockerIndex = __builtin_ctzll(northEastBlockers);
                 Bitboard blockedMoves = MoveGeneration::Northeast(northEastFirstBlockerIndex);
@@ -200,7 +211,11 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
 
         Bitboard southWestAttacks = MoveGeneration::Southwest(index);
         if(southWestAttacks != 0ULL) {
-            Bitboard southWestBlockers = (southWestAttacks & this->board.getOccupied());
+            //Bitboard southWestBlockers = (southWestAttacks & this->board.getOccupied());
+            //LEGAL MOVE GENERATION: Remove King 
+            Bitboard southWestBlockers = (color == WHITE) ? (southWestAttacks & this->board.getOccupiedWithoutBlackKing())
+                : (southWestAttacks & this->board.getOccupiedWithoutWhiteKing());
+
             if(southWestBlockers != 0ULL) {
                 int southWestFirstBlockerIndex = 63 -__builtin_clzll(southWestBlockers);
                 Bitboard blockedMoves = MoveGeneration::Southwest(southWestFirstBlockerIndex);
@@ -213,9 +228,15 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
             }
         }
 
+        std::cout << "sw attacks: " << southWestAttacks << std::endl;
+
         Bitboard southEastAttacks = MoveGeneration::Southeast(index);
         if(southEastAttacks!= 0ULL) {
-            Bitboard southEastBlockers = (southEastAttacks & this->board.getOccupied());
+            //Bitboard southEastBlockers = (southEastAttacks & this->board.getOccupied());
+            //LEGAL MOVE GENERATION: Remove King 
+            Bitboard southEastBlockers = (color == WHITE) ? (southEastAttacks & this->board.getOccupiedWithoutBlackKing())
+                : (southEastAttacks & this->board.getOccupiedWithoutWhiteKing());
+
             if(southEastBlockers != 0ULL) {
                 int southEastFirstBlockerIndex = 63 - __builtin_clzll(southEastBlockers);
                 Bitboard blockedMoves = MoveGeneration::Southeast(southEastFirstBlockerIndex);
@@ -253,7 +274,11 @@ Bitboard MoveGeneration::generateRookMoves(Bitboard rooks, Color color) {
         //Bitboard moves = MoveGeneration::North(index) | MoveGeneration::South(index) | MoveGeneration::East(index) | MoveGeneration::West(index);
         Bitboard northAttacks = MoveGeneration::North(index);
         if(northAttacks != 0ULL) {
-            Bitboard northBlockers = (northAttacks & this->board.getOccupied());
+            //Bitboard northBlockers = (northAttacks & this->board.getOccupied());
+            //LEGAL MOVE GENERATION: Remove King 
+            Bitboard northBlockers = (color == WHITE) ? (northAttacks & this->board.getOccupiedWithoutBlackKing())
+                : (northAttacks & this->board.getOccupiedWithoutWhiteKing());
+
             if(northBlockers != 0ULL) {
                 //ctzll returns the number of trailing zeros
                 int northFirstBlockerIndex = __builtin_ctzll(northBlockers);
@@ -270,7 +295,11 @@ Bitboard MoveGeneration::generateRookMoves(Bitboard rooks, Color color) {
 
         Bitboard southAttacks = MoveGeneration::South(index);
         if(southAttacks!= 0ULL) {
-            Bitboard southBlockers = (southAttacks & this->board.getOccupied());
+            //Bitboard southBlockers = (southAttacks & this->board.getOccupied());
+            //LEGAL MOVE GENERATION: Remove King 
+            Bitboard southBlockers = (color == WHITE) ? (southAttacks & this->board.getOccupiedWithoutBlackKing())
+                : (southAttacks & this->board.getOccupiedWithoutWhiteKing());
+
             if(southBlockers != 0ULL) {
                 //ctzll returns the number of leading zeros
                 int southFirstBlockerIndex = 63 - __builtin_clzll(southBlockers);
@@ -287,7 +316,11 @@ Bitboard MoveGeneration::generateRookMoves(Bitboard rooks, Color color) {
 
         Bitboard westAttacks = MoveGeneration::West(index);
         if(westAttacks != 0ULL) {
-            Bitboard westBlockers = (westAttacks & this->board.getOccupied());
+            //Bitboard westBlockers = (westAttacks & this->board.getOccupied());
+            //LEGAL MOVE GENERATION: Remove King 
+            Bitboard westBlockers = (color == WHITE) ? (westAttacks & this->board.getOccupiedWithoutBlackKing())
+                : (westAttacks & this->board.getOccupiedWithoutWhiteKing());
+
             if(westBlockers != 0ULL) {
                 //ctzll returns the number of trailing zeros
                 int westFirstBlockerIndex = 63 -__builtin_clzll(westBlockers);
@@ -304,7 +337,11 @@ Bitboard MoveGeneration::generateRookMoves(Bitboard rooks, Color color) {
 
         Bitboard eastAttacks = MoveGeneration::East(index);
         if(eastAttacks!= 0ULL) {
-            Bitboard eastBlockers = (eastAttacks & this->board.getOccupied());
+            //Bitboard eastBlockers = (eastAttacks & this->board.getOccupied());
+            //LEGAL MOVE GENERATION: Remove King 
+            Bitboard eastBlockers = (color == WHITE) ? (eastAttacks & this->board.getOccupiedWithoutBlackKing())
+                : (eastAttacks & this->board.getOccupiedWithoutWhiteKing());
+            
             if(eastBlockers != 0ULL) {
                 //ctzll returns the number of leading zeros
                 int eastFirstBlockerIndex = __builtin_ctzll(eastBlockers);
@@ -498,9 +535,9 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
 
     Bitboard moves;
     if(color == BLACK) {
-        moves = (attacks & ~this->board.getOccupiedByBlack());
+        moves = (attacks & ~this->board.getOccupiedByBlack()) & (~generateAttackedSquaresWithoutKing(WHITE));
     } else {
-        moves = (attacks & ~this->board.getOccupiedByWhite());
+        moves = (attacks & ~this->board.getOccupiedByWhite()) & (~generateAttackedSquaresWithoutKing(BLACK));
     }
 
     return moves;
@@ -508,6 +545,9 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
 
 
 Bitboard MoveGeneration::generateAttackedSquares(Color color) {
-    Bitboard attackedSquares = generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generateKingMoves(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
-    return attackedSquares;
+    return generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generateKingMoves(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
+}
+
+Bitboard MoveGeneration::generateAttackedSquaresWithoutKing(Color color) {
+    return generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
 }
