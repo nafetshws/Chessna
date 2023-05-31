@@ -76,6 +76,11 @@ void test_generateKingMoves() {
     IS_EQUAL(moveGeneration.generateKingMoves(CURRENT_POSITION, WHITE), 2156);
 }
 
+void test_generateAttackedSquares() {
+    MoveGeneration moveGeneration{Board()};
+    IS_EQUAL(moveGeneration.generateAttackedSquares(WHITE), 16711680);
+}
+
 
 void test_moveGeneration() {
     test_generateRookMoves(); 
@@ -86,6 +91,7 @@ void test_moveGeneration() {
 
     test_generateKnightMoves();
     test_generateKingMoves();
+    test_generateAttackedSquares();
 }
 
 void test_all() {
