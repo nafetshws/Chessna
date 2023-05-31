@@ -158,8 +158,6 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
     Bitboard allSinlgeMoves = EMPTY;
     Bitboard totalMoves = EMPTY;
 
-    std::cout << "Bishops: " << bishops << std::endl;
-
     while(bishops > 0) {
         Bitboard finalNorthWestMoves = EMPTY;
         Bitboard finalNorthEastMoves = EMPTY;
@@ -227,8 +225,6 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
                 finalSouthWestMoves = southWestAttacks;
             }
         }
-
-        std::cout << "sw attacks: " << southWestAttacks << std::endl;
 
         Bitboard southEastAttacks = MoveGeneration::Southeast(index);
         if(southEastAttacks!= 0ULL) {
@@ -480,29 +476,30 @@ Bitboard MoveGeneration::generateKnightMoves(Bitboard knights, Color color) {
     return moves;
 }
 
-Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
+Bitboard MoveGeneration::generateKingAttacks(Bitboard king, Color color) {
     if(king == (CURRENT_POSITION)) king = (color == WHITE) ? this->board.whiteKing : this->board.blackKing;
-    //north
+
     Bitboard northAttack = ((king & ~(RANK_8)) << NORTH);
-    //west
     Bitboard westAttack = ((king & ~(FILE_A)) << WEST);
-    //south
     Bitboard southAttack = ((king & ~(RANK_1)) >> SOUTH);
-    //east
     Bitboard eastAttack = ((king & ~(FILE_H)) >> EAST);
 
-    //Northeast
     Bitboard northeastAttack = (king & ~RANK_8 & ~FILE_H) << NORTH_EAST; 
-    //Northwest
     Bitboard northwestAttack = (king & ~RANK_8 & ~FILE_A) << NORTH_WEST;
-    //Southeast
     Bitboard southeastAttack = (king & ~RANK_1 & ~FILE_H) >> SOUTH_EAST;
-    //Southwest
     Bitboard southwestAttack = (king & ~RANK_1 & ~FILE_A) >> SOUTH_WEST;
 
-    Bitboard castle = EMPTY;
+    return northAttack | westAttack | southAttack | eastAttack | northeastAttack | northwestAttack | southeastAttack | southwestAttack;
+}
+
+Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
+    if(king == (CURRENT_POSITION)) king = (color == WHITE) ? this->board.whiteKing : this->board.blackKing;
+
+    Bitboard attacks = generateKingAttacks(king, color);
 
     //castling
+    Bitboard castle = EMPTY;
+
     if(color == WHITE) {
         if(this->board.castlingAbillity.find('K') != std::string::npos) {
             if((~this->board.getOccupied() & WHITE_CASTLE_KING_MASK) == WHITE_CASTLE_KING_MASK) {
@@ -531,16 +528,16 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
         } 
     }
 
-    Bitboard attacks = (northAttack | westAttack | southAttack | eastAttack | northeastAttack | northwestAttack | southeastAttack | southwestAttack | castle); 
+    Bitboard pseudoLegalMoves = attacks | castle;
 
-    Bitboard moves;
+    Bitboard legalMoves;
     if(color == BLACK) {
-        moves = (attacks & ~this->board.getOccupiedByBlack()) & (~generateAttackedSquaresWithoutKing(WHITE));
+        legalMoves = (pseudoLegalMoves & ~this->board.getOccupiedByBlack()) & (~generateAttackedSquaresWithoutKing(WHITE)) & (~generateKingAttacks(CURRENT_POSITION, WHITE));
     } else {
-        moves = (attacks & ~this->board.getOccupiedByWhite()) & (~generateAttackedSquaresWithoutKing(BLACK));
+        legalMoves = (pseudoLegalMoves & ~this->board.getOccupiedByWhite()) & (~generateAttackedSquaresWithoutKing(BLACK)) & (~generateKingAttacks(CURRENT_POSITION, BLACK));
     }
 
-    return moves;
+    return legalMoves;
 }
 
 

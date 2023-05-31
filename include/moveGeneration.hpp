@@ -22,7 +22,9 @@ class MoveGeneration {
         Bitboard generateEnPassentMoves(Bitboard pawns = CURRENT_POSITION, Color color = BLACK);
 
         Bitboard generateKnightMoves(Bitboard knights = CURRENT_POSITION, Color color = BLACK);
+
         Bitboard generateKingMoves(Bitboard king = CURRENT_POSITION, Color color = BLACK);
+        Bitboard generateKingAttacks(Bitboard king = CURRENT_POSITION, Color color = BLACK);
 
         Bitboard generateAttackedSquares(Color color = BLACK);
         Bitboard generateAttackedSquaresWithoutKing(Color color = BLACK);

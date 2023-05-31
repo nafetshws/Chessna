@@ -9,3 +9,6 @@
 
 ## Possible bugs
 Move generation: castling as attack square
+
+## TODO
+legal king moves doesn't care for other king
