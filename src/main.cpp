@@ -5,11 +5,11 @@
 #include "../include/types.hpp"
 
 int main(){
-    std::string fen = "rnbqkbnr/pppppppp/8/8/2B1P3/N2PBN2/PPP1QPPP/R3K2R w KQkq - 0 1";
+    std::string fen = "8/4k3/8/8/4R3/8/4K3/8 w - - 0 1";
     Board board(fen);
     
     MoveGeneration moveGeneration(board);
-    Bitboard moves = moveGeneration.generateKingMoves(CURRENT_POSITION, WHITE);
+    Bitboard moves = moveGeneration.generateKingMoves(CURRENT_POSITION, BLACK);
 
     std::cout << "Moves: " << moves << std::endl;
 }

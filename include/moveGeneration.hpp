@@ -25,6 +25,7 @@ class MoveGeneration {
         Bitboard generateKingMoves(Bitboard king = CURRENT_POSITION, Color color = BLACK);
 
         Bitboard generateAttackedSquares(Color color = BLACK);
+        Bitboard generateAttackedSquaresWithoutKing(Color color = BLACK);
        
     private:
 

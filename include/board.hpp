@@ -21,6 +21,8 @@ struct Board {
     Bitboard getOccupied();
     Bitboard getOccupiedByWhite();
     Bitboard getOccupiedByBlack();
+    Bitboard getOccupiedWithoutWhiteKing();
+    Bitboard getOccupiedWithoutBlackKing();
 
     void castleKingSide(Color color = BLACK);
     void castleQueenSide(Color color = BLACK);

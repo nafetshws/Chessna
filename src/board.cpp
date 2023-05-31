@@ -268,3 +268,11 @@ Bitboard Board::getOccupiedByBlack() {
 Bitboard Board::getOccupied() {
     return getOccupiedByWhite() | getOccupiedByBlack(); 
 }
+
+Bitboard Board::getOccupiedWithoutWhiteKing() {
+    return getOccupiedByBlack() | (getOccupiedByWhite() ^ whiteKing);
+}
+
+Bitboard Board::getOccupiedWithoutBlackKing() {
+    return getOccupiedByWhite() | (getOccupiedByBlack() ^ blackKing);
+}
