@@ -5,11 +5,13 @@
 #include "../include/types.hpp"
 
 int main(){
-    std::string fen = "8/4k3/8/8/4R3/8/4K3/8 w - - 0 1";
+    std::string fen = "8/4k3/8/2B3Q1/8/8/8/8 w - - 0 1";
     Board board(fen);
     
     MoveGeneration moveGeneration(board);
-    Bitboard moves = moveGeneration.generateKingMoves(CURRENT_POSITION, BLACK);
+    int inCheck = moveGeneration.isInCheck();
 
-    std::cout << "Moves: " << moves << std::endl;
+    std::cout << "is in check: " << inCheck << std::endl;
+
+    return 0;
 }

@@ -21,6 +21,7 @@ class MoveGeneration {
         Bitboard generatePawnAttacks(Bitboard pawns = CURRENT_POSITION, Color color = BLACK);
         Bitboard generateEnPassentMoves(Bitboard pawns = CURRENT_POSITION, Color color = BLACK);
 
+        Bitboard generateKnightAttacks(Bitboard knights = CURRENT_POSITION, Color color = BLACK);
         Bitboard generateKnightMoves(Bitboard knights = CURRENT_POSITION, Color color = BLACK);
 
         Bitboard generateKingMoves(Bitboard king = CURRENT_POSITION, Color color = BLACK);
@@ -28,6 +29,8 @@ class MoveGeneration {
 
         Bitboard generateAttackedSquares(Color color = BLACK);
         Bitboard generateAttackedSquaresWithoutKing(Color color = BLACK);
+
+        int isInCheck(Color color = BLACK);
        
     private:
 

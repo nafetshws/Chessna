@@ -91,6 +91,20 @@ void test_generateAttackedSquares() {
     IS_EQUAL(moveGeneration.generateAttackedSquares(WHITE), 16711680);
 }
 
+void test_isInCheck() {
+    MoveGeneration moveGeneration{Board("8/4k3/6N1/4Q3/4R3/8/4K3/8 w - - 0 1")};
+    IS_EQUAL(moveGeneration.isInCheck(BLACK), 2);
+}
+
+void test_isInCheck2() {
+    MoveGeneration moveGeneration{Board("8/4k3/8/2B3Q1/8/8/8/8 w - - 0 1")};
+    IS_EQUAL(moveGeneration.isInCheck(BLACK), 2);
+}
+
+void test_isInCheck3() {
+    MoveGeneration moveGeneration{Board("rnb1k2r/pppppppp/8/4q3/4r3/2bP1n2/PPP2PPP/RNBQKBNR w KQkq - 0 1")};
+    IS_EQUAL(moveGeneration.isInCheck(WHITE), 3);
+}
 
 
 void test_moveGeneration() {
@@ -105,6 +119,10 @@ void test_moveGeneration() {
     test_legalKingMoves();
     test_legalKingMoves2();
     test_generateAttackedSquares();
+
+    test_isInCheck();
+    test_isInCheck2();
+    test_isInCheck3();
 }
 
 void test_all() {

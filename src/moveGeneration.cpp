@@ -445,26 +445,25 @@ Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
     }
 }
 
-Bitboard MoveGeneration::generateKnightMoves(Bitboard knights, Color color) {
+Bitboard MoveGeneration::generateKnightAttacks(Bitboard knights, Color color) {
     if(knights == (CURRENT_POSITION)) knights = (color == WHITE) ? this->board.whiteKnights : this->board.blackKnights;
-    //noNoEa
+
     Bitboard noNoEaAttacks = ((knights & ~(RANK_7 | RANK_8 | FILE_H)) << NORTH_NORTH_EAST);
-    //noEaEa
     Bitboard noEaEaAttacks = ((knights & ~(RANK_8 | FILE_G | FILE_H)) << NORTH_EAST_EAST);
-    //soEaEa
     Bitboard soEaEaAttacks = ((knights & ~(RANK_1 | FILE_G | FILE_H)) >> SOUTH_EAST_EAST);
-    //soSoEa
     Bitboard soSoEaAttacks = ((knights & ~(RANK_1 | RANK_2 | FILE_H)) >> SOUTH_SOUTH_EAST);
-    //soSoWe
     Bitboard soSoWeAttacks = ((knights & ~(RANK_1 | RANK_2 | FILE_A)) >> SOUTH_SOUTH_WEST);
-    //soWeWe
     Bitboard SoWeWeAttacks = ((knights & ~(RANK_1 | FILE_A | FILE_B)) >> SOUTH_WEST_WEST);
-    //noWeWe
     Bitboard noWeWeAttacks = ((knights & ~(RANK_8 | FILE_A | FILE_B)) << NORTH_WEST_WEST);
-    //noNoWe
     Bitboard noNoWeAttacks = ((knights & ~(RANK_7 | RANK_8 | FILE_A)) << NORTH_NORTH_WEST);
 
-    Bitboard attacks = noNoEaAttacks | noEaEaAttacks | soEaEaAttacks | soSoEaAttacks | soSoWeAttacks | SoWeWeAttacks | noWeWeAttacks | noNoWeAttacks;
+    return noNoEaAttacks | noEaEaAttacks | soEaEaAttacks | soSoEaAttacks | soSoWeAttacks | SoWeWeAttacks | noWeWeAttacks | noNoWeAttacks;
+}
+
+Bitboard MoveGeneration::generateKnightMoves(Bitboard knights, Color color) {
+    if(knights == (CURRENT_POSITION)) knights = (color == WHITE) ? this->board.whiteKnights : this->board.blackKnights;
+
+    Bitboard attacks = generateKnightAttacks(knights, color);
 
     Bitboard moves;
     if(color == BLACK) {
@@ -538,6 +537,42 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     }
 
     return legalMoves;
+}
+
+int MoveGeneration::isInCheck(Color color) {
+    //return types : 0 - not in check; 1 - single check; 2 - double check
+    int check = 0;
+    if(color == WHITE) {
+        Bitboard moves = generateBishopMoves(this->board.whiteKing, WHITE);
+        if((moves & this->board.blackBishops) != 0) check++;
+        if((moves & this->board.blackQueen) != 0) check++;
+
+        moves = generateRookMoves(this->board.whiteKing, WHITE);
+        if((moves & this->board.blackRooks) != 0) check++;
+        if((moves & this->board.blackQueen) != 0) check++;
+
+        moves = generateKnightAttacks(this->board.whiteKing, WHITE);
+        if((moves & this->board.blackKnights) != 0) check++;
+
+        moves = generatePawnAttacks(this->board.whiteKing, WHITE);
+        if((moves & this->board.blackPawns) != 0) check++;
+
+    } else {
+        Bitboard moves = generateBishopMoves(this->board.blackKing, BLACK);
+        if((moves & this->board.whiteBishops) != 0) check++;
+        if((moves & this->board.whiteQueen) != 0) check++;
+
+        moves = generateRookMoves(this->board.blackKing, BLACK);
+        if((moves & this->board.whiteRooks) != 0) check++;
+        if((moves & this->board.whiteQueen) != 0) check++;
+
+        moves = generateKnightAttacks(this->board.blackKing, BLACK);
+        if((moves & this->board.whiteKnights) != 0) check++;
+
+        moves = generatePawnAttacks(this->board.blackKing, BLACK);
+        if((moves & this->board.whitePawns) != 0) check++;
+    }
+    return check;
 }
 
 
