@@ -31,6 +31,51 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             //1. move king out of check -> already in moves
             //2. capture the checking piece
             //3. block the checking piece (only rooks, bishops and queens)
+
+            //2
+            Square checkingPiecePos = check_info.pieces.at(0).pos;
+            Attack_Info a = isUnderAttack(checkingPiecePos, WHITE);
+            if(a.numberOfAttacks > 0) {
+                for(int i = 0; i < a.pieces.size(); i++) {
+                    moves.push_back(Move(a.pieces.at(i).pos, checkingPiecePos));
+                }
+            }
+
+            //3
+            PieceType checkingPieceType = check_info.pieces.at(0).type;
+            if(checkingPieceType == QUEEN || checkingPieceType == ROOK || checkingPieceType == BISHOP) { 
+                Bitboard kingAsQueenMoves = generateQueenMoves(this->board.blackKing, color);
+                //there could be multiple queens on the board -> look up pos of checking piece
+                Bitboard enemyMoves;
+                switch(checkingPieceType) {
+                    case QUEEN:
+                        enemyMoves = generateQueenMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
+                        break;
+                    case ROOK:
+                        enemyMoves = generateRookMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
+                        break;
+                    case BISHOP:
+                        enemyMoves = generateBishopMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
+                        break;
+                    default:
+                        std::cout << "Error while calculating blocking pieces" << std::endl;
+                        break;
+                }
+
+                Bitboard intersectionRay = kingAsQueenMoves & enemyMoves;
+
+                while(intersectionRay != 0) {
+                    Square destination = __builtin_ctzll(intersectionRay);
+                    Attack_Info a_info = isUnderAttack(destination, color);
+                    for(int i = 0; i < a_info.numberOfAttacks; i++) {
+                        moves.push_back(Move(a_info.pieces.at(i).pos, destination));
+                    }
+                    //remove from intersectionRay
+                    intersectionRay = (~destination) & intersectionRay;
+                }
+            }
+
+            return moves;
         }
 
         //generate knight moves
