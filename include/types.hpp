@@ -5,7 +5,7 @@
 #include <vector>
 
 typedef unsigned long long Bitboard;
-typedef char Square;
+typedef int Square;
 
 enum Color {
     WHITE,

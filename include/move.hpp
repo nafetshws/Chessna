@@ -1,3 +1,4 @@
+#include <string>
 #include "../include/types.hpp"
 
 #ifndef MOVE_H
@@ -11,6 +12,5 @@ struct Move {
     Square origin;
     Square destination;
 };
-
 
 #endif
