@@ -8,6 +8,120 @@ MoveGeneration::MoveGeneration(Board board) {
     this->board = board;
 }
 
+std::vector<Move> MoveGeneration::generateMoves(Color color) {
+    std::vector<Move> moves;
+
+    //pseudo legal
+    if(color == BLACK) {
+        //generate all king moves
+        Bitboard kingMoves = generateKingMoves(CURRENT_POSITION, color);
+        Square origin = __builtin_ctzll(this->board.blackKing);
+
+        while(kingMoves != 0) {
+            Square destination = __builtin_ctzll(kingMoves);
+            moves.push_back(Move(origin, destination));
+            //delete move from bitboard
+            kingMoves = ~(1ULL << destination) & kingMoves;
+        }
+
+        Check_Info check_info = isInCheck(color);
+
+        if(check_info.numberOfChecks >= 2) return moves;
+        else if(check_info.numberOfChecks == 1) {
+            //1. move king out of check -> already in moves
+            //2. capture the checking piece
+            //3. block the checking piece (only rooks, bishops and queens)
+        }
+
+        //generate knight moves
+        Bitboard knights = this->board.blackKnights;
+        while(knights != 0) {
+            Square origin = __builtin_ctzll(knights);
+            Bitboard knight = 1ULL << origin; 
+            Bitboard knightMoves = generateKnightMoves(CURRENT_POSITION, color);
+
+            while(knightMoves != 0) {
+                Square destination = __builtin_ctzll(knightMoves);
+                moves.push_back(Move(origin, destination));
+                //delete move from bitboard
+                knightMoves = ~(1ULL << destination) & knightMoves;
+            }
+            //remove  from knights
+            knights = (~knight) & knightMoves;
+        }
+
+        //generate rook moves
+        Bitboard rooks = this->board.blackRooks;
+        while(rooks != 0) {
+            Square origin = __builtin_ctzll(rooks);
+            Bitboard rook = 1ULL << origin; 
+            Bitboard rookMoves = generateRookMoves(CURRENT_POSITION, color);
+
+            while(rookMoves != 0) {
+                Square destination = __builtin_ctzll(rookMoves);
+                moves.push_back(Move(origin, destination));
+                //delete move from bitboard
+                rookMoves = ~(1ULL << destination) & rookMoves;
+            }
+            //remove rook from
+            rooks = (~rook) & rookMoves;
+        }
+
+        //generate bishop moves
+        Bitboard bishops = this->board.blackBishops;
+        while(bishops != 0) {
+            Square origin = __builtin_ctzll(bishops);
+            Bitboard bishop = 1ULL << origin; 
+            Bitboard bishopMoves = generateBishopMoves(CURRENT_POSITION, color);
+
+            while(bishopMoves != 0) {
+                Square destination = __builtin_ctzll(bishopMoves);
+                moves.push_back(Move(origin, destination));
+                //delete move from bitboard
+                bishopMoves = ~(1ULL << destination) & bishopMoves;
+            }
+            //remove bishop from
+            bishops = (~bishop) & bishopMoves;
+        }
+
+        //generate queen moves
+        Bitboard queens = this->board.blackQueen;
+        while(queens != 0) {
+            Square origin = __builtin_ctzll(queens);
+            Bitboard queen = 1ULL << origin; 
+            Bitboard queenMoves = generateQueenMoves(CURRENT_POSITION, color);
+
+            while(queenMoves != 0) {
+                Square destination = __builtin_ctzll(queenMoves);
+                moves.push_back(Move(origin, destination));
+                //delete move from bitboard
+                queenMoves = ~(1ULL << destination) & queenMoves;
+            }
+            //remove queen from
+            queens = (~queen) & queenMoves;
+        }
+
+        Bitboard pawns = this->board.blackPawns;
+        while(pawns != 0) {
+            Square origin = __builtin_ctzll(pawns);
+            Bitboard pawn = 1ULL << origin; 
+            Bitboard pawnMoves = generatePawnMoves(CURRENT_POSITION, color);
+
+            while(pawnMoves != 0) {
+                Square destination = __builtin_ctzll(pawnMoves);
+                moves.push_back(Move(origin, destination));
+                //delete move from bitboard
+                pawnMoves = ~(1ULL << destination) & pawnMoves;
+            }
+            //remove pawn from
+            pawns = (~pawn) & pawnMoves;
+        }
+
+        
+    }
+    return moves;
+}
+
 //returns all squares that are north to the current square
 Bitboard MoveGeneration::North(Square square) {
     int rank = square / 8;
@@ -539,40 +653,60 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     return legalMoves;
 }
 
-int MoveGeneration::isInCheck(Color color) {
-    //return types : 0 - not in check; 1 - single check; 2 - double check
-    int check = 0;
+Attack_Info MoveGeneration::isUnderAttack(Square square, Color color) {
+    Bitboard squareAsBitboard = 1ULL << square;
+    int numberOfAttacks = 0;
+    Attack_Info attack_info; 
+
     if(color == WHITE) {
-        Bitboard moves = generateBishopMoves(this->board.whiteKing, WHITE);
-        if((moves & this->board.blackBishops) != 0) check++;
-        if((moves & this->board.blackQueen) != 0) check++;
+        Bitboard moves = generateBishopMoves(squareAsBitboard, color);
+        Bitboard intersect = moves & this->board.blackBishops;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), BISHOP, color));}
+        intersect = moves & this->board.blackQueen;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
 
-        moves = generateRookMoves(this->board.whiteKing, WHITE);
-        if((moves & this->board.blackRooks) != 0) check++;
-        if((moves & this->board.blackQueen) != 0) check++;
+        moves = generateRookMoves(squareAsBitboard, color);
+        intersect = moves & this->board.blackRooks;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), ROOK, color));}
+        intersect = moves & this->board.blackQueen;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
 
-        moves = generateKnightAttacks(this->board.whiteKing, WHITE);
-        if((moves & this->board.blackKnights) != 0) check++;
+        moves = generateKnightAttacks(squareAsBitboard, color);
+        intersect = moves & this->board.blackKnights;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), KNIGHT, color));}
 
-        moves = generatePawnAttacks(this->board.whiteKing, WHITE);
-        if((moves & this->board.blackPawns) != 0) check++;
-
+        moves = generatePawnAttacks(squareAsBitboard, color);
+        intersect = moves & this->board.blackPawns;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), PAWN, color));}
     } else {
-        Bitboard moves = generateBishopMoves(this->board.blackKing, BLACK);
-        if((moves & this->board.whiteBishops) != 0) check++;
-        if((moves & this->board.whiteQueen) != 0) check++;
+        Bitboard moves = generateBishopMoves(squareAsBitboard, color);
+        Bitboard intersect = moves & this->board.whiteBishops;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), BISHOP, color));}
+        intersect = moves & this->board.whiteQueen;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
 
-        moves = generateRookMoves(this->board.blackKing, BLACK);
-        if((moves & this->board.whiteRooks) != 0) check++;
-        if((moves & this->board.whiteQueen) != 0) check++;
+        moves = generateRookMoves(squareAsBitboard, color);
+        intersect = moves & this->board.whiteRooks;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), ROOK, color));}
+        intersect = moves & this->board.whiteQueen;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
 
-        moves = generateKnightAttacks(this->board.blackKing, BLACK);
-        if((moves & this->board.whiteKnights) != 0) check++;
+        moves = generateKnightAttacks(squareAsBitboard, color);
+        intersect = moves & this->board.whiteKnights;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), KNIGHT, color));}
 
-        moves = generatePawnAttacks(this->board.blackKing, BLACK);
-        if((moves & this->board.whitePawns) != 0) check++;
+        moves = generatePawnAttacks(squareAsBitboard, color);
+        intersect = moves & this->board.whitePawns;
+        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), PAWN, color));}
     }
-    return check;
+
+    attack_info.numberOfAttacks = numberOfAttacks;
+    return attack_info;
+
+}
+
+Check_Info MoveGeneration::isInCheck(Color color) {
+    return Check_Info(isUnderAttack(__builtin_ctzll(( (color == WHITE) ? this->board.whiteKing : this->board.blackKing)), color));
 }
 
 

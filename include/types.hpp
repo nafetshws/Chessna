@@ -2,9 +2,53 @@
 #define TYPES_H
 
 #include <string>
+#include <vector>
 
 typedef unsigned long long Bitboard;
-typedef int Square;
+typedef char Square;
+
+enum Color {
+    WHITE,
+    BLACK
+};
+
+enum PieceType {
+    PAWN,
+    ROOK,
+    KNIGHT,
+    BISHOP,
+    QUEEN,
+    KING
+};
+
+struct Piece {
+    Square pos;
+    PieceType type;
+    Color color;
+
+    Piece(Square _pos, PieceType _type, Color _color) : pos(_pos),type(_type),color(_color) {}
+};
+
+struct Attack_Info {
+    int numberOfAttacks;
+    std::vector<Piece> pieces;
+
+    Attack_Info() : numberOfAttacks(0), pieces() {}
+    Attack_Info(int _numberOfAttacks, std::vector<Piece> _pieces) : numberOfAttacks(_numberOfAttacks),pieces(_pieces) {}
+};
+
+struct Check_Info {
+    int numberOfChecks;
+    std::vector<Piece> pieces;
+
+    Check_Info() : numberOfChecks(0), pieces() {}
+    Check_Info(int _numberOfChecks, std::vector<Piece> _pieces) : numberOfChecks(_numberOfChecks),pieces(_pieces) {}
+
+    Check_Info(Attack_Info a_info) {
+        numberOfChecks = a_info.numberOfAttacks;
+        pieces = a_info.pieces; 
+    }
+};
 
 enum Direction {
     NORTH = 8,
@@ -28,11 +72,6 @@ enum Direction {
     NORTH_WEST_WEST = 6,
     NORTH_NORTH_WEST = 15
 
-};
-
-enum Color {
-    WHITE,
-    BLACK
 };
 
 const Bitboard FILE_A = 0x101010101010101;

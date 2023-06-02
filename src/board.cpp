@@ -4,7 +4,6 @@
 #include "../include/board.hpp"
 #include "../include/types.hpp"
 
-
 Board::Board(std::string fen) {
     initBoard(fen);
 }

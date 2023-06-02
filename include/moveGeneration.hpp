@@ -13,6 +13,8 @@ class MoveGeneration {
 
         MoveGeneration(Board board);
 
+        std::vector<Move> generateMoves(Color color = BLACK);
+
         Bitboard generateRookMoves(Bitboard rooks = CURRENT_POSITION, Color color = BLACK);
         Bitboard generateBishopMoves(Bitboard bishops = CURRENT_POSITION, Color color = BLACK);
         Bitboard generateQueenMoves(Bitboard queens = CURRENT_POSITION, Color color = BLACK);
@@ -30,7 +32,8 @@ class MoveGeneration {
         Bitboard generateAttackedSquares(Color color = BLACK);
         Bitboard generateAttackedSquaresWithoutKing(Color color = BLACK);
 
-        int isInCheck(Color color = BLACK);
+        Check_Info isInCheck(Color color = BLACK);
+        Attack_Info isUnderAttack(Square square, Color color = BLACK);
        
     private:
 
