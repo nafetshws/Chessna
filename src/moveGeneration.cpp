@@ -3,6 +3,7 @@
 #include "../include/board.hpp"
 #include "../include/move.hpp"
 #include "../include/types.hpp"
+#include "../include/functions.hpp"
 
 MoveGeneration::MoveGeneration(Board board) {
     this->board = board;
@@ -11,159 +12,159 @@ MoveGeneration::MoveGeneration(Board board) {
 std::vector<Move> MoveGeneration::generateMoves(Color color) {
     std::vector<Move> moves;
 
-    //pseudo legal
-    if(color == BLACK) {
-        //generate all king moves
-        Bitboard kingMoves = generateKingMoves(CURRENT_POSITION, color);
-        Square origin = __builtin_ctzll(this->board.blackKing);
+    //TODO
+    //en passent check evasion
 
-        while(kingMoves != 0) {
-            Square destination = __builtin_ctzll(kingMoves);
+    //pseudo legal
+    //generate all king moves
+    Bitboard kingMoves = generateKingMoves(CURRENT_POSITION, color);
+    Square origin = __builtin_ctzll(this->board.getKing(color));
+
+    while(kingMoves != 0) {
+        Square destination = __builtin_ctzll(kingMoves);
+        moves.push_back(Move(origin, destination));
+        //delete move from bitboard
+        kingMoves = ~(1ULL << destination) & kingMoves;
+    }
+
+    Check_Info check_info = isInCheck(color);
+
+    if(check_info.numberOfChecks >= 2) return moves;
+    else if(check_info.numberOfChecks == 1) {
+        //1. move king out of check -> already in moves
+        //2. capture the checking piece
+        //3. block the checking piece (only rooks, bishops and queens)
+
+        //2
+        Square checkingPiecePos = check_info.pieces.at(0).pos;
+        Attack_Info a = isUnderAttack(checkingPiecePos, WHITE);
+        if(a.numberOfAttacks > 0) {
+            for(int i = 0; i < a.pieces.size(); i++) {
+                moves.push_back(Move(a.pieces.at(i).pos, checkingPiecePos));
+            }
+        }
+
+        //3
+        PieceType checkingPieceType = check_info.pieces.at(0).type;
+        if(checkingPieceType == QUEEN || checkingPieceType == ROOK || checkingPieceType == BISHOP) { 
+            Bitboard kingAsQueenMoves = generateQueenMoves(this->board.getKing(color), color);
+            //there could be multiple queens on the board -> look up pos of checking piece
+            Bitboard enemyMoves;
+            switch(checkingPieceType) {
+                case QUEEN:
+                    enemyMoves = generateQueenMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
+                    break;
+                case ROOK:
+                    enemyMoves = generateRookMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
+                    break;
+                case BISHOP:
+                    enemyMoves = generateBishopMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
+                    break;
+                default:
+                    std::cout << "Error while calculating blocking pieces" << std::endl;
+                    break;
+            }
+
+            Bitboard intersectionRay = kingAsQueenMoves & enemyMoves;
+
+            while(intersectionRay != 0) {
+                Square destination = __builtin_ctzll(intersectionRay);
+                Attack_Info a_info = isUnderAttack(destination, color);
+                for(int i = 0; i < a_info.numberOfAttacks; i++) {
+                    moves.push_back(Move(a_info.pieces.at(i).pos, destination));
+                }
+                //remove from intersectionRay
+                intersectionRay = (~destination) & intersectionRay;
+            }
+        }
+
+        return moves;
+    }
+
+    //generate knight moves
+    Bitboard knights = this->board.getKnights(color);
+    while(knights != 0) {
+        Square origin = __builtin_ctzll(knights);
+        Bitboard knight = 1ULL << origin; 
+        Bitboard knightMoves = generateKnightMoves(CURRENT_POSITION, color);
+
+        while(knightMoves != 0) {
+            Square destination = __builtin_ctzll(knightMoves);
             moves.push_back(Move(origin, destination));
             //delete move from bitboard
-            kingMoves = ~(1ULL << destination) & kingMoves;
+            knightMoves = ~(1ULL << destination) & knightMoves;
         }
-
-        Check_Info check_info = isInCheck(color);
-
-        if(check_info.numberOfChecks >= 2) return moves;
-        else if(check_info.numberOfChecks == 1) {
-            //1. move king out of check -> already in moves
-            //2. capture the checking piece
-            //3. block the checking piece (only rooks, bishops and queens)
-
-            //2
-            Square checkingPiecePos = check_info.pieces.at(0).pos;
-            Attack_Info a = isUnderAttack(checkingPiecePos, WHITE);
-            if(a.numberOfAttacks > 0) {
-                for(int i = 0; i < a.pieces.size(); i++) {
-                    moves.push_back(Move(a.pieces.at(i).pos, checkingPiecePos));
-                }
-            }
-
-            //3
-            PieceType checkingPieceType = check_info.pieces.at(0).type;
-            if(checkingPieceType == QUEEN || checkingPieceType == ROOK || checkingPieceType == BISHOP) { 
-                Bitboard kingAsQueenMoves = generateQueenMoves(this->board.blackKing, color);
-                //there could be multiple queens on the board -> look up pos of checking piece
-                Bitboard enemyMoves;
-                switch(checkingPieceType) {
-                    case QUEEN:
-                        enemyMoves = generateQueenMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
-                        break;
-                    case ROOK:
-                        enemyMoves = generateRookMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
-                        break;
-                    case BISHOP:
-                        enemyMoves = generateBishopMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
-                        break;
-                    default:
-                        std::cout << "Error while calculating blocking pieces" << std::endl;
-                        break;
-                }
-
-                Bitboard intersectionRay = kingAsQueenMoves & enemyMoves;
-
-                while(intersectionRay != 0) {
-                    Square destination = __builtin_ctzll(intersectionRay);
-                    Attack_Info a_info = isUnderAttack(destination, color);
-                    for(int i = 0; i < a_info.numberOfAttacks; i++) {
-                        moves.push_back(Move(a_info.pieces.at(i).pos, destination));
-                    }
-                    //remove from intersectionRay
-                    intersectionRay = (~destination) & intersectionRay;
-                }
-            }
-
-            return moves;
-        }
-
-        //generate knight moves
-        Bitboard knights = this->board.blackKnights;
-        while(knights != 0) {
-            Square origin = __builtin_ctzll(knights);
-            Bitboard knight = 1ULL << origin; 
-            Bitboard knightMoves = generateKnightMoves(CURRENT_POSITION, color);
-
-            while(knightMoves != 0) {
-                Square destination = __builtin_ctzll(knightMoves);
-                moves.push_back(Move(origin, destination));
-                //delete move from bitboard
-                knightMoves = ~(1ULL << destination) & knightMoves;
-            }
-            //remove  from knights
-            knights = (~knight) & knightMoves;
-        }
-
-        //generate rook moves
-        Bitboard rooks = this->board.blackRooks;
-        while(rooks != 0) {
-            Square origin = __builtin_ctzll(rooks);
-            Bitboard rook = 1ULL << origin; 
-            Bitboard rookMoves = generateRookMoves(CURRENT_POSITION, color);
-
-            while(rookMoves != 0) {
-                Square destination = __builtin_ctzll(rookMoves);
-                moves.push_back(Move(origin, destination));
-                //delete move from bitboard
-                rookMoves = ~(1ULL << destination) & rookMoves;
-            }
-            //remove rook from
-            rooks = (~rook) & rookMoves;
-        }
-
-        //generate bishop moves
-        Bitboard bishops = this->board.blackBishops;
-        while(bishops != 0) {
-            Square origin = __builtin_ctzll(bishops);
-            Bitboard bishop = 1ULL << origin; 
-            Bitboard bishopMoves = generateBishopMoves(CURRENT_POSITION, color);
-
-            while(bishopMoves != 0) {
-                Square destination = __builtin_ctzll(bishopMoves);
-                moves.push_back(Move(origin, destination));
-                //delete move from bitboard
-                bishopMoves = ~(1ULL << destination) & bishopMoves;
-            }
-            //remove bishop from
-            bishops = (~bishop) & bishopMoves;
-        }
-
-        //generate queen moves
-        Bitboard queens = this->board.blackQueen;
-        while(queens != 0) {
-            Square origin = __builtin_ctzll(queens);
-            Bitboard queen = 1ULL << origin; 
-            Bitboard queenMoves = generateQueenMoves(CURRENT_POSITION, color);
-
-            while(queenMoves != 0) {
-                Square destination = __builtin_ctzll(queenMoves);
-                moves.push_back(Move(origin, destination));
-                //delete move from bitboard
-                queenMoves = ~(1ULL << destination) & queenMoves;
-            }
-            //remove queen from
-            queens = (~queen) & queenMoves;
-        }
-
-        Bitboard pawns = this->board.blackPawns;
-        while(pawns != 0) {
-            Square origin = __builtin_ctzll(pawns);
-            Bitboard pawn = 1ULL << origin; 
-            Bitboard pawnMoves = generatePawnMoves(CURRENT_POSITION, color);
-
-            while(pawnMoves != 0) {
-                Square destination = __builtin_ctzll(pawnMoves);
-                moves.push_back(Move(origin, destination));
-                //delete move from bitboard
-                pawnMoves = ~(1ULL << destination) & pawnMoves;
-            }
-            //remove pawn from
-            pawns = (~pawn) & pawnMoves;
-        }
-
-        
+        //remove  from knights
+        knights = (~knight) & knightMoves;
     }
+
+    //generate rook moves
+    Bitboard rooks = this->board.getRooks(color);
+    while(rooks != 0) {
+        Square origin = __builtin_ctzll(rooks);
+        Bitboard rook = 1ULL << origin; 
+        Bitboard rookMoves = generateRookMoves(CURRENT_POSITION, color);
+
+        while(rookMoves != 0) {
+            Square destination = __builtin_ctzll(rookMoves);
+            moves.push_back(Move(origin, destination));
+            //delete move from bitboard
+            rookMoves = ~(1ULL << destination) & rookMoves;
+        }
+        //remove rook from
+        rooks = (~rook) & rookMoves;
+    }
+
+    //generate bishop moves
+    Bitboard bishops = this->board.getBishops(color);
+    while(bishops != 0) {
+        Square origin = __builtin_ctzll(bishops);
+        Bitboard bishop = 1ULL << origin; 
+        Bitboard bishopMoves = generateBishopMoves(CURRENT_POSITION, color);
+
+        while(bishopMoves != 0) {
+            Square destination = __builtin_ctzll(bishopMoves);
+            moves.push_back(Move(origin, destination));
+            //delete move from bitboard
+            bishopMoves = ~(1ULL << destination) & bishopMoves;
+        }
+        //remove bishop from
+        bishops = (~bishop) & bishopMoves;
+    }
+
+    //generate queen moves
+    Bitboard queens = this->board.getQueens(color);
+    while(queens != 0) {
+        Square origin = __builtin_ctzll(queens);
+        Bitboard queen = 1ULL << origin; 
+        Bitboard queenMoves = generateQueenMoves(CURRENT_POSITION, color);
+
+        while(queenMoves != 0) {
+            Square destination = __builtin_ctzll(queenMoves);
+            moves.push_back(Move(origin, destination));
+            //delete move from bitboard
+            queenMoves = ~(1ULL << destination) & queenMoves;
+        }
+        //remove queen from
+        queens = (~queen) & queenMoves;
+    }
+
+    Bitboard pawns = this->board.getPawns(color);
+    while(pawns != 0) {
+        Square origin = __builtin_ctzll(pawns);
+        Bitboard pawn = 1ULL << origin; 
+        Bitboard pawnMoves = generatePawnMoves(CURRENT_POSITION, color);
+
+        while(pawnMoves != 0) {
+            Square destination = __builtin_ctzll(pawnMoves);
+            moves.push_back(Move(origin, destination));
+            //delete move from bitboard
+            pawnMoves = ~(1ULL << destination) & pawnMoves;
+        }
+        //remove pawn from
+        pawns = (~pawn) & pawnMoves;
+    }
+        
     return moves;
 }
 
@@ -312,7 +313,7 @@ Bitboard MoveGeneration::East(Square square) {
 
 
 Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
-    if(bishops == (CURRENT_POSITION)) bishops = (color == BLACK) ? this->board.blackBishops : this->board.whiteBishops;
+    if(bishops == (CURRENT_POSITION)) bishops = this->board.getBishops(color); 
 
     Bitboard allSinlgeMoves = EMPTY;
     Bitboard totalMoves = EMPTY;
@@ -413,7 +414,7 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
 }
 
 Bitboard MoveGeneration::generateRookMoves(Bitboard rooks, Color color) {
-    if(rooks == (CURRENT_POSITION)) rooks = (color == WHITE) ? this->board.whiteRooks : this->board.blackRooks;
+    if(rooks == (CURRENT_POSITION)) rooks = this->board.getRooks(color); 
 
     Bitboard allSinlgeMoves = EMPTY;
     Bitboard totalMoves = EMPTY;
@@ -519,12 +520,12 @@ Bitboard MoveGeneration::generateRookMoves(Bitboard rooks, Color color) {
 }
 
 Bitboard MoveGeneration::generateQueenMoves(Bitboard queens, Color color) {
-    if(queens == (CURRENT_POSITION)) queens = (color == BLACK) ? this->board.blackQueen : this->board.whiteQueen;
+    if(queens == (CURRENT_POSITION)) queens = this->board.getQueens(color); 
     return (generateBishopMoves(queens, color) | generateRookMoves(queens, color));
 }
 
 Bitboard MoveGeneration::generatePawnAttacks(Bitboard pawns, Color color) {
-    if(pawns == (CURRENT_POSITION)) pawns = (color == WHITE) ? this->board.whitePawns : this->board.blackPawns;
+    if(pawns == (CURRENT_POSITION)) pawns = this->board.getPawns(color); 
     if(color == WHITE) {
         //SouthWest
         Bitboard swAttacks = ((pawns & ~FILE_A) << NORTH_WEST); 
@@ -547,7 +548,7 @@ Bitboard MoveGeneration::generatePawnAttacks(Bitboard pawns, Color color) {
 }
 
 Bitboard MoveGeneration::generateEnPassentMoves(Bitboard pawns, Color color) {
-    if(pawns == (CURRENT_POSITION)) pawns = (color == WHITE) ? this->board.whitePawns : this->board.blackPawns;
+    if(pawns == (CURRENT_POSITION)) pawns = this->board.getPawns(color) ;
     if(color == WHITE) {
         //en passent
         bool enPassentPossible = false;
@@ -576,7 +577,7 @@ Bitboard MoveGeneration::generateEnPassentMoves(Bitboard pawns, Color color) {
 }
 
 Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
-    if(pawns == (CURRENT_POSITION)) pawns = (color == WHITE) ? this->board.whitePawns : this->board.blackPawns;
+    if(pawns == (CURRENT_POSITION)) pawns = this->board.getPawns(color); 
     if(color == WHITE) {
         //pawn pushes
         pawns = (pawns == CURRENT_POSITION) ? this->board.whitePawns : pawns;
@@ -620,7 +621,7 @@ Bitboard MoveGeneration::generateKnightAttacks(Bitboard knights, Color color) {
 }
 
 Bitboard MoveGeneration::generateKnightMoves(Bitboard knights, Color color) {
-    if(knights == (CURRENT_POSITION)) knights = (color == WHITE) ? this->board.whiteKnights : this->board.blackKnights;
+    if(knights == (CURRENT_POSITION)) knights = this->board.getKnights(color); 
 
     Bitboard attacks = generateKnightAttacks(knights, color);
 
@@ -635,7 +636,7 @@ Bitboard MoveGeneration::generateKnightMoves(Bitboard knights, Color color) {
 }
 
 Bitboard MoveGeneration::generateKingAttacks(Bitboard king, Color color) {
-    if(king == (CURRENT_POSITION)) king = (color == WHITE) ? this->board.whiteKing : this->board.blackKing;
+    if(king == (CURRENT_POSITION)) king = this->board.getKing(color); 
 
     Bitboard northAttack = ((king & ~(RANK_8)) << NORTH);
     Bitboard westAttack = ((king & ~(FILE_A)) << WEST);
@@ -651,7 +652,7 @@ Bitboard MoveGeneration::generateKingAttacks(Bitboard king, Color color) {
 }
 
 Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
-    if(king == (CURRENT_POSITION)) king = (color == WHITE) ? this->board.whiteKing : this->board.blackKing;
+    if(king == (CURRENT_POSITION)) king = this->board.getKing(color); 
 
     Bitboard attacks = generateKingAttacks(king, color);
 
@@ -703,55 +704,32 @@ Attack_Info MoveGeneration::isUnderAttack(Square square, Color color) {
     int numberOfAttacks = 0;
     Attack_Info attack_info; 
 
-    if(color == WHITE) {
-        Bitboard moves = generateBishopMoves(squareAsBitboard, color);
-        Bitboard intersect = moves & this->board.blackBishops;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), BISHOP, color));}
-        intersect = moves & this->board.blackQueen;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
+    Bitboard moves = generateBishopMoves(squareAsBitboard, color);
+    Bitboard intersect = moves & this->board.getBishops(getOppositeColor(color));
+    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), BISHOP, color));}
+    intersect = moves & this->board.getQueens(getOppositeColor(color));
+    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
 
-        moves = generateRookMoves(squareAsBitboard, color);
-        intersect = moves & this->board.blackRooks;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), ROOK, color));}
-        intersect = moves & this->board.blackQueen;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
+    moves = generateRookMoves(squareAsBitboard, color);
+    intersect = moves & this->board.getRooks(getOppositeColor(color));
+    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), ROOK, color));}
+    intersect = moves & this->board.getQueens(getOppositeColor(color));
+    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
 
-        moves = generateKnightAttacks(squareAsBitboard, color);
-        intersect = moves & this->board.blackKnights;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), KNIGHT, color));}
+    moves = generateKnightAttacks(squareAsBitboard, color);
+    intersect = moves & this->board.getKnights(getOppositeColor(color));
+    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), KNIGHT, color));}
 
-        moves = generatePawnAttacks(squareAsBitboard, color);
-        intersect = moves & this->board.blackPawns;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), PAWN, color));}
-    } else {
-        Bitboard moves = generateBishopMoves(squareAsBitboard, color);
-        Bitboard intersect = moves & this->board.whiteBishops;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), BISHOP, color));}
-        intersect = moves & this->board.whiteQueen;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
-
-        moves = generateRookMoves(squareAsBitboard, color);
-        intersect = moves & this->board.whiteRooks;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), ROOK, color));}
-        intersect = moves & this->board.whiteQueen;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
-
-        moves = generateKnightAttacks(squareAsBitboard, color);
-        intersect = moves & this->board.whiteKnights;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), KNIGHT, color));}
-
-        moves = generatePawnAttacks(squareAsBitboard, color);
-        intersect = moves & this->board.whitePawns;
-        if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), PAWN, color));}
-    }
+    moves = generatePawnAttacks(squareAsBitboard, color);
+    intersect = moves & this->board.getPawns(getOppositeColor(color));
+    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), PAWN, color));}
 
     attack_info.numberOfAttacks = numberOfAttacks;
     return attack_info;
-
 }
 
 Check_Info MoveGeneration::isInCheck(Color color) {
-    return Check_Info(isUnderAttack(__builtin_ctzll(( (color == WHITE) ? this->board.whiteKing : this->board.blackKing)), color));
+    return Check_Info(isUnderAttack(__builtin_ctzll(this->board.getKing(color)), color));
 }
 
 

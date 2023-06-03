@@ -5,5 +5,6 @@
 #include "types.hpp"
 
 std::string convertSquareToCoordinate(Square square); 
+Color getOppositeColor(Color color);
 
 #endif

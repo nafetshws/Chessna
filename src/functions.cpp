@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include "../include/functions.hpp"
+#include "../include/types.hpp"
 
 std::string convertSquareToCoordinate(Square square) {
     int file = square % 8; //0-7
@@ -37,4 +38,9 @@ std::string convertSquareToCoordinate(Square square) {
     }
     coordinate += std::to_string(row+1);
     return coordinate;
+}
+
+Color getOppositeColor(Color color) {
+    if(color == WHITE) return BLACK;
+    return WHITE;
 }

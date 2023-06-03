@@ -30,6 +30,14 @@ struct Board {
     void printBoard(Bitboard board); 
     void prettyPrintBoard();
 
+    Bitboard getPawns(Color color);
+    Bitboard getRooks(Color color);
+    Bitboard getKnights(Color color);
+    Bitboard getBishops(Color color);
+    Bitboard getQueens(Color color);
+    Bitboard getKing(Color color);
 };
+
+
 
 #endif

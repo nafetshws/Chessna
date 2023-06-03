@@ -256,6 +256,26 @@ void Board::prettyPrintBoard() {
     std::cout << std::endl << "   " << "a b c d e f g h" << std::endl;
 }
 
+Bitboard Board::getPawns(Color color) {
+    return (color == WHITE) ? this->whitePawns : this->blackPawns;
+}
+Bitboard Board::getRooks(Color color) {
+    return (color == WHITE) ? this->whiteRooks : this->blackRooks;
+}
+Bitboard Board::getKnights(Color color) {
+    return (color == WHITE) ? this->whiteKnights : this->blackKnights;
+}
+
+Bitboard Board::getBishops(Color color) {
+    return (color == WHITE) ? this->whiteBishops : this->blackBishops;
+}
+Bitboard Board::getQueens(Color color) {
+    return (color == WHITE) ? this->whiteQueen : this->blackQueen;
+}
+Bitboard Board::getKing(Color color) {
+    return (color == WHITE) ? this->whiteKing : this->blackKing;
+}
+
 Bitboard Board::getOccupiedByWhite() {
     return whitePawns | whiteRooks | whiteKnights | whiteBishops | whiteQueen | whiteKing;
 }

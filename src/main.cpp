@@ -14,8 +14,7 @@ int main(){
     std::vector<Move> moves = moveGeneration.generateMoves();
 
     std::cout << convertSquareToCoordinate(moves.at(0).origin) << std::endl;
-
-    std::cout << "number of moves: " << moves.size() << std::endl;
+    std::cout << convertSquareToCoordinate(moves.at(0).destination) << std::endl;
 
     return 0;
 }
