@@ -1,7 +1,6 @@
 #include <vector>
 #include "../include/moveGeneration.hpp"
 #include "../include/board.hpp"
-#include "../include/move.hpp"
 #include "../include/types.hpp"
 #include "../include/functions.hpp"
 
@@ -11,7 +10,6 @@ MoveGeneration::MoveGeneration(Board board) {
 
 std::vector<Move> MoveGeneration::generateMoves(Color color) {
     std::vector<Move> moves;
-
     //TODO
     //en passent check evasion
 
@@ -37,7 +35,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         //2
         Square checkingPiecePos = check_info.pieces.at(0).pos;
-        Attack_Info a = isUnderAttack(checkingPiecePos, WHITE);
+        Attack_Info a = isUnderAttack(checkingPiecePos, getOppositeColor(color));
         if(a.numberOfAttacks > 0) {
             for(int i = 0; i < a.pieces.size(); i++) {
                 moves.push_back(Move(a.pieces.at(i).pos, checkingPiecePos));
@@ -47,34 +45,39 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
         //3
         PieceType checkingPieceType = check_info.pieces.at(0).type;
         if(checkingPieceType == QUEEN || checkingPieceType == ROOK || checkingPieceType == BISHOP) { 
-            Bitboard kingAsQueenMoves = generateQueenMoves(this->board.getKing(color), color);
+            Bitboard kingAsSlidingPieceMoves; 
             //there could be multiple queens on the board -> look up pos of checking piece
             Bitboard enemyMoves;
             switch(checkingPieceType) {
                 case QUEEN:
-                    enemyMoves = generateQueenMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
+                    enemyMoves = generateQueenMoves(1ULL << check_info.pieces.at(0).pos, getOppositeColor(color));
+                    kingAsSlidingPieceMoves = generateQueenMoves(this->board.getKing(color), color);
                     break;
                 case ROOK:
-                    enemyMoves = generateRookMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
+                    enemyMoves = generateRookMoves(1ULL << check_info.pieces.at(0).pos, getOppositeColor(color));
+                    kingAsSlidingPieceMoves = generateRookMoves(this->board.getKing(color), color);
                     break;
                 case BISHOP:
-                    enemyMoves = generateBishopMoves(1ULL << check_info.pieces.at(0).pos, WHITE);
+                    enemyMoves = generateBishopMoves(1ULL << check_info.pieces.at(0).pos, getOppositeColor(color));
+                    kingAsSlidingPieceMoves = generateBishopMoves(this->board.getKing(color), color);
                     break;
                 default:
                     std::cout << "Error while calculating blocking pieces" << std::endl;
                     break;
             }
 
-            Bitboard intersectionRay = kingAsQueenMoves & enemyMoves;
+            Bitboard intersectionRay = kingAsSlidingPieceMoves & enemyMoves;
 
             while(intersectionRay != 0) {
                 Square destination = __builtin_ctzll(intersectionRay);
-                Attack_Info a_info = isUnderAttack(destination, color);
+                Attack_Info a_info = isUnderAttack(destination, getOppositeColor(color));
                 for(int i = 0; i < a_info.numberOfAttacks; i++) {
+                    //prevent diagonal pawn moves without enemy piece to capture
+                    if(a_info.pieces.at(i).type == PAWN && (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) == 0) continue;
                     moves.push_back(Move(a_info.pieces.at(i).pos, destination));
                 }
                 //remove from intersectionRay
-                intersectionRay = (~destination) & intersectionRay;
+                intersectionRay = ~(1ULL << destination) & intersectionRay;
             }
         }
 
@@ -659,32 +662,21 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     //castling
     Bitboard castle = EMPTY;
 
-    if(color == WHITE) {
-        if(this->board.castlingAbillity.find('K') != std::string::npos) {
-            if((~this->board.getOccupied() & WHITE_CASTLE_KING_MASK) == WHITE_CASTLE_KING_MASK) {
-                //castleKingSide(color);
-                castle = castle | (this->board.whiteKing << 2);
-            }
-        } 
-        if(this->board.castlingAbillity.find('Q') != std::string::npos) {
-            if((~this->board.getOccupied() & WHITE_CASTLE_QUEEN_MASK) == WHITE_CASTLE_QUEEN_MASK) {
-                //castleQueenSide(color);
-                castle = castle | (this->board.whiteKing >> 2);
-            }
-        } 
-    } else {
-        if(this->board.castlingAbillity.find('k') != std::string::npos) {
-            if((~this->board.getOccupied() & BLACK_CASTLE_KING_MASK) == BLACK_CASTLE_KING_MASK) {
-                //castleKingSide(color);
-                castle = castle | (this->board.whiteKing << 2);
-            }
-        } 
-        if(this->board.castlingAbillity.find('q') != std::string::npos) {
-            if((~this->board.getOccupied() & BLACK_CASTLE_QUEEN_MASK) == BLACK_CASTLE_QUEEN_MASK) {
-                //castleQueenSide(color);
-                castle = castle | (this->board.whiteKing >> 2);
-            }
-        } 
+    if(isInCheck(color).numberOfChecks == 0) {
+        //king castle ability
+        if(isUnderAttack(this->board.getKing(color) << 1, color).numberOfAttacks == 0
+        && isUnderAttack(this->board.getKing(color) << 2, color).numberOfAttacks == 0) {
+            if(this->board.getKingSideCastleAbility(color)) {
+               castle = castle | (this->board.getKing(color) << 2); 
+            }        
+        }
+
+        if(isUnderAttack(this->board.getKing(color) >> 1, color).numberOfAttacks == 0
+        && isUnderAttack(this->board.getKing(color) >> 2, color).numberOfAttacks == 0) {
+            if(this->board.getQueenSideCastleAbility(color)) {
+               castle = castle | (this->board.getKing(color) >> 2); 
+            }        
+        }
     }
 
     Bitboard pseudoLegalMoves = attacks | castle;
@@ -701,6 +693,10 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
 
 Attack_Info MoveGeneration::isUnderAttack(Square square, Color color) {
     Bitboard squareAsBitboard = 1ULL << square;
+    return isUnderAttack(squareAsBitboard, color);
+}
+
+Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color) {
     int numberOfAttacks = 0;
     Attack_Info attack_info; 
 

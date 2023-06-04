@@ -4,7 +4,6 @@
 #include <iostream>
 #include "../include/types.hpp"
 #include "../include/board.hpp"
-#include "../include/move.hpp"
 #include <vector>
 
 class MoveGeneration {
@@ -34,6 +33,7 @@ class MoveGeneration {
 
         Check_Info isInCheck(Color color = BLACK);
         Attack_Info isUnderAttack(Square square, Color color = BLACK);
+        Attack_Info isUnderAttack(Bitboard squareAsBitboard, Color color = BLACK); 
        
     private:
 

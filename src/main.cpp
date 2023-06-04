@@ -7,14 +7,16 @@
 #include "../include/functions.hpp"
 
 int main(){
-    std::string fen = "8/4k3/8/2B3Q1/8/8/8/8 w - - 0 1";
-    Board board(DEFAULT_FEN);
+    std::string fen = "r1b1k2r/ppp2ppp/3p4/4Q3/8/3P4/PPP2PPP/RNBQKBNR w KQkq - 0 1";
+    Board board(fen);
     
     MoveGeneration moveGeneration(board);
-    std::vector<Move> moves = moveGeneration.generateMoves();
+    std::vector<Move> moves = moveGeneration.generateMoves(BLACK);
 
-    std::cout << convertSquareToCoordinate(moves.at(0).origin) << std::endl;
-    std::cout << convertSquareToCoordinate(moves.at(0).destination) << std::endl;
+    std::cout << "moves: " << moves.size() << std::endl;
+
+    printMoves(moves);
+
 
     return 0;
 }

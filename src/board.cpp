@@ -177,6 +177,21 @@ void Board::initBoard(std::string fen){
     this->fullMoveCounter = stoi(fullMoveCounter);
 }
 
+bool Board::getKingSideCastleAbility(Color color) {
+    if(color == WHITE) {
+        return this->castlingAbillity.find('K') != std::string::npos;
+    } else {
+        return this->castlingAbillity.find('k') != std::string::npos;
+    }
+}
+bool Board::getQueenSideCastleAbility(Color color) {
+    if(color == WHITE) {
+        return this->castlingAbillity.find('Q') != std::string::npos;
+    } else {
+        return this->castlingAbillity.find('q') != std::string::npos;
+    }
+}
+
 void Board::castleKingSide(Color color) {
     if(color == WHITE) {
         //check if castling is still available
@@ -282,6 +297,14 @@ Bitboard Board::getOccupiedByWhite() {
 
 Bitboard Board::getOccupiedByBlack() {
     return blackPawns | blackRooks | blackKnights | blackBishops | blackQueen | blackKing;
+}
+
+Bitboard Board::getOccupiedBy(Color color) {
+    if(color == BLACK) {
+        return getOccupiedByBlack();
+    } else {
+        return getOccupiedByWhite();
+    }
 }
 
 Bitboard Board::getOccupied() {

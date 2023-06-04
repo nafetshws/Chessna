@@ -106,6 +106,33 @@ void test_isInCheck3() {
     IS_EQUAL(moveGeneration.isInCheck(WHITE).numberOfChecks, 3);
 }
 
+void test_moveGenerationInDoubleCheck() {
+    MoveGeneration moveGeneration{Board("8/4k3/6N1/4Q3/4R3/8/4K3/8 w - - 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 3);
+}
+
+void test_moveGenerationInDoubleCheck2() {
+    MoveGeneration moveGeneration{Board("rnb1k2r/pppppppp/8/4q3/4r3/2bP1n2/PPP2PPP/RNBQKBNR w KQkq - 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 0);
+}
+
+void test_moveGenerationInSinlgeCheck() {
+    MoveGeneration moveGeneration{Board("rnb1k2r/pppppppp/8/8/8/2bP4/PPP2PPP/RNBQKBNR w KQkq - 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 6);
+}
+
+void test_moveGenerationInSinlgeCheck2() {
+    MoveGeneration moveGeneration{Board("r1b1k2r/pppppppp/8/8/8/3P1n2/PPP2PPP/RNBQKBNR w KQkq - 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 4);
+}
+
+void test_moveGenerationInSinlgeCheck3() {
+    MoveGeneration moveGeneration{Board("r1b1k2r/pppppppp/8/8/8/3P4/PPPp1PPP/RNBQKBNR w KQkq - 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 5);
+}
+
+
+
 
 void test_moveGeneration() {
     test_generateRookMoves(); 
@@ -123,6 +150,13 @@ void test_moveGeneration() {
     test_isInCheck();
     test_isInCheck2();
     test_isInCheck3();
+
+    test_moveGenerationInDoubleCheck();
+    test_moveGenerationInDoubleCheck2();
+
+    test_moveGenerationInSinlgeCheck();
+    test_moveGenerationInSinlgeCheck2();
+    test_moveGenerationInSinlgeCheck3();
 }
 
 void test_all() {

@@ -3,6 +3,7 @@
 #include "../include/functions.hpp"
 #include "../include/types.hpp"
 
+
 std::string convertSquareToCoordinate(Square square) {
     int file = square % 8; //0-7
     int row = square / 8; //0-7
@@ -43,4 +44,16 @@ std::string convertSquareToCoordinate(Square square) {
 Color getOppositeColor(Color color) {
     if(color == WHITE) return BLACK;
     return WHITE;
+}
+
+void printMoves(std::vector<Move> moves, int max){
+    int i = 0;
+    while(i < moves.size() && i < max) {
+        std::cout << convertSquareToCoordinate(moves.at(i).origin) << convertSquareToCoordinate(moves.at(i).destination) << std::endl;
+        i++;
+    }
+}
+
+Bitboard squareToBitboard(Square square) {
+    return 1ULL << square;
 }
