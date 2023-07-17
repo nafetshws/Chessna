@@ -7,13 +7,12 @@
 #include "../include/functions.hpp"
 
 int main(){
-    std::string fen = "r1b1k2r/ppp2ppp/3p4/4Q3/8/3P4/PPP2PPP/RNBQKBNR w KQkq - 0 1";
+    //std::string fen = "8/8/8/2k5/3Pp3/8/8/3K4 b - d3 0 1";
+    std::string fen = "3k4/8/2pp1p2/1P1BN1N1/8/2P2P2/8/3K4 w - - 0 1";
     Board board(fen);
     
     MoveGeneration moveGeneration(board);
     std::vector<Move> moves = moveGeneration.generateMoves(BLACK);
-
-    std::cout << "moves: " << moves.size() << std::endl;
 
     printMoves(moves);
 

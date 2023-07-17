@@ -104,7 +104,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     while(knights != 0) {
         Square origin = __builtin_ctzll(knights);
         Bitboard knight = 1ULL << origin; 
-        Bitboard knightMoves = generateKnightMoves(CURRENT_POSITION, color);
+        Bitboard knightMoves = generateKnightMoves(knight, color);
 
         while(knightMoves != 0) {
             Square destination = __builtin_ctzll(knightMoves);
@@ -113,7 +113,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             knightMoves = ~(1ULL << destination) & knightMoves;
         }
         //remove  from knights
-        knights = (~knight) & knightMoves;
+        knights = (~knight) & knights;
     }
 
     //generate rook moves
@@ -121,7 +121,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     while(rooks != 0) {
         Square origin = __builtin_ctzll(rooks);
         Bitboard rook = 1ULL << origin; 
-        Bitboard rookMoves = generateRookMoves(CURRENT_POSITION, color);
+        Bitboard rookMoves = generateRookMoves(rook, color);
 
         while(rookMoves != 0) {
             Square destination = __builtin_ctzll(rookMoves);
@@ -130,7 +130,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             rookMoves = ~(1ULL << destination) & rookMoves;
         }
         //remove rook from
-        rooks = (~rook) & rookMoves;
+        rooks = (~rook) & rooks;
     }
 
     //generate bishop moves
@@ -138,7 +138,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     while(bishops != 0) {
         Square origin = __builtin_ctzll(bishops);
         Bitboard bishop = 1ULL << origin; 
-        Bitboard bishopMoves = generateBishopMoves(CURRENT_POSITION, color);
+        Bitboard bishopMoves = generateBishopMoves(bishop, color);
 
         while(bishopMoves != 0) {
             Square destination = __builtin_ctzll(bishopMoves);
@@ -147,7 +147,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             bishopMoves = ~(1ULL << destination) & bishopMoves;
         }
         //remove bishop from
-        bishops = (~bishop) & bishopMoves;
+        bishops = (~bishop) & bishop;
     }
 
     //generate queen moves
@@ -155,7 +155,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     while(queens != 0) {
         Square origin = __builtin_ctzll(queens);
         Bitboard queen = 1ULL << origin; 
-        Bitboard queenMoves = generateQueenMoves(CURRENT_POSITION, color);
+        Bitboard queenMoves = generateQueenMoves(queen, color);
 
         while(queenMoves != 0) {
             Square destination = __builtin_ctzll(queenMoves);
@@ -164,14 +164,14 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             queenMoves = ~(1ULL << destination) & queenMoves;
         }
         //remove queen from
-        queens = (~queen) & queenMoves;
+        queens = (~queen) & queens;
     }
 
     Bitboard pawns = this->board.getPawns(color);
     while(pawns != 0) {
         Square origin = __builtin_ctzll(pawns);
         Bitboard pawn = 1ULL << origin; 
-        Bitboard pawnMoves = generatePawnMoves(CURRENT_POSITION, color);
+        Bitboard pawnMoves = generatePawnMoves(pawn, color);
 
         while(pawnMoves != 0) {
             Square destination = __builtin_ctzll(pawnMoves);
@@ -179,8 +179,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             //delete move from bitboard
             pawnMoves = ~(1ULL << destination) & pawnMoves;
         }
-        //remove pawn from
-        pawns = (~pawn) & pawnMoves;
+        //remove pawn from bitboard
+        pawns = (~pawn) & pawns;
     }
         
     return moves;
