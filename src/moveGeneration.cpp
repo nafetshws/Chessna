@@ -13,11 +13,11 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     //TODO
     //en passent check evasion
 
-    //pseudo legal
     //generate all king moves
     Bitboard kingMoves = generateKingMoves(CURRENT_POSITION, color);
     Square origin = __builtin_ctzll(this->board.getKing(color));
 
+    //transform moves from bitboard into a vector
     while(kingMoves != 0) {
         Square destination = __builtin_ctzll(kingMoves);
         moves.push_back(Move(origin, destination));
@@ -25,17 +25,25 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
         kingMoves = ~(1ULL << destination) & kingMoves;
     }
 
+    /*
+    * Generate moves when <<color>> is in check
+    */
     Check_Info check_info = isInCheck(color);
 
+    //if the king is in double check he has to move
     if(check_info.numberOfChecks >= 2) return moves;
+
     else if(check_info.numberOfChecks == 1) {
+        //Possiblites to react when in check:
         //1. move king out of check -> already in moves
         //2. capture the checking piece
         //3. block the checking piece (only rooks, bishops and queens)
 
         //2
         Square checkingPiecePos = check_info.pieces.at(0).pos;
+        //find every move that captures the checking piece
         Attack_Info a = isUnderAttack(checkingPiecePos, getOppositeColor(color));
+        //add those moves to the vector
         if(a.numberOfAttacks > 0) {
             for(int i = 0; i < a.pieces.size(); i++) {
                 moves.push_back(Move(a.pieces.at(i).pos, checkingPiecePos));
@@ -44,6 +52,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         //3
         PieceType checkingPieceType = check_info.pieces.at(0).type;
+        //only rooks, bishops and queens can be blocked
         if(checkingPieceType == QUEEN || checkingPieceType == ROOK || checkingPieceType == BISHOP) { 
             Bitboard kingAsSlidingPieceMoves; 
             //there could be multiple queens on the board -> look up pos of checking piece
@@ -66,8 +75,10 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     break;
             }
 
+            //the intersection of the enemy pieces moves and the king as the sliding piece move mark the squares that can block the enemy piece
             Bitboard intersectionRay = kingAsSlidingPieceMoves & enemyMoves;
 
+            //transform bitboard of squares to block the attacker into moves by the attacked player
             while(intersectionRay != 0) {
                 Square destination = __builtin_ctzll(intersectionRay);
                 Attack_Info a_info = isUnderAttack(destination, getOppositeColor(color));
@@ -83,6 +94,10 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         return moves;
     }
+
+    /*
+    * Generate mvoes if the king isn't in check
+    */
 
     //generate knight moves
     Bitboard knights = this->board.getKnights(color);

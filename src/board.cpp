@@ -235,7 +235,7 @@ void Board::printBoard(Bitboard board) {
 
 void Board::prettyPrintBoard() {
     //initialize 2d vector filled with char 0
-    std::vector<std::vector<char>> board (8, std::vector<char>(8, '0'));
+    std::vector< std::vector<char> > board (8, std::vector<char>(8, '0'));
     board[0][0] = 'b';
 
     //convert bitboards to 2d array

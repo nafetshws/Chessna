@@ -6,10 +6,15 @@ FILES = src/main.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp
 TEST_OUT = build/test.obj
 OUT = build/main.obj
 
+CC_FLAGS = -std=c++11
+
+BUILD_DIR = ./build
+
 main:
-	g++ -o $(OUT) $(FILES) 
+	[ -d $(BUILD_DIR) ] || mkdir -p $(BUILD_DIR)
+	g++ -o $(OUT) $(FILES) $(CC_FLAGS) 
 tests:
-	g++ -o $(TEST_OUT) $(TEST_FILES) 
+	g++ -o $(TEST_OUT) $(TEST_FILES) $(CC_FLAGS)
 
 .PHONY: clean
 clean:
