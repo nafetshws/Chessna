@@ -12,6 +12,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     std::vector<Move> moves;
     //TODO
     //en passent check evasion
+    //move types are not accurate!!
 
     //generate all king moves
     Bitboard kingMoves = generateKingMoves(CURRENT_POSITION, color);
@@ -20,7 +21,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     //transform moves from bitboard into a vector
     while(kingMoves != 0) {
         Square destination = __builtin_ctzll(kingMoves);
-        moves.push_back(Move(origin, destination));
+        moves.push_back(Move(origin, destination, PieceType::KING, color, MoveType::QUIET));
         //delete move from bitboard
         kingMoves = ~(1ULL << destination) & kingMoves;
     }
@@ -40,18 +41,14 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
         //3. block the checking piece (only rooks, bishops and queens)
 
         //2
-        Square checkingPiecePos = check_info.pieces.at(0).pos;
+        Square checkingPiecePos = check_info.moves.at(0).origin;
         //find every move that captures the checking piece
-        Attack_Info a = isUnderAttack(checkingPiecePos, getOppositeColor(color));
+        Attack_Info a = isUnderAttack((Square)checkingPiecePos, getOppositeColor(color));
         //add those moves to the vector
-        if(a.numberOfAttacks > 0) {
-            for(int i = 0; i < a.pieces.size(); i++) {
-                moves.push_back(Move(a.pieces.at(i).pos, checkingPiecePos));
-            }
-        }
+        moves.insert(moves.end(), a.moves.begin(), a.moves.end());
 
         //3
-        PieceType checkingPieceType = check_info.pieces.at(0).type;
+        PieceType checkingPieceType = check_info.moves.at(0).pieceType;
         //only rooks, bishops and queens can be blocked
         if(checkingPieceType == QUEEN || checkingPieceType == ROOK || checkingPieceType == BISHOP) { 
             Bitboard kingAsSlidingPieceMoves; 
@@ -59,15 +56,15 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             Bitboard enemyMoves;
             switch(checkingPieceType) {
                 case QUEEN:
-                    enemyMoves = generateQueenMoves(1ULL << check_info.pieces.at(0).pos, getOppositeColor(color));
+                    enemyMoves = generateQueenMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
                     kingAsSlidingPieceMoves = generateQueenMoves(this->board.getKing(color), color);
                     break;
                 case ROOK:
-                    enemyMoves = generateRookMoves(1ULL << check_info.pieces.at(0).pos, getOppositeColor(color));
+                    enemyMoves = generateRookMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
                     kingAsSlidingPieceMoves = generateRookMoves(this->board.getKing(color), color);
                     break;
                 case BISHOP:
-                    enemyMoves = generateBishopMoves(1ULL << check_info.pieces.at(0).pos, getOppositeColor(color));
+                    enemyMoves = generateBishopMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
                     kingAsSlidingPieceMoves = generateBishopMoves(this->board.getKing(color), color);
                     break;
                 default:
@@ -82,11 +79,12 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             while(intersectionRay != 0) {
                 Square destination = __builtin_ctzll(intersectionRay);
                 Attack_Info a_info = isUnderAttack(destination, getOppositeColor(color));
-                for(int i = 0; i < a_info.numberOfAttacks; i++) {
-                    //prevent diagonal pawn moves without enemy piece to capture
-                    if(a_info.pieces.at(i).type == PAWN && (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) == 0) continue;
-                    moves.push_back(Move(a_info.pieces.at(i).pos, destination));
-                }
+                moves.insert(moves.end(), a_info.moves.begin(), a_info.moves.end());
+                //for(int i = 0; i < a_info.numberOfAttacks; i++) {
+                //    //prevent diagonal pawn moves without enemy piece to capture
+                //    if(a_info.moves.at(i).pieceType == PAWN && (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) == 0) continue;
+                //    moves.push_back(Move(a_info.pieces.at(i).pos, destination));
+                //}
                 //remove from intersectionRay
                 intersectionRay = ~(1ULL << destination) & intersectionRay;
             }
@@ -108,7 +106,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(knightMoves != 0) {
             Square destination = __builtin_ctzll(knightMoves);
-            moves.push_back(Move(origin, destination));
+            moves.push_back(Move(origin, destination, PieceType::KNIGHT, color, MoveType::QUIET));
             //delete move from bitboard
             knightMoves = ~(1ULL << destination) & knightMoves;
         }
@@ -125,7 +123,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(rookMoves != 0) {
             Square destination = __builtin_ctzll(rookMoves);
-            moves.push_back(Move(origin, destination));
+            moves.push_back(Move(origin, destination, PieceType::ROOK, color, MoveType::QUIET));
             //delete move from bitboard
             rookMoves = ~(1ULL << destination) & rookMoves;
         }
@@ -142,7 +140,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(bishopMoves != 0) {
             Square destination = __builtin_ctzll(bishopMoves);
-            moves.push_back(Move(origin, destination));
+            moves.push_back(Move(origin, destination, PieceType::BISHOP, color, MoveType::QUIET));
             //delete move from bitboard
             bishopMoves = ~(1ULL << destination) & bishopMoves;
         }
@@ -159,7 +157,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(queenMoves != 0) {
             Square destination = __builtin_ctzll(queenMoves);
-            moves.push_back(Move(origin, destination));
+            moves.push_back(Move(origin, destination, PieceType::QUEEN, color, MoveType::QUIET));
             //delete move from bitboard
             queenMoves = ~(1ULL << destination) & queenMoves;
         }
@@ -167,6 +165,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
         queens = (~queen) & queens;
     }
 
+    //generate pawn moves
     Bitboard pawns = this->board.getPawns(color);
     while(pawns != 0) {
         Square origin = __builtin_ctzll(pawns);
@@ -175,7 +174,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(pawnMoves != 0) {
             Square destination = __builtin_ctzll(pawnMoves);
-            moves.push_back(Move(origin, destination));
+            moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::PAWN_PUSH));
             //delete move from bitboard
             pawnMoves = ~(1ULL << destination) & pawnMoves;
         }
@@ -585,7 +584,7 @@ Bitboard MoveGeneration::generateEnPassentMoves(Bitboard pawns, Color color) {
         Bitboard enPassentSquare = EMPTY;
         if(this->board.enPassentTargetSquare != -1) {
             enPassentSquare = (1ULL << this->board.enPassentTargetSquare);
-            if(((((pawns & ~FILE_A) >> SOUTH_WEST) | ((pawns & ~ FILE_H) >> SOUTH_EAST)) & enPassentSquare) == enPassentSquare) {
+            if(((((pawns & (~FILE_A)) >> SOUTH_WEST) | ((pawns & (~FILE_H)) >> SOUTH_EAST)) & enPassentSquare) == enPassentSquare) {
                 enPassentPossible = true;
             }
         }
@@ -659,7 +658,7 @@ Bitboard MoveGeneration::generateKingAttacks(Bitboard king, Color color) {
     Bitboard northAttack = ((king & ~(RANK_8)) << NORTH);
     Bitboard westAttack = ((king & ~(FILE_A)) << WEST);
     Bitboard southAttack = ((king & ~(RANK_1)) >> SOUTH);
-    Bitboard eastAttack = ((king & ~(FILE_H)) >> EAST);
+    Bitboard eastAttack = ((king & ~(FILE_H)) << EAST);
 
     Bitboard northeastAttack = (king & ~RANK_8 & ~FILE_H) << NORTH_EAST; 
     Bitboard northwestAttack = (king & ~RANK_8 & ~FILE_A) << NORTH_WEST;
@@ -673,6 +672,7 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     if(king == (CURRENT_POSITION)) king = this->board.getKing(color); 
 
     Bitboard attacks = generateKingAttacks(king, color);
+    std::cout << "king attacks: " << attacks << std::endl;
 
     //castling
     Bitboard castle = EMPTY;
@@ -715,26 +715,55 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
     int numberOfAttacks = 0;
     Attack_Info attack_info; 
 
+    //add bishop and diagonal queen moves
     Bitboard moves = generateBishopMoves(squareAsBitboard, color);
     Bitboard intersect = moves & this->board.getBishops(getOppositeColor(color));
-    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), BISHOP, color));}
-    intersect = moves & this->board.getQueens(getOppositeColor(color));
-    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::BISHOP, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
+    intersect = moves & this->board.getQueens(getOppositeColor(color));
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::QUEEN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
+
+    //add rook and horizontal/vertical queen moves
     moves = generateRookMoves(squareAsBitboard, color);
     intersect = moves & this->board.getRooks(getOppositeColor(color));
-    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), ROOK, color));}
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::ROOK, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
+
     intersect = moves & this->board.getQueens(getOppositeColor(color));
-    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), QUEEN, color));}
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::QUEEN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
-    moves = generateKnightAttacks(squareAsBitboard, color);
+    //add knight moves
+    moves = generateKnightMoves(squareAsBitboard, color);
     intersect = moves & this->board.getKnights(getOppositeColor(color));
-    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), KNIGHT, color));}
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::KNIGHT, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
+    //add pawn moves
     moves = generatePawnAttacks(squareAsBitboard, color);
     intersect = moves & this->board.getPawns(getOppositeColor(color));
-    if(intersect != 0) {numberOfAttacks++; attack_info.pieces.push_back(Piece(__builtin_ctzll(intersect), PAWN, color));}
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::PAWN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
+    //add en passent moves
+    Bitboard pawns = this->board.getPawns(getOppositeColor(color));
+    while(pawns != 0){
+        Square pawn = __builtin_ctzll(pawns);
+        Bitboard moves = generateEnPassentMoves(squareToBitboard(pawn), getOppositeColor(color));
+        if(color == WHITE && moves != 0){
+            //en passent square is moved up one row and compared with attacked square
+            if((moves << Direction::NORTH) == squareAsBitboard){
+                //piece can be captured by en passent
+                Move move(pawn, (Square)__builtin_ctzll(moves), PieceType::PAWN, color, MoveType::EN_PASSENT_CAPTURE);
+                numberOfAttacks++;
+                attack_info.moves.push_back(move);
+            }
+        } else if(color == BLACK && moves != 0){
+            //en passent square is moved down one row and compared with attacked square
+            if((moves >> Direction::SOUTH) == squareAsBitboard) {
+                Move move(pawn, (Square)__builtin_ctzll(moves), PieceType::PAWN, color, MoveType::EN_PASSENT_CAPTURE);
+                numberOfAttacks++;
+                attack_info.moves.push_back(move);
+            }
+        }
+        pawns = (~squareToBitboard(pawn)) & pawns;
+    }
     attack_info.numberOfAttacks = numberOfAttacks;
     return attack_info;
 }

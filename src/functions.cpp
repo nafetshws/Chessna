@@ -57,3 +57,26 @@ void printMoves(std::vector<Move> moves, int max){
 Bitboard squareToBitboard(Square square) {
     return 1ULL << square;
 }
+
+std::vector<Square> convertBitboardToSquares(Bitboard bitboard) {
+    std::vector<Square> squares;
+    while(bitboard != 0){
+        Square index = __builtin_ctzll(bitboard);
+        squares.push_back(index);
+        //remove index from bitboard
+        bitboard = (~squareToBitboard(index)) & bitboard;
+    }
+    return squares;
+}
+
+void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType pieceType, Color color, MoveType moveType, int &numberOfAttacks, Attack_Info &attack_info){
+    if(intersect != 0) {
+        std::vector<Square> origins = convertBitboardToSquares(intersect);
+        for(int i = 0; i < origins.size(); i++) {
+            Move move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, moveType);
+            numberOfAttacks++;
+            attack_info.moves.push_back(move);
+        }
+    }
+}
+

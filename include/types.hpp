@@ -21,6 +21,16 @@ enum PieceType {
     KING
 };
 
+enum MoveType {
+    QUIET,
+    PROMOTION,
+    CAPTURE,
+    EN_PASSENT_CAPTURE,
+    PAWN_PUSH,
+    NULL_MOVE,
+    CASTLING
+};
+
 struct Piece {
     Square pos;
     PieceType type;
@@ -29,32 +39,35 @@ struct Piece {
     Piece(Square _pos, PieceType _type, Color _color) : pos(_pos),type(_type),color(_color) {}
 };
 
+struct Move {
+    Move(Square _origin, Square _destination, PieceType _pieceType, Color _color, MoveType _moveType) : origin(_origin), destination(_destination), pieceType(_pieceType), color(_color), moveType(_moveType) {}
+
+    Square origin;
+    Square destination;
+    PieceType pieceType;
+    Color color;
+    MoveType moveType;
+};
+
 struct Attack_Info {
     int numberOfAttacks;
-    std::vector<Piece> pieces;
+    std::vector<Move> moves;
 
-    Attack_Info() : numberOfAttacks(0), pieces() {}
-    Attack_Info(int _numberOfAttacks, std::vector<Piece> _pieces) : numberOfAttacks(_numberOfAttacks),pieces(_pieces) {}
+    Attack_Info() : numberOfAttacks(0), moves() {}
+    Attack_Info(int _numberOfAttacks, std::vector<Move> _moves) : numberOfAttacks(_numberOfAttacks), moves(_moves) {}
 };
 
 struct Check_Info {
     int numberOfChecks;
-    std::vector<Piece> pieces;
+    std::vector<Move> moves;
 
-    Check_Info() : numberOfChecks(0), pieces() {}
-    Check_Info(int _numberOfChecks, std::vector<Piece> _pieces) : numberOfChecks(_numberOfChecks),pieces(_pieces) {}
+    Check_Info() : numberOfChecks(0), moves() {}
+    Check_Info(int _numberOfChecks, std::vector<Move> _moves) : numberOfChecks(_numberOfChecks), moves(_moves) {}
 
     Check_Info(Attack_Info a_info) {
         numberOfChecks = a_info.numberOfAttacks;
-        pieces = a_info.pieces; 
+        moves = a_info.moves;
     }
-};
-
-struct Move {
-    Move(Square _origin, Square _destination) : origin(_origin), destination(_destination) {}
-
-    Square origin;
-    Square destination;
 };
 
 enum Direction {
