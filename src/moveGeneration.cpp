@@ -656,9 +656,11 @@ Bitboard MoveGeneration::generateKingAttacks(Bitboard king, Color color) {
     if(king == (CURRENT_POSITION)) king = this->board.getKing(color); 
 
     Bitboard northAttack = ((king & ~(RANK_8)) << NORTH);
-    Bitboard westAttack = ((king & ~(FILE_A)) << WEST);
+    Bitboard westAttack = ((king & ~(FILE_A)) >> WEST);
     Bitboard southAttack = ((king & ~(RANK_1)) >> SOUTH);
     Bitboard eastAttack = ((king & ~(FILE_H)) << EAST);
+
+    Bitboard directAttacks = westAttack; 
 
     Bitboard northeastAttack = (king & ~RANK_8 & ~FILE_H) << NORTH_EAST; 
     Bitboard northwestAttack = (king & ~RANK_8 & ~FILE_A) << NORTH_WEST;
@@ -672,7 +674,6 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     if(king == (CURRENT_POSITION)) king = this->board.getKing(color); 
 
     Bitboard attacks = generateKingAttacks(king, color);
-    std::cout << "king attacks: " << attacks << std::endl;
 
     //castling
     Bitboard castle = EMPTY;
