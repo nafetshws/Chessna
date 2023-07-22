@@ -40,13 +40,23 @@ class MoveGeneration {
         Bitboard Northwest(Square square);
         Bitboard Northeast(Square square);
         Bitboard North(Square square);
-
         Bitboard Southwest(Square square);
         Bitboard Southeast(Square square);
         Bitboard South(Square square);
-
         Bitboard East(Square square);
         Bitboard West(Square square);
+
+        Bitboard getLegalNorthwestMoves(Bitboard pieces, Color color);
+        Bitboard getLegalNortheastMoves(Bitboard pieces, Color color);
+        Bitboard getLegalSouthwestMoves(Bitboard pieces, Color color);
+        Bitboard getLegalSoutheastMoves(Bitboard pieces, Color color);
+
+        Bitboard getLegalNorthMoves(Bitboard pieces, Color color);
+        Bitboard getLegalSouthMoves(Bitboard pieces, Color color);
+        Bitboard getLegalWestMoves(Bitboard pieces, Color color);
+        Bitboard getLegalEastMoves(Bitboard pieces, Color color);
+
+
 
 };
 

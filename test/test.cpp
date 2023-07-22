@@ -138,7 +138,12 @@ void test_enPassentCheckEvasion(){
 
 void test_enPassentCheckEvasion2(){
     MoveGeneration moveGeneration{Board("k7/8/8/5Pp1/7K/8/8/8 w - g6 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 9);
+    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 5);
+}
+
+void test_enPassentCheckEvasion3(){
+    MoveGeneration moveGeneration{Board("8/8/8/k7/2Pp4/8/8/3KQ3 b - c3 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 4);
 }
 
 //function to execute all move generation tests
@@ -168,6 +173,7 @@ void test_moveGeneration() {
 
     test_enPassentCheckEvasion();
     test_enPassentCheckEvasion2();
+    test_enPassentCheckEvasion3();
 }
 
 //function to execute all tests
