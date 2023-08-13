@@ -152,6 +152,21 @@ void test_getPinnedPieces(){
     IS_EQUAL(moveGeneration.getPinnedPieces(BLACK).absolutePins, realValue);
 }
 
+void test_pinnedPiecesMoveGeneration() {
+    MoveGeneration moveGeneration{Board("4k3/5p2/2b3B1/4r3/Q7/8/8/2K1R3 b - - 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 14);
+}
+
+void test_pinnedPiecesMoveGeneration2() {
+    MoveGeneration moveGeneration{Board("6k1/8/3r4/8/1q1BN3/2P5/3KR2r/r7 w - - 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 15);
+}
+
+void test_pinnedPiecesMoveGeneration3() {
+    MoveGeneration moveGeneration{Board("6k1/8/3r4/6b1/1q1BN3/2P5/3KR2r/r7 w - - 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 4);
+}
+
 //function to execute all move generation tests
 void test_moveGeneration() {
     test_generateRookMoves(); 
@@ -182,6 +197,9 @@ void test_moveGeneration() {
     test_enPassentCheckEvasion3();
 
     test_getPinnedPieces();
+    test_pinnedPiecesMoveGeneration();
+    test_pinnedPiecesMoveGeneration2();
+    test_pinnedPiecesMoveGeneration3();
 }
 
 //function to execute all tests

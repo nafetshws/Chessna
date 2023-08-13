@@ -87,7 +87,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                 }
                 break;
             case Direction::N: case Direction::S:
-                std::cout << "direction north/south" << std::endl;
                 if(pin.pinnedPieceType == ROOK || pin.pinnedPieceType == QUEEN) {
                     Bitboard legalMoves = getLegalNorthMoves(pin.pinnedPiece, color) | getLegalSouthMoves(pin.pinnedPiece, color);
                     std::vector<Square> destinations = convertBitboardToSquares(legalMoves);
