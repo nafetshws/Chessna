@@ -34,6 +34,8 @@ class MoveGeneration {
         Check_Info isInCheck(Color color = BLACK);
         Attack_Info isUnderAttack(Square square, Color color = BLACK);
         Attack_Info isUnderAttack(Bitboard squareAsBitboard, Color color = BLACK); 
+
+        Pins getPinnedPieces(Color color);
        
     private:
 

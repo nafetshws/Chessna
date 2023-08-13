@@ -3,6 +3,7 @@
 #include <vector>
 #include "../include/board.hpp"
 #include "../include/types.hpp"
+#include "../include/functions.hpp"
 
 Board::Board(std::string fen) {
     initBoard(fen);
@@ -317,4 +318,19 @@ Bitboard Board::getOccupiedWithoutWhiteKing() {
 
 Bitboard Board::getOccupiedWithoutBlackKing() {
     return getOccupiedByWhite() | (getOccupiedByBlack() ^ blackKing);
+}
+
+PieceType Board::getPieceTypeOfSquare(Square square, Color color) {
+    Bitboard b = squareToBitboard(square);
+    return getPieceTypeOfSquare(b, color);
+}
+
+PieceType Board::getPieceTypeOfSquare(Bitboard b, Color color) {
+    if((this->getPawns(color) & b) != 0) return PAWN;
+    if((this->getBishops(color) & b) != 0) return BISHOP;
+    if((this->getKnights(color) & b) != 0) return KNIGHT;
+    if((this->getRooks(color) & b) != 0) return ROOK;
+    if((this->getQueens(color) & b) != 0) return QUEEN;
+    if((this->getKing(color) & b) != 0) return KING;
+    return UNOCCUPIED; 
 }

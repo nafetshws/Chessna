@@ -146,6 +146,12 @@ void test_enPassentCheckEvasion3(){
     IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 4);
 }
 
+void test_getPinnedPieces(){
+    Bitboard realValue = 11259067787902976;
+    MoveGeneration moveGeneration{Board("4k3/3n1p2/8/1Q2r2B/8/8/8/2K1R3 b - - 0 1")};
+    IS_EQUAL(moveGeneration.getPinnedPieces(BLACK).absolutePins, realValue);
+}
+
 //function to execute all move generation tests
 void test_moveGeneration() {
     test_generateRookMoves(); 
@@ -174,6 +180,8 @@ void test_moveGeneration() {
     test_enPassentCheckEvasion();
     test_enPassentCheckEvasion2();
     test_enPassentCheckEvasion3();
+
+    test_getPinnedPieces();
 }
 
 //function to execute all tests

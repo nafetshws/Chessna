@@ -11,17 +11,16 @@ MoveGeneration::MoveGeneration(Board board) {
 std::vector<Move> MoveGeneration::generateMoves(Color color) {
     std::vector<Move> moves;
     //TODO
-    //en passent check evasion
     //move types are not accurate!!
 
     //generate all king moves
     Bitboard kingMoves = generateKingMoves(CURRENT_POSITION, color);
-    Square origin = __builtin_ctzll(this->board.getKing(color));
+    Square kingOrigin = __builtin_ctzll(this->board.getKing(color));
 
     //transform moves from bitboard into a vector
     while(kingMoves != 0) {
         Square destination = __builtin_ctzll(kingMoves);
-        moves.push_back(Move(origin, destination, PieceType::KING, color, MoveType::QUIET));
+        moves.push_back(Move(kingOrigin, destination, PieceType::KING, color, MoveType::QUIET));
         //delete move from bitboard
         kingMoves = ~(1ULL << destination) & kingMoves;
     }
@@ -29,32 +28,122 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     /*
     * Generate moves by pinned pieces and append them to the pinnedPieces Bitboard
     */
-    Bitboard pinnedPiecesBitboard = EMPTY;
 
-    //check for pinned pieces -> Pinners: rooks, bishops, queens
-    //Bitboard possiblePinner = generateRookMoves(CURRENT_POSITION, getOppositeColor(color));
-    //Bitboard kingAsRookMoves = generateRookMoves(this->board.getKing(color), getOppositeColor(color));
+    Pins pinnedPieces = getPinnedPieces(color);
+    Bitboard pinnedPiecesBitboard = pinnedPieces.absolutePins;
 
-    //Bitboard pinnedPiece = (possiblePinner & kingAsRookMoves) & this->board.getOccupiedBy(color);
-    //std::cout << "pinned piece: " << pinnedPiece << std::endl;
+    for(Pin pin : pinnedPieces.pins) {
+        Direction direction = pin.direction;
+        Square pinnedPieceOriginSquare = __builtin_ctzll(pin.pinnedPiece);
 
-    //Bitboard possiblePinner = generateQueenMoves(CURRENT_POSITION, getOppositeColor(color));
-    //Bitboard kingAsQueenMoves = generateQueenMoves(this->board.getKing(color), getOppositeColor(color));
+        switch(direction) {
+            case Direction::NW: case Direction::SE:
+                //move along pin
+                if(pin.pinnedPieceType == BISHOP || pin.pinnedPieceType == QUEEN) {
+                    Bitboard legalMoves = getLegalNorthwestMoves(pin.pinnedPiece, color) | getLegalSoutheastMoves(pin.pinnedPiece, color);
+                    std::vector<Square> destinations = convertBitboardToSquares(legalMoves);
 
-    //Bitboard pinnedPiece = (possiblePinner & kingAsQueenMoves) & this->board.getOccupiedBy(color);
+                    for(Square destination : destinations) {
+                        MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
 
-    //Bitboard possiblePinner = generateBishopMoves(this->board.getQueens(getOppositeColor(color)), getOppositeColor(color));
-    //Bitboard kingAsBishopMoves = generateBishopMoves(this->board.getKing(color), getOppositeColor(color));
+                        moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
+                    }
+                } else if (pin.pinnedPieceType == PAWN) {
+                    //caputres only
+                    if(color == BLACK && direction == Direction::SE) {
+                        if(((pin.pinnedPiece >> SOUTH_EAST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
+                            moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_EAST), PAWN, color, MoveType::CAPTURE));
+                        }
+                    } else if(color == WHITE && direction == Direction::NW) {
+                        if(((pin.pinnedPiece << NORTH_WEST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
+                            moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_WEST), PAWN, color, MoveType::CAPTURE));
+                        }
+                    } 
+                }
+                break;
+            case Direction::NE: case Direction::SW:
+                //move along pin
+                if(pin.pinnedPieceType == BISHOP || pin.pinnedPieceType == QUEEN) {
+                    Bitboard legalMoves = getLegalNortheastMoves(pin.pinnedPiece, color) | getLegalSouthwestMoves(pin.pinnedPiece, color);
+                    std::vector<Square> destinations = convertBitboardToSquares(legalMoves);
 
-    //Bitboard pinnedPiece = (possiblePinner & kingAsBishopMoves) & this->board.getOccupiedBy(color);
-    //std::cout << "pinned piece 1: " << pinnedPiece << std::endl;
+                    for(Square destination : destinations) {
+                        MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
 
-    //possiblePinner = generateRookMoves(this->board.getQueens(getOppositeColor(color)), getOppositeColor(color));
-    //Bitboard kingAsRookMoves = generateRookMoves(this->board.getKing(color), getOppositeColor(color));
+                        moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
+                    }
 
-    //pinnedPiece = (possiblePinner & kingAsRookMoves) & this->board.getOccupiedBy(color);
+                } else if (pin.pinnedPieceType == PAWN) {
+                    //caputres only
+                    if(color == BLACK && direction == Direction::SW) {
+                        if(((pin.pinnedPiece >> SOUTH_WEST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
+                            moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << SOUTH_WEST), PAWN, color, MoveType::CAPTURE));
+                        }
+                    } else if(color == WHITE && direction == Direction::NE) {
+                        if(((pin.pinnedPiece << NORTH_EAST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
+                            moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_EAST), PAWN, color, MoveType::CAPTURE));
+                        }
+                    } 
+                }
+                break;
+            case Direction::N: case Direction::S:
+                std::cout << "direction north/south" << std::endl;
+                if(pin.pinnedPieceType == ROOK || pin.pinnedPieceType == QUEEN) {
+                    Bitboard legalMoves = getLegalNorthMoves(pin.pinnedPiece, color) | getLegalSouthMoves(pin.pinnedPiece, color);
+                    std::vector<Square> destinations = convertBitboardToSquares(legalMoves);
 
-    //std::cout << "pinned piece 2: " << pinnedPiece << std::endl;
+                    for(Square destination : destinations) {
+                        MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+
+                        moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
+                    }
+
+                } else if (pin.pinnedPieceType == PAWN) {
+                    //pawn pushes only
+                    if(color == BLACK && direction == Direction::S) {
+                        Bitboard pawnSinglePushes = (pin.pinnedPiece >> SOUTH) & (~board.getOccupied());
+                        Bitboard pawnDoublePushes = ((pin.pinnedPiece & RANK_7) >> 2*SOUTH) & (~board.getOccupied());
+                        Bitboard pawnMoves = pawnSinglePushes | pawnDoublePushes;
+
+                        Square pinnedPieceOriginSquare = (pin.pinnedPiece);
+                        std::vector<Square> destinations = convertBitboardToSquares(pawnMoves);
+
+                        for(Square destination : destinations) {
+                            MoveType moveType = MoveType::PAWN_PUSH; 
+                            moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
+                        }
+                    } else if(color == WHITE && direction == Direction::N) {
+                        Bitboard pawnSinglePushes = (pin.pinnedPiece << NORTH) & (~board.getOccupied());
+                        Bitboard pawnDoublePushes = ((pin.pinnedPiece & RANK_2) << 2*NORTH) & (~board.getOccupied());
+                        Bitboard pawnMoves = pawnSinglePushes | pawnDoublePushes;
+
+                        Square pinnedPieceOriginSquare = (pin.pinnedPiece);
+                        std::vector<Square> destinations = convertBitboardToSquares(pawnMoves);
+
+                        for(Square destination : destinations) {
+                            MoveType moveType = MoveType::PAWN_PUSH; 
+                            moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
+                        }
+                    } 
+                }
+                break;
+            case Direction::E: case Direction::W:
+                if(pin.pinnedPieceType == ROOK || pin.pinnedPieceType == QUEEN) {
+                    Bitboard legalMoves = getLegalEastMoves(pin.pinnedPiece, color) | getLegalWestMoves(pin.pinnedPiece, color);
+                    std::vector<Square> destinations = convertBitboardToSquares(legalMoves);
+
+                    for(Square destination : destinations) {
+                        MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+
+                        moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
+                    }
+                } 
+                break;
+            default:
+                break; 
+        }
+    }
+
 
     /*
     * Generate moves when <<color>> is in check
@@ -64,6 +153,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     //if the king is in double check he has to move
     if(check_info.numberOfChecks >= 2) return moves;
 
+    //TODO: consider pinned pieces
     else if(check_info.numberOfChecks == 1) {
         //Possiblites to react when in check:
         //1. move king out of check -> already in moves
@@ -110,12 +200,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                 Square destination = __builtin_ctzll(intersectionRay);
                 Attack_Info a_info = isUnderAttack(destination, getOppositeColor(color));
                 moves.insert(moves.end(), a_info.moves.begin(), a_info.moves.end());
-                //for(int i = 0; i < a_info.numberOfAttacks; i++) {
-                //    //prevent diagonal pawn moves without enemy piece to capture
-                //    if(a_info.moves.at(i).pieceType == PAWN && (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) == 0) continue;
-                //    moves.push_back(Move(a_info.pieces.at(i).pos, destination));
-                //}
-                //remove from intersectionRay
                 intersectionRay = ~(1ULL << destination) & intersectionRay;
             }
         }
@@ -215,8 +299,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     return moves;
 }
 
-
-
 Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
     if(bishops == (CURRENT_POSITION)) bishops = this->board.getBishops(color); 
 
@@ -227,8 +309,8 @@ Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
         int index = 63 - __builtin_clzll(bishops);
         Bitboard finalNorthWestMoves = MoveGeneration::getLegalNorthwestMoves(bishops, color);
         Bitboard finalNorthEastMoves = MoveGeneration::getLegalNortheastMoves(bishops, color);
-        Bitboard finalSouthWestMoves  = MoveGeneration::getLegalSouthwestMoves(bishops, color);
-        Bitboard finalSouthEastMoves  = MoveGeneration::getLegalSoutheastMoves(bishops, color);
+        Bitboard finalSouthWestMoves = MoveGeneration::getLegalSouthwestMoves(bishops, color);
+        Bitboard finalSouthEastMoves = MoveGeneration::getLegalSoutheastMoves(bishops, color);
 
 
         allSinlgeMoves = finalNorthWestMoves | finalNorthEastMoves | finalSouthWestMoves | finalSouthEastMoves;
@@ -475,7 +557,7 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
         Bitboard moves = generateEnPassentMoves(squareToBitboard(pawn), getOppositeColor(color));
         if(color == WHITE && moves != 0){
             //en passent square is moved up one row and compared with attacked square
-            if((moves << Direction::NORTH) == squareAsBitboard){
+            if((moves << DirectionValues::NORTH) == squareAsBitboard){
                 //piece can be captured by en passent
                 Move move(pawn, (Square)__builtin_ctzll(moves), PieceType::PAWN, color, MoveType::EN_PASSENT_CAPTURE);
                 numberOfAttacks++;
@@ -483,7 +565,7 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
             }
         } else if(color == BLACK && moves != 0){
             //en passent square is moved down one row and compared with attacked square
-            if((moves >> Direction::SOUTH) == squareAsBitboard) {
+            if((moves >> DirectionValues::SOUTH) == squareAsBitboard) {
                 Move move(pawn, (Square)__builtin_ctzll(moves), PieceType::PAWN, color, MoveType::EN_PASSENT_CAPTURE);
                 numberOfAttacks++;
                 attack_info.moves.push_back(move);
@@ -508,6 +590,110 @@ Bitboard MoveGeneration::generateAttackedSquaresWithoutKing(Color color) {
     return generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
 }
 
+
+Pins MoveGeneration::getPinnedPieces(Color color){
+    //TODO: IMPROVE LENGTH OF CODE (REUSE)
+    Bitboard pinnedPiecesBitboard = EMPTY;
+    Color oppositeColor = getOppositeColor(color);
+
+    Pins pins;
+    Bitboard intersection = EMPTY;
+
+    //look up absolute pins by bishops and queens
+    Bitboard kingSw = getLegalSouthwestMoves(this->board.getKing(color), oppositeColor);
+    Bitboard bishopsNe = getLegalNortheastMoves(this->board.getBishops(oppositeColor), oppositeColor);
+    Bitboard queensNe = getLegalNortheastMoves(this->board.getQueens(oppositeColor), oppositeColor);
+
+    intersection = kingSw & bishopsNe;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), BISHOP, intersection, Direction::SW));
+    intersection = kingSw & queensNe;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::SW));
+
+    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingSw & bishopsNe) | (kingSw & queensNe)); 
+
+    Bitboard kingSe = getLegalSoutheastMoves(this->board.getKing(color), oppositeColor);
+    Bitboard bishopsNw = getLegalNorthwestMoves(this->board.getBishops(oppositeColor), oppositeColor);
+    Bitboard queensNw = getLegalNorthwestMoves(this->board.getQueens(oppositeColor), oppositeColor);
+
+    intersection = kingSe & bishopsNw;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), BISHOP, intersection, Direction::SE));
+    intersection = kingSe & queensNw;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::SE));
+
+    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingSe & bishopsNw) | (kingSe & queensNw)); 
+
+    Bitboard kingNw = getLegalNorthwestMoves(this->board.getKing(color), oppositeColor);
+    Bitboard bishopsSe = getLegalSoutheastMoves(this->board.getBishops(oppositeColor), oppositeColor);
+    Bitboard queensSe = getLegalSoutheastMoves(this->board.getQueens(oppositeColor), oppositeColor);
+
+    intersection = kingNw & bishopsSe;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), BISHOP, intersection, Direction::NW));
+    intersection = kingNw & queensSe;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::NW));
+
+    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingNw & bishopsSe) | (kingNw & queensSe)); 
+
+    Bitboard kingNe = getLegalNortheastMoves(this->board.getKing(color), oppositeColor);
+    Bitboard bishopsSw = getLegalSouthwestMoves(this->board.getBishops(oppositeColor), oppositeColor);
+    Bitboard queensSw = getLegalSouthwestMoves(this->board.getQueens(oppositeColor), oppositeColor);
+
+    intersection = kingNe & bishopsSw;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), BISHOP, intersection, Direction::NE));
+    intersection = kingNe & queensSw;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::NE));
+
+    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingNe & bishopsSw) | (kingNe & queensSw)); 
+    
+    //look up absoulte pins by bishops and queens
+    Bitboard kingN = getLegalNorthMoves(this->board.getKing(color), oppositeColor);
+    Bitboard rooksS = getLegalSouthMoves(this->board.getRooks(oppositeColor), oppositeColor); 
+    Bitboard queensS = getLegalSouthMoves(this->board.getQueens(oppositeColor), oppositeColor);
+
+    intersection = kingN & rooksS;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), ROOK, intersection, Direction::N));
+    intersection = kingN & queensS;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::N));
+    
+    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingN & rooksS) | (kingN & queensS)); 
+
+    Bitboard kingS = getLegalSouthMoves(this->board.getKing(color), oppositeColor);
+    Bitboard rooksN = getLegalNorthMoves(this->board.getRooks(oppositeColor), oppositeColor); 
+    Bitboard queensN = getLegalNorthMoves(this->board.getQueens(oppositeColor), oppositeColor);
+
+    intersection = kingS & rooksN;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), ROOK, intersection, Direction::S));
+    intersection = kingS & queensN;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::S));
+
+    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingS & rooksN) | (kingS & queensN)); 
+
+    Bitboard kingW = getLegalWestMoves(this->board.getKing(color), oppositeColor);
+    Bitboard rooksE = getLegalEastMoves(this->board.getRooks(oppositeColor), oppositeColor); 
+    Bitboard queensE = getLegalEastMoves(this->board.getQueens(oppositeColor), oppositeColor);
+
+    intersection = kingW & rooksE;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), ROOK, intersection, Direction::W));
+    intersection = kingW & queensE;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::W));
+
+    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingW & rooksE) | (kingW & queensE)); 
+
+    Bitboard kingE = getLegalEastMoves(this->board.getKing(color), oppositeColor);
+    Bitboard rooksW = getLegalWestMoves(this->board.getRooks(oppositeColor), oppositeColor); 
+    Bitboard queensW = getLegalWestMoves(this->board.getQueens(oppositeColor), oppositeColor);
+
+    intersection = kingE & rooksW;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), ROOK, intersection, Direction::E));
+    intersection = kingE & queensW;
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::E));
+
+    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingE & rooksW) | (kingE & queensW)); 
+
+    pins.absolutePins = pinnedPiecesBitboard;
+
+    return pins;
+}
+
 //returns all squares that are north to the current square
 Bitboard MoveGeneration::North(Square square) {
     int rank = square / 8;
@@ -515,11 +701,11 @@ Bitboard MoveGeneration::North(Square square) {
 
     if(rank == 7) return attacks;
 
-    attacks = (1ULL << (square + Direction::NORTH));
+    attacks = (1ULL << (square + DirectionValues::NORTH));
     rank++;
 
     while(rank < 7) {
-        attacks = attacks | (attacks << Direction::NORTH); 
+        attacks = attacks | (attacks << DirectionValues::NORTH); 
         rank++;
     }
     return attacks;
@@ -532,12 +718,12 @@ Bitboard MoveGeneration::Northeast(Square square) {
 
     if(rank == 7 || file == 7) return attacks;
 
-    attacks = (1ULL << (square + Direction::NORTH_EAST));
+    attacks = (1ULL << (square + DirectionValues::NORTH_EAST));
     rank++;
     file++;
 
     while(rank < 7 && file < 7) {
-        attacks = attacks | (attacks << Direction::NORTH_EAST); 
+        attacks = attacks | (attacks << DirectionValues::NORTH_EAST); 
         rank++;
         file++;
     }
@@ -551,12 +737,12 @@ Bitboard MoveGeneration::Northwest(Square square) {
 
     if(rank == 7 || file == 0) return attacks;
 
-    attacks = (1ULL << (square + Direction::NORTH_WEST));
+    attacks = (1ULL << (square + DirectionValues::NORTH_WEST));
     rank++;
     file--;
 
     while(rank < 7 && file > 0) {
-        attacks = attacks | (attacks << Direction::NORTH_WEST); 
+        attacks = attacks | (attacks << DirectionValues::NORTH_WEST); 
         rank++;
         file--;
     }
@@ -570,11 +756,11 @@ Bitboard MoveGeneration::South(Square square) {
 
     if(rank == 0) return attacks;
 
-    attacks = (1ULL << (square - Direction::SOUTH));
+    attacks = (1ULL << (square - DirectionValues::SOUTH));
     rank--;
 
     while(rank > 0) {
-        attacks = attacks | (attacks >> Direction::SOUTH); 
+        attacks = attacks | (attacks >> DirectionValues::SOUTH); 
         rank--;
     }
     return attacks;
@@ -587,12 +773,12 @@ Bitboard MoveGeneration::Southeast(Square square) {
 
     if(rank == 0 || file == 7) return attacks;
 
-    attacks = (1ULL << (square - Direction::SOUTH_EAST));
+    attacks = (1ULL << (square - DirectionValues::SOUTH_EAST));
     rank--;
     file++;
 
     while(rank > 0 && file < 7) {
-        attacks = attacks | (attacks >> Direction::SOUTH_EAST); 
+        attacks = attacks | (attacks >> DirectionValues::SOUTH_EAST); 
         rank--;
         file++;
     }
@@ -606,12 +792,12 @@ Bitboard MoveGeneration::Southwest(Square square) {
 
     if(rank == 0 || file == 0) return attacks;
 
-    attacks = (1ULL << (square - Direction::SOUTH_WEST));
+    attacks = (1ULL << (square - DirectionValues::SOUTH_WEST));
     rank--;
     file--;
 
     while(rank > 0 && file > 0) {
-        attacks = attacks | (attacks >> Direction::SOUTH_WEST); 
+        attacks = attacks | (attacks >> DirectionValues::SOUTH_WEST); 
         rank--;
         file--;
     }
@@ -624,11 +810,11 @@ Bitboard MoveGeneration::West(Square square) {
 
     if(file == 0) return attacks;
 
-    attacks = (1ULL << (square - Direction::WEST));
+    attacks = (1ULL << (square - DirectionValues::WEST));
     file--;
 
     while(file > 0) {
-        attacks = attacks | (attacks >> Direction::WEST);
+        attacks = attacks | (attacks >> DirectionValues::WEST);
         file--;
     }
 
@@ -641,11 +827,11 @@ Bitboard MoveGeneration::East(Square square) {
 
     if(file == 7) return attacks;
 
-    attacks = (1ULL << (square + Direction::EAST));
+    attacks = (1ULL << (square + DirectionValues::EAST));
     file++;
 
     while(file < 7) {
-        attacks = attacks | (attacks << Direction::EAST);
+        attacks = attacks | (attacks << DirectionValues::EAST);
         file++;
     }
     return attacks;

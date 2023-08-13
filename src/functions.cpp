@@ -58,6 +58,10 @@ Bitboard squareToBitboard(Square square) {
     return 1ULL << square;
 }
 
+Square bitboardToSquare(Bitboard b) {
+    return __builtin_ctzll(b);
+}
+
 std::vector<Square> convertBitboardToSquares(Bitboard bitboard) {
     std::vector<Square> squares;
     while(bitboard != 0){

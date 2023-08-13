@@ -18,7 +18,8 @@ enum PieceType {
     KNIGHT,
     BISHOP,
     QUEEN,
-    KING
+    KING,
+    UNOCCUPIED
 };
 
 enum MoveType {
@@ -70,7 +71,7 @@ struct Check_Info {
     }
 };
 
-enum Direction {
+enum DirectionValues {
     NORTH = 8,
     NORTH_EAST = 9,
     NORTH_WEST = 7,
@@ -92,6 +93,25 @@ enum Direction {
     NORTH_WEST_WEST = 6,
     NORTH_NORTH_WEST = 15
 
+};
+
+enum Direction {
+    N, NE, NW, S, SE, SW, E, W, NNE, NEE, SEE, SSE, SSW, SWW, NWW, NNW
+};
+
+struct Pin {
+    PieceType pinnedPieceType;
+    PieceType pinnerType;
+    Bitboard pinnedPiece;
+    Direction direction;
+
+    Pin(PieceType _pinnedPieceType, PieceType _pinnerType, Bitboard _pinnedPiece, Direction _direction)
+        : pinnedPieceType(_pinnedPieceType), pinnerType(_pinnerType), pinnedPiece(_pinnedPiece), direction(_direction) {}
+};
+
+struct Pins {
+    std::vector<Pin> pins;
+    Bitboard absolutePins;
 };
 
 const Bitboard FILE_A = 0x101010101010101;

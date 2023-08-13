@@ -39,6 +39,9 @@ struct Board {
     Bitboard getBishops(Color color);
     Bitboard getQueens(Color color);
     Bitboard getKing(Color color);
+
+    PieceType getPieceTypeOfSquare(Square square, Color color);
+    PieceType getPieceTypeOfSquare(Bitboard b, Color color); 
 };
 
 
