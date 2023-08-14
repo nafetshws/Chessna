@@ -32,6 +32,10 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     Pins pinnedPieces = getPinnedPieces(color);
     Bitboard pinnedPiecesBitboard = pinnedPieces.absolutePins;
 
+    std::cout << "pinned pieces: " << pinnedPiecesBitboard << std::endl;
+
+    std::cout << "*************************************************" << std::endl;
+
     for(Pin pin : pinnedPieces.pins) {
         Direction direction = pin.direction;
         Square pinnedPieceOriginSquare = __builtin_ctzll(pin.pinnedPiece);
@@ -523,34 +527,38 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
     int numberOfAttacks = 0;
     Attack_Info attack_info; 
 
+    Pins pins = getPinnedPieces(getOppositeColor(color));
+
+    //std::cout << "absolute pins: " << pins.absolutePins << std::endl;
+
     //add bishop and diagonal queen moves
     Bitboard moves = generateBishopMoves(squareAsBitboard, color);
-    Bitboard intersect = moves & this->board.getBishops(getOppositeColor(color));
+    Bitboard intersect = moves & (this->board.getBishops(getOppositeColor(color)) & (~pins.absolutePins));
     convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::BISHOP, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
-    intersect = moves & this->board.getQueens(getOppositeColor(color));
+    intersect = moves & (this->board.getQueens(getOppositeColor(color)) & (~pins.absolutePins));
     convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::QUEEN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
     //add rook and horizontal/vertical queen moves
     moves = generateRookMoves(squareAsBitboard, color);
-    intersect = moves & this->board.getRooks(getOppositeColor(color));
+    intersect = moves & (this->board.getRooks(getOppositeColor(color)) & (~pins.absolutePins));
     convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::ROOK, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
-    intersect = moves & this->board.getQueens(getOppositeColor(color));
+    intersect = moves & (this->board.getQueens(getOppositeColor(color)) & (~pins.absolutePins));
     convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::QUEEN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
     //add knight moves
     moves = generateKnightMoves(squareAsBitboard, color);
-    intersect = moves & this->board.getKnights(getOppositeColor(color));
+    intersect = moves & (this->board.getKnights(getOppositeColor(color)) & (~pins.absolutePins));
     convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::KNIGHT, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
     //add pawn moves
     moves = generatePawnAttacks(squareAsBitboard, color);
-    intersect = moves & this->board.getPawns(getOppositeColor(color));
+    intersect = moves & (this->board.getPawns(getOppositeColor(color)) & (~pins.absolutePins));
     convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::PAWN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
     //add en passent moves
-    Bitboard pawns = this->board.getPawns(getOppositeColor(color));
+    Bitboard pawns = this->board.getPawns(getOppositeColor(color)) & (~pins.absolutePins);
     while(pawns != 0){
         Square pawn = __builtin_ctzll(pawns);
         Bitboard moves = generateEnPassentMoves(squareToBitboard(pawn), getOppositeColor(color));
@@ -589,6 +597,15 @@ Bitboard MoveGeneration::generateAttackedSquaresWithoutKing(Color color) {
     return generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
 }
 
+Bitboard MoveGeneration::checkForPinnedPieces(Bitboard kingMoves, Bitboard pieceMoves, Bitboard piece2Moves, PieceType pieceType, PieceType piece2Type, Direction direction, Color color, Pins &pins) {
+    Bitboard intersection = (kingMoves & pieceMoves) & this->board.getOccupiedBy(color);
+    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), pieceType, intersection, direction));
+    Bitboard intersection2 = (kingMoves & piece2Moves) & this->board.getOccupiedBy(color);
+    if(intersection2 != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection2, color), piece2Type, intersection2, direction));
+
+    return intersection | intersection2;
+}
+
 
 Pins MoveGeneration::getPinnedPieces(Color color){
     //TODO: IMPROVE LENGTH OF CODE (REUSE)
@@ -597,96 +614,34 @@ Pins MoveGeneration::getPinnedPieces(Color color){
 
     Pins pins;
     Bitboard intersection = EMPTY;
+    Bitboard intersection2 = EMPTY;
 
-    //look up absolute pins by bishops and queens
-    Bitboard kingSw = getLegalSouthwestMoves(this->board.getKing(color), oppositeColor);
-    Bitboard bishopsNe = getLegalNortheastMoves(this->board.getBishops(oppositeColor), oppositeColor);
-    Bitboard queensNe = getLegalNortheastMoves(this->board.getQueens(oppositeColor), oppositeColor);
+    Bitboard king = this->board.getKing(color);
+    Bitboard oppositeBishops = this->board.getBishops(oppositeColor);
+    Bitboard oppositeRooks = this->board.getRooks(oppositeColor);
+    Bitboard oppositeQueens = this->board.getQueens(oppositeColor);
 
-    intersection = kingSw & bishopsNe;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), BISHOP, intersection, Direction::SW));
-    intersection = kingSw & queensNe;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::SW));
+    std::vector<Direction> dirs = {SW, SE, NW, NE};
+    std::vector<Direction> oppositeDirs = {NE, NW, SE, SW};
 
-    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingSw & bishopsNe) | (kingSw & queensNe)); 
+    for(int i = 0; i < dirs.size(); i++) {
+        Bitboard kingMoves = getAllLegalMovesOf(king, dirs.at(i), oppositeColor);
+        Bitboard bishopMoves = getAllLegalMovesOf(oppositeBishops, oppositeDirs.at(i), oppositeColor);
+        Bitboard queenMoves = getAllLegalMovesOf(oppositeQueens, oppositeDirs.at(i), oppositeColor);
 
-    Bitboard kingSe = getLegalSoutheastMoves(this->board.getKing(color), oppositeColor);
-    Bitboard bishopsNw = getLegalNorthwestMoves(this->board.getBishops(oppositeColor), oppositeColor);
-    Bitboard queensNw = getLegalNorthwestMoves(this->board.getQueens(oppositeColor), oppositeColor);
+        pinnedPiecesBitboard = pinnedPiecesBitboard | checkForPinnedPieces(kingMoves, bishopMoves, queenMoves, BISHOP, QUEEN, dirs.at(i), color, pins);
+    }
 
-    intersection = kingSe & bishopsNw;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), BISHOP, intersection, Direction::SE));
-    intersection = kingSe & queensNw;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::SE));
+     dirs = {S, N, E, W};
+     oppositeDirs = {N, S, W, E};
 
-    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingSe & bishopsNw) | (kingSe & queensNw)); 
+    for(int i = 0; i < dirs.size(); i++) {
+        Bitboard kingMoves = getAllLegalMovesOf(king, dirs.at(i), oppositeColor);
+        Bitboard rooksMoves = getAllLegalMovesOf(oppositeRooks, oppositeDirs.at(i), oppositeColor);
+        Bitboard queenMoves = getAllLegalMovesOf(oppositeQueens, oppositeDirs.at(i), oppositeColor);
 
-    Bitboard kingNw = getLegalNorthwestMoves(this->board.getKing(color), oppositeColor);
-    Bitboard bishopsSe = getLegalSoutheastMoves(this->board.getBishops(oppositeColor), oppositeColor);
-    Bitboard queensSe = getLegalSoutheastMoves(this->board.getQueens(oppositeColor), oppositeColor);
-
-    intersection = kingNw & bishopsSe;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), BISHOP, intersection, Direction::NW));
-    intersection = kingNw & queensSe;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::NW));
-
-    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingNw & bishopsSe) | (kingNw & queensSe)); 
-
-    Bitboard kingNe = getLegalNortheastMoves(this->board.getKing(color), oppositeColor);
-    Bitboard bishopsSw = getLegalSouthwestMoves(this->board.getBishops(oppositeColor), oppositeColor);
-    Bitboard queensSw = getLegalSouthwestMoves(this->board.getQueens(oppositeColor), oppositeColor);
-
-    intersection = kingNe & bishopsSw;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), BISHOP, intersection, Direction::NE));
-    intersection = kingNe & queensSw;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::NE));
-
-    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingNe & bishopsSw) | (kingNe & queensSw)); 
-    
-    //look up absoulte pins by bishops and queens
-    Bitboard kingN = getLegalNorthMoves(this->board.getKing(color), oppositeColor);
-    Bitboard rooksS = getLegalSouthMoves(this->board.getRooks(oppositeColor), oppositeColor); 
-    Bitboard queensS = getLegalSouthMoves(this->board.getQueens(oppositeColor), oppositeColor);
-
-    intersection = kingN & rooksS;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), ROOK, intersection, Direction::N));
-    intersection = kingN & queensS;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::N));
-    
-    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingN & rooksS) | (kingN & queensS)); 
-
-    Bitboard kingS = getLegalSouthMoves(this->board.getKing(color), oppositeColor);
-    Bitboard rooksN = getLegalNorthMoves(this->board.getRooks(oppositeColor), oppositeColor); 
-    Bitboard queensN = getLegalNorthMoves(this->board.getQueens(oppositeColor), oppositeColor);
-
-    intersection = kingS & rooksN;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), ROOK, intersection, Direction::S));
-    intersection = kingS & queensN;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::S));
-
-    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingS & rooksN) | (kingS & queensN)); 
-
-    Bitboard kingW = getLegalWestMoves(this->board.getKing(color), oppositeColor);
-    Bitboard rooksE = getLegalEastMoves(this->board.getRooks(oppositeColor), oppositeColor); 
-    Bitboard queensE = getLegalEastMoves(this->board.getQueens(oppositeColor), oppositeColor);
-
-    intersection = kingW & rooksE;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), ROOK, intersection, Direction::W));
-    intersection = kingW & queensE;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::W));
-
-    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingW & rooksE) | (kingW & queensE)); 
-
-    Bitboard kingE = getLegalEastMoves(this->board.getKing(color), oppositeColor);
-    Bitboard rooksW = getLegalWestMoves(this->board.getRooks(oppositeColor), oppositeColor); 
-    Bitboard queensW = getLegalWestMoves(this->board.getQueens(oppositeColor), oppositeColor);
-
-    intersection = kingE & rooksW;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), ROOK, intersection, Direction::E));
-    intersection = kingE & queensW;
-    if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), QUEEN, intersection, Direction::E));
-
-    pinnedPiecesBitboard = pinnedPiecesBitboard | ((kingE & rooksW) | (kingE & queensW)); 
+        pinnedPiecesBitboard = pinnedPiecesBitboard | checkForPinnedPieces(kingMoves, rooksMoves, queenMoves, ROOK, QUEEN, dirs.at(i), color, pins);
+    }
 
     pins.absolutePins = pinnedPiecesBitboard;
 
@@ -985,6 +940,7 @@ Bitboard MoveGeneration::getLegalSouthMoves(Bitboard pieces, Color color){
 Bitboard MoveGeneration::getLegalWestMoves(Bitboard pieces, Color color){
     int index = 63 - __builtin_clzll(pieces);
     Bitboard westAttacks = MoveGeneration::West(index);
+    //std::cout << "west of square " << index << ": " << westAttacks << std::endl;
     if(westAttacks != 0ULL) {
         //Bitboard westBlockers = (westAttacks & this->board.getOccupied());
         //LEGAL MOVE GENERATION: Remove King 
@@ -1029,4 +985,44 @@ Bitboard MoveGeneration::getLegalEastMoves(Bitboard pieces, Color color){
         }
     }
     return EMPTY;
+}
+
+Bitboard MoveGeneration::getAllLegalMovesOf(Bitboard pieces, Direction direction, Color color) {
+    Bitboard ret = EMPTY;
+
+    while(pieces != 0) {
+        Square index = __builtin_ctzll(pieces);
+        Bitboard b = squareToBitboard(index);
+        switch(direction) {
+            case Direction::SW:
+                ret = ret | getLegalSouthwestMoves(b, color);
+                break;
+            case Direction::SE:
+                ret = ret | getLegalSoutheastMoves(b, color);
+                break;
+            case Direction::NW:
+                ret = ret | getLegalNorthwestMoves(b, color);
+                break;
+            case Direction::NE:
+                ret = ret | getLegalNortheastMoves(b, color);
+                break;
+            case Direction::N:
+                ret = ret | getLegalNorthMoves(b, color);
+                break;
+            case Direction::S:
+                ret = ret | getLegalSouthMoves(b, color);
+                break;
+            case Direction::E:
+                ret = ret | getLegalEastMoves(b, color);
+                break;
+            case Direction::W:
+                ret = ret | getLegalWestMoves(b, color);
+                break;
+            default:
+                break;
+        }
+        //remove piece bit from bitboard
+        pieces = pieces & (~b);
+    }
+    return ret;
 }
