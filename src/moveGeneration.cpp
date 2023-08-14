@@ -26,15 +26,72 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     }
 
     /*
+    * Generate moves when <<color>> is in check
+    */
+    Check_Info check_info = isInCheck(color);
+
+    //if the king is in double check he has to move
+    if(check_info.numberOfChecks >= 2) return moves;
+
+    //TODO: consider pinned pieces
+    else if(check_info.numberOfChecks == 1) {
+        //Possiblites to react when in check:
+        //1. move king out of check -> already in moves
+        //2. capture the checking piece
+        //3. block the checking piece (only rooks, bishops and queens)
+
+        //2
+        Square checkingPiecePos = check_info.moves.at(0).origin;
+        //find every move that captures the checking piece
+        Attack_Info a = isUnderAttack((Square)checkingPiecePos, getOppositeColor(color));
+        //add those moves to the vector
+        moves.insert(moves.end(), a.moves.begin(), a.moves.end());
+
+        //3
+        PieceType checkingPieceType = check_info.moves.at(0).pieceType;
+        //only rooks, bishops and queens can be blocked
+        if(checkingPieceType == QUEEN || checkingPieceType == ROOK || checkingPieceType == BISHOP) { 
+            Bitboard kingAsSlidingPieceMoves; 
+            //there could be multiple queens on the board -> look up pos of checking piece
+            Bitboard enemyMoves;
+            switch(checkingPieceType) {
+                case QUEEN:
+                    enemyMoves = generateQueenMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
+                    kingAsSlidingPieceMoves = generateQueenMoves(this->board.getKing(color), color);
+                    break;
+                case ROOK:
+                    enemyMoves = generateRookMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
+                    kingAsSlidingPieceMoves = generateRookMoves(this->board.getKing(color), color);
+                    break;
+                case BISHOP:
+                    enemyMoves = generateBishopMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
+                    kingAsSlidingPieceMoves = generateBishopMoves(this->board.getKing(color), color);
+                    break;
+                default:
+                    std::cout << "Error while calculating blocking pieces" << std::endl;
+                    break;
+            }
+
+            //the intersection of the enemy pieces moves and the king as the sliding piece move mark the squares that can block the enemy piece
+            Bitboard intersectionRay = kingAsSlidingPieceMoves & enemyMoves;
+
+            //transform bitboard of squares to block the attacker into moves by the attacked player
+            while(intersectionRay != 0) {
+                Square destination = __builtin_ctzll(intersectionRay);
+                Attack_Info a_info = isUnderAttack(destination, getOppositeColor(color));
+                moves.insert(moves.end(), a_info.moves.begin(), a_info.moves.end());
+                intersectionRay = ~(1ULL << destination) & intersectionRay;
+            }
+        }
+        return moves;
+    }
+
+    /*
     * Generate moves by pinned pieces and append them to the pinnedPieces Bitboard
     */
 
     Pins pinnedPieces = getPinnedPieces(color);
     Bitboard pinnedPiecesBitboard = pinnedPieces.absolutePins;
-
-    std::cout << "pinned pieces: " << pinnedPiecesBitboard << std::endl;
-
-    std::cout << "*************************************************" << std::endl;
 
     for(Pin pin : pinnedPieces.pins) {
         Direction direction = pin.direction;
@@ -148,66 +205,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     }
 
 
-    /*
-    * Generate moves when <<color>> is in check
-    */
-    Check_Info check_info = isInCheck(color);
-
-    //if the king is in double check he has to move
-    if(check_info.numberOfChecks >= 2) return moves;
-
-    //TODO: consider pinned pieces
-    else if(check_info.numberOfChecks == 1) {
-        //Possiblites to react when in check:
-        //1. move king out of check -> already in moves
-        //2. capture the checking piece
-        //3. block the checking piece (only rooks, bishops and queens)
-
-        //2
-        Square checkingPiecePos = check_info.moves.at(0).origin;
-        //find every move that captures the checking piece
-        Attack_Info a = isUnderAttack((Square)checkingPiecePos, getOppositeColor(color));
-        //add those moves to the vector
-        moves.insert(moves.end(), a.moves.begin(), a.moves.end());
-
-        //3
-        PieceType checkingPieceType = check_info.moves.at(0).pieceType;
-        //only rooks, bishops and queens can be blocked
-        if(checkingPieceType == QUEEN || checkingPieceType == ROOK || checkingPieceType == BISHOP) { 
-            Bitboard kingAsSlidingPieceMoves; 
-            //there could be multiple queens on the board -> look up pos of checking piece
-            Bitboard enemyMoves;
-            switch(checkingPieceType) {
-                case QUEEN:
-                    enemyMoves = generateQueenMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
-                    kingAsSlidingPieceMoves = generateQueenMoves(this->board.getKing(color), color);
-                    break;
-                case ROOK:
-                    enemyMoves = generateRookMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
-                    kingAsSlidingPieceMoves = generateRookMoves(this->board.getKing(color), color);
-                    break;
-                case BISHOP:
-                    enemyMoves = generateBishopMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
-                    kingAsSlidingPieceMoves = generateBishopMoves(this->board.getKing(color), color);
-                    break;
-                default:
-                    std::cout << "Error while calculating blocking pieces" << std::endl;
-                    break;
-            }
-
-            //the intersection of the enemy pieces moves and the king as the sliding piece move mark the squares that can block the enemy piece
-            Bitboard intersectionRay = kingAsSlidingPieceMoves & enemyMoves;
-
-            //transform bitboard of squares to block the attacker into moves by the attacked player
-            while(intersectionRay != 0) {
-                Square destination = __builtin_ctzll(intersectionRay);
-                Attack_Info a_info = isUnderAttack(destination, getOppositeColor(color));
-                moves.insert(moves.end(), a_info.moves.begin(), a_info.moves.end());
-                intersectionRay = ~(1ULL << destination) & intersectionRay;
-            }
-        }
-        return moves;
-    }
 
     /*
     * Generate mvoes if the king isn't in check

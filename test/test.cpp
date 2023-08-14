@@ -158,12 +158,13 @@ void test_pinnedPiecesMoveGeneration() {
 }
 
 void test_pinnedPiecesMoveGeneration2() {
-    MoveGeneration moveGeneration{Board("6k1/8/3r4/8/1q1BN3/2P5/3KR2r/r7 w - - 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 15);
+    MoveGeneration moveGeneration{Board("6k1/8/3r4/6b1/1q1BN3/2P5/3KR2r/r7 w - - 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 3);
 }
 
+
 void test_pinnedPiecesMoveGeneration3() {
-    MoveGeneration moveGeneration{Board("6k1/8/3r4/6b1/1q1BN3/2P5/3KR2r/r7 w - - 0 1")};
+    MoveGeneration moveGeneration{Board("6k1/8/3r4/6b1/1q1BN3/2P5/3KR3/r7 w - - 0 1")};
     IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 4);
 }
 
