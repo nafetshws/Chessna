@@ -8,6 +8,99 @@ MoveGeneration::MoveGeneration(Board board) {
     this->board = board;
 }
 
+u64 MoveGeneration::perft(int depth, Color color) {
+    u64 nodes = 0ULL;
+
+    if(depth == 0) return 1ULL; 
+    
+    std::vector<Move> moves = generateMoves(color);
+    for(int i = 0; i < moves.size(); i++) {
+        Board copyBoard = this->board;
+        makeMove(moves.at(i));
+        nodes += perft(depth-1, getOppositeColor(color));
+        //unmake move
+        this->board = copyBoard;
+    }
+    return nodes;
+}
+
+void MoveGeneration::makeMove(Move move) {
+    Bitboard *pieces;
+
+    switch(move.pieceType) {
+        case PAWN:
+            if(move.color == WHITE) pieces = &this->board.whitePawns;
+            else pieces = &this->board.blackPawns; 
+            break;
+        case ROOK:
+            if(move.color == WHITE) pieces = &this->board.whiteRooks;
+            else pieces = &this->board.blackRooks; 
+            break;
+        case KNIGHT:
+            if(move.color == WHITE) pieces = &this->board.whiteKnights;
+            else pieces = &this->board.blackKnights; 
+            break;
+        case BISHOP:
+            if(move.color == WHITE) pieces = &this->board.whiteBishops;
+            else pieces = &this->board.blackBishops; 
+            break;
+        case QUEEN:
+            if(move.color == WHITE) pieces = &this->board.whiteQueen;
+            else pieces = &this->board.blackQueen; 
+            break;
+        case KING:
+            if(move.color == WHITE) pieces = &this->board.whiteKing;
+            else pieces = &this->board.blackKing; 
+            break;
+        default:
+            break;
+    }
+
+    if(move.moveType == QUIET || move.moveType == PAWN_PUSH) {
+        *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
+    } else if(move.moveType == CAPTURE) {
+        Piece target = findPiece(move.destination);
+        *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
+        switch(target.type) {
+            case PAWN:
+                if(target.color == WHITE) this->board.whitePawns ^= squareToBitboard(move.destination);
+                else this->board.blackPawns ^= squareToBitboard(move.destination);
+                break;
+            case ROOK:
+                if(target.color == WHITE) this->board.whiteRooks ^= squareToBitboard(move.destination);
+                else this->board.blackRooks ^= squareToBitboard(move.destination);
+                break;
+            case KNIGHT:
+                if(target.color == WHITE) this->board.whiteKnights ^= squareToBitboard(move.destination);
+                else this->board.whiteKnights ^= squareToBitboard(move.destination);
+                break;
+            case BISHOP:
+                if(target.color == WHITE) this->board.whiteBishops ^= squareToBitboard(move.destination);
+                else this->board.blackBishops ^= squareToBitboard(move.destination);
+                break;
+            case QUEEN:
+                if(target.color == WHITE) this->board.whiteQueen ^= squareToBitboard(move.destination);
+                else this->board.blackQueen ^= squareToBitboard(move.destination);
+                break;
+            default:
+                break;
+        }
+    } else if (move.moveType == EN_PASSENT_CAPTURE) {
+        *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
+        if(move.color == WHITE) {
+            Bitboard enPassentSquare = squareToBitboard(this->board.enPassentTargetSquare);
+            Bitboard target = enPassentSquare >> SOUTH;
+            this->board.blackPawns ^= target;
+        } else {
+            Bitboard enPassentSquare = squareToBitboard(this->board.enPassentTargetSquare);
+            Bitboard target = enPassentSquare << NORTH;
+            this->board.blackPawns ^= target;
+        }
+    }
+
+
+}
+
 std::vector<Move> MoveGeneration::generateMoves(Color color) {
     std::vector<Move> moves;
     //TODO
@@ -20,7 +113,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     //transform moves from bitboard into a vector
     while(kingMoves != 0) {
         Square destination = __builtin_ctzll(kingMoves);
-        moves.push_back(Move(kingOrigin, destination, PieceType::KING, color, MoveType::QUIET));
+        MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+        moves.push_back(Move(kingOrigin, destination, PieceType::KING, color, moveType));
         //delete move from bitboard
         kingMoves = ~(1ULL << destination) & kingMoves;
     }
@@ -644,6 +738,24 @@ Bitboard MoveGeneration::generateAttackedSquares(Color color) {
 
 Bitboard MoveGeneration::generateAttackedSquaresWithoutKing(Color color) {
     return generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
+}
+
+Piece MoveGeneration::findPiece(Square s) {
+    Bitboard position = squareToBitboard(s);
+    Color color;
+    PieceType pieceType = UNOCCUPIED;
+    
+    if((position & this->board.getOccupiedBy(WHITE)) != 0) color = WHITE;
+    else color = BLACK;
+
+    if((this->board.getPawns(color) & position) != 0) pieceType = PAWN;
+    if((this->board.getRooks(color) & position) != 0) pieceType = ROOK;
+    if((this->board.getKnights(color) & position) != 0) pieceType = KNIGHT;
+    if((this->board.getBishops(color) & position) != 0) pieceType = BISHOP;
+    if((this->board.getQueens(color) & position) != 0) pieceType = QUEEN;
+    if((this->board.getKing(color) & position) != 0) pieceType = KING;
+
+    return Piece(s, pieceType, color);
 }
 
 Bitboard MoveGeneration::checkForPinnedPieces(Bitboard kingMoves, Bitboard pieceMoves, Bitboard piece2Moves, PieceType pieceType, PieceType piece2Type, Direction direction, Color color, Pins &pins) {

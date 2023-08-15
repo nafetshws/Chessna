@@ -7,13 +7,13 @@
 #include "../include/functions.hpp"
 
 int main(){
-    std::string fen = "5k2/8/8/K2Pp2r/8/8/8/8 w - d3 0 1";
+    std::string fen = DEFAULT_FEN; 
     Board board(fen);
     
     MoveGeneration moveGeneration(board);
-    std::vector<Move> moves = moveGeneration.generateMoves(WHITE);
+    u64 nodes = moveGeneration.perft(5, WHITE);
 
-    printMoves(moves);
+    std::cout << "Nodes: " << nodes << std::endl;
 
 
     return 0;

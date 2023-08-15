@@ -5,6 +5,7 @@
 #include <vector>
 
 typedef unsigned long long Bitboard;
+typedef unsigned long long u64;
 typedef int Square;
 
 enum Color {
@@ -24,12 +25,16 @@ enum PieceType {
 
 enum MoveType {
     QUIET,
-    PROMOTION,
+    BISHOP_PROMOTION,
+    KNIGHT_PROMOTION,
+    ROOK_PROMOTION,
+    QUEEN_PROMOTION,
     CAPTURE,
     EN_PASSENT_CAPTURE,
     PAWN_PUSH,
     NULL_MOVE,
-    CASTLING
+    KING_CASTLE,
+    QUEEN_CASTLE,
 };
 
 struct Piece {
