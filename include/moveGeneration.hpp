@@ -36,6 +36,7 @@ class MoveGeneration {
         Attack_Info isUnderAttack(Bitboard squareAsBitboard, Color color = BLACK); 
 
         Pins getPinnedPieces(Color color);
+        Bitboard getAllLegalMovesOf(Bitboard pieces, Direction direction, Color color);
        
     private:
 
@@ -58,9 +59,9 @@ class MoveGeneration {
         Bitboard getLegalWestMoves(Bitboard pieces, Color color);
         Bitboard getLegalEastMoves(Bitboard pieces, Color color);
 
-        Bitboard getAllLegalMovesOf(Bitboard pieces, Direction direction, Color color);
 
         Bitboard checkForPinnedPieces(Bitboard kingMoves, Bitboard pieceMoves, Bitboard piece2Moves, PieceType pieceType, PieceType piece2Type, Direction direction, Color color, Pins &pins); 
+        bool checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboard attackerPawn, Color color);
 
 };
 

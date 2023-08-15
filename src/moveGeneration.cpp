@@ -56,6 +56,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             Bitboard enemyMoves;
             switch(checkingPieceType) {
                 case QUEEN:
+                    //TODO: Check for problems!!!
                     enemyMoves = generateQueenMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
                     kingAsSlidingPieceMoves = generateQueenMoves(this->board.getKing(color), color);
                     break;
@@ -372,16 +373,61 @@ Bitboard MoveGeneration::generatePawnAttacks(Bitboard pawns, Color color) {
     }
 }
 
+bool MoveGeneration::checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboard attackerPawn, Color color) {
+    if(color == WHITE) {
+        this->board.whitePawns = this->board.whitePawns & (~attackerPawn);
+        this->board.blackPawns = this->board.blackPawns & (~targetPawn);
+    } else {
+        this->board.blackPawns = this->board.blackPawns & (~attackerPawn);
+        this->board.whitePawns = this->board.whitePawns & (~targetPawn);
+    }
+
+    Color oppositeColor = getOppositeColor(color);
+    bool enPassentPossible = false;
+
+    Bitboard kingMovesEast = getLegalEastMoves(this->board.getKing(color), color);
+    Bitboard kingMovesWest = getLegalWestMoves(this->board.getKing(color), color);
+    Bitboard rookMovesEast = getAllLegalMovesOf(this->board.getRooks(oppositeColor), Direction::E, oppositeColor);
+    Bitboard queenMovesEast = getAllLegalMovesOf(this->board.getQueens(oppositeColor), Direction::E, oppositeColor);
+    Bitboard rookMovesWest = getAllLegalMovesOf(this->board.getRooks(oppositeColor), Direction::W, oppositeColor);
+    Bitboard queenMovesWest = getAllLegalMovesOf(this->board.getQueens(oppositeColor), Direction::W, oppositeColor);
+
+    if(((kingMovesEast & rookMovesWest) != 0) || (kingMovesEast & queenMovesWest) != 0
+        || (kingMovesWest & rookMovesEast) != 0 || (kingMovesWest & queenMovesEast) != 0) {
+            enPassentPossible = false;
+    } else {
+        enPassentPossible = true;
+    }
+
+    if(color == WHITE) {
+        this->board.whitePawns = this->board.whitePawns | attackerPawn; 
+        this->board.blackPawns = this->board.blackPawns | targetPawn;
+    } else {
+        this->board.blackPawns = this->board.blackPawns | attackerPawn;
+        this->board.whitePawns = this->board.whitePawns | targetPawn;
+    }
+    return enPassentPossible;
+}
+
 Bitboard MoveGeneration::generateEnPassentMoves(Bitboard pawns, Color color) {
     if(pawns == (CURRENT_POSITION)) pawns = this->board.getPawns(color) ;
+
+    Color oppositeColor = getOppositeColor(color);
+
     if(color == WHITE) {
         //en passent
         bool enPassentPossible = false;
         Bitboard enPassentSquare = EMPTY;
         if(this->board.enPassentTargetSquare != -1) {
             enPassentSquare = (1ULL << this->board.enPassentTargetSquare);
-            if(((((pawns & ~FILE_A) << NORTH_WEST) | ((pawns & ~ FILE_H) << NORTH_EAST)) & enPassentSquare) == enPassentSquare) {
-                enPassentPossible = true;
+            if((((pawns & ~FILE_A) << NORTH_WEST) & enPassentSquare) == enPassentSquare) {
+                Bitboard targetPawn = enPassentSquare >> SOUTH;
+                Bitboard attackerPawn = enPassentSquare >> SOUTH_EAST;
+                enPassentPossible = checkForEnPassenDiscoveredCheck(targetPawn, attackerPawn, color);
+            } else if((((pawns & (~FILE_H)) >> NORTH_EAST) & enPassentSquare) == enPassentSquare) {
+                Bitboard targetPawn = enPassentSquare << SOUTH;
+                Bitboard attackerPawn = enPassentSquare << SOUTH_WEST;
+                enPassentPossible = checkForEnPassenDiscoveredCheck(targetPawn, attackerPawn, color);
             }
         }
         if(enPassentPossible) return enPassentSquare;
@@ -392,8 +438,14 @@ Bitboard MoveGeneration::generateEnPassentMoves(Bitboard pawns, Color color) {
         Bitboard enPassentSquare = EMPTY;
         if(this->board.enPassentTargetSquare != -1) {
             enPassentSquare = (1ULL << this->board.enPassentTargetSquare);
-            if(((((pawns & (~FILE_A)) >> SOUTH_WEST) | ((pawns & (~FILE_H)) >> SOUTH_EAST)) & enPassentSquare) == enPassentSquare) {
-                enPassentPossible = true;
+            if((((pawns & (~FILE_A)) >> SOUTH_WEST) & enPassentSquare) == enPassentSquare) {
+                Bitboard targetPawn = enPassentSquare << NORTH;
+                Bitboard attackerPawn = enPassentSquare << NORTH_EAST;
+                enPassentPossible = checkForEnPassenDiscoveredCheck(targetPawn, attackerPawn, color);
+            } else if((((pawns & (~FILE_H)) >> SOUTH_EAST) & enPassentSquare) == enPassentSquare) {
+                Bitboard targetPawn = enPassentSquare << NORTH;
+                Bitboard attackerPawn = enPassentSquare << NORTH_WEST;
+                enPassentPossible = checkForEnPassenDiscoveredCheck(targetPawn, attackerPawn, color);
             }
         }
         if(enPassentPossible) return enPassentSquare;
