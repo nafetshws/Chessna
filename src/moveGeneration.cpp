@@ -99,18 +99,21 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         switch(direction) {
             case Direction::NW: case Direction::SE:
-                //move along pin
+                //only bishops and queens can move along a diagonal pin
                 if(pin.pinnedPieceType == BISHOP || pin.pinnedPieceType == QUEEN) {
+                    //generate legal moves along pin
                     Bitboard legalMoves = getLegalNorthwestMoves(pin.pinnedPiece, color) | getLegalSoutheastMoves(pin.pinnedPiece, color);
+                    //convert bitboard to squares
                     std::vector<Square> destinations = convertBitboardToSquares(legalMoves);
 
+                    //add moves to pins
                     for(Square destination : destinations) {
                         MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
 
                         moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
                     }
+                //if the pawn is pinned it can only capture the pinner
                 } else if (pin.pinnedPieceType == PAWN) {
-                    //caputres only
                     if(color == BLACK && direction == Direction::SE) {
                         if(((pin.pinnedPiece >> SOUTH_EAST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
                             moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_EAST), PAWN, color, MoveType::CAPTURE));
@@ -203,9 +206,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                 break; 
         }
     }
-
-
-
     /*
     * Generate mvoes if the king isn't in check
     */
@@ -595,8 +595,10 @@ Bitboard MoveGeneration::generateAttackedSquaresWithoutKing(Color color) {
 }
 
 Bitboard MoveGeneration::checkForPinnedPieces(Bitboard kingMoves, Bitboard pieceMoves, Bitboard piece2Moves, PieceType pieceType, PieceType piece2Type, Direction direction, Color color, Pins &pins) {
+    //to find a pinned piece you can check whether the intersection of king moves and moves of the opponent pieces intersect on the position of a piece
     Bitboard intersection = (kingMoves & pieceMoves) & this->board.getOccupiedBy(color);
     if(intersection != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection, color), pieceType, intersection, direction));
+    //the same thing for the queen
     Bitboard intersection2 = (kingMoves & piece2Moves) & this->board.getOccupiedBy(color);
     if(intersection2 != 0) pins.pins.push_back(Pin(this->board.getPieceTypeOfSquare(intersection2, color), piece2Type, intersection2, direction));
 
@@ -605,7 +607,6 @@ Bitboard MoveGeneration::checkForPinnedPieces(Bitboard kingMoves, Bitboard piece
 
 
 Pins MoveGeneration::getPinnedPieces(Color color){
-    //TODO: IMPROVE LENGTH OF CODE (REUSE)
     Bitboard pinnedPiecesBitboard = EMPTY;
     Color oppositeColor = getOppositeColor(color);
 
@@ -621,6 +622,7 @@ Pins MoveGeneration::getPinnedPieces(Color color){
     std::vector<Direction> dirs = {SW, SE, NW, NE};
     std::vector<Direction> oppositeDirs = {NE, NW, SE, SW};
 
+    //check for pinned pieces on diagonal lines
     for(int i = 0; i < dirs.size(); i++) {
         Bitboard kingMoves = getAllLegalMovesOf(king, dirs.at(i), oppositeColor);
         Bitboard bishopMoves = getAllLegalMovesOf(oppositeBishops, oppositeDirs.at(i), oppositeColor);
@@ -632,6 +634,7 @@ Pins MoveGeneration::getPinnedPieces(Color color){
      dirs = {S, N, E, W};
      oppositeDirs = {N, S, W, E};
 
+    //check for pinned pieces on straight lines
     for(int i = 0; i < dirs.size(); i++) {
         Bitboard kingMoves = getAllLegalMovesOf(king, dirs.at(i), oppositeColor);
         Bitboard rooksMoves = getAllLegalMovesOf(oppositeRooks, oppositeDirs.at(i), oppositeColor);
