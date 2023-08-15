@@ -7,11 +7,11 @@
 #include "../include/functions.hpp"
 
 int main(){
-    std::string fen = "8/8/8/8/k2Pp2Q/8/8/4K3 w - d3 0 1";
+    std::string fen = "5k2/8/8/K2Pp2r/8/8/8/8 w - d3 0 1";
     Board board(fen);
     
     MoveGeneration moveGeneration(board);
-    std::vector<Move> moves = moveGeneration.generateMoves(BLACK);
+    std::vector<Move> moves = moveGeneration.generateMoves(WHITE);
 
     printMoves(moves);
 

@@ -168,6 +168,21 @@ void test_pinnedPiecesMoveGeneration3() {
     IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 4);
 }
 
+void test_enPassent_discoveredCheck() {
+    MoveGeneration moveGeneration{Board("8/8/8/8/k2Pp2Q/8/8/4K3 w - d3 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 6);
+}
+
+void test_enPassent_discoveredCheck2() {
+    MoveGeneration moveGeneration{Board("8/8/8/8/k1pPp2Q/8/8/4K3 w - d3 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 9);
+}
+
+void test_enPassent_discoveredCheck3() {
+    MoveGeneration moveGeneration{Board("5k2/8/8/K2Pp2r/8/8/8/8 w - d3 0 1")};
+    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 6);
+}
+
 //function to execute all move generation tests
 void test_moveGeneration() {
     test_generateRookMoves(); 
@@ -201,6 +216,10 @@ void test_moveGeneration() {
     test_pinnedPiecesMoveGeneration();
     test_pinnedPiecesMoveGeneration2();
     test_pinnedPiecesMoveGeneration3();
+
+    test_enPassent_discoveredCheck();
+    test_enPassent_discoveredCheck2();
+    test_enPassent_discoveredCheck3();
 }
 
 //function to execute all tests
