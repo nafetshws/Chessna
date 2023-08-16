@@ -12,7 +12,7 @@ std::string printableMove(Move move);
 Bitboard squareToBitboard(Square square);
 Square bitboardToSquare(Bitboard b);
 std::vector<Square> convertBitboardToSquares(Bitboard bitboard);
-void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType pieceType, Color color, MoveType moveType, int &numberOfAttacks, Attack_Info &attack_info);
+void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType pieceType, Color color, Bitboard occupied, int &numberOfAttacks, Attack_Info &attack_info);
 
 
 #endif

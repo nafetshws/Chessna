@@ -78,10 +78,11 @@ std::vector<Square> convertBitboardToSquares(Bitboard bitboard) {
     return squares;
 }
 
-void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType pieceType, Color color, MoveType moveType, int &numberOfAttacks, Attack_Info &attack_info){
+void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType pieceType, Color color, Bitboard occupied, int &numberOfAttacks, Attack_Info &attack_info){
     if(intersect != 0) {
         std::vector<Square> origins = convertBitboardToSquares(intersect);
         for(int i = 0; i < origins.size(); i++) {
+            MoveType moveType = (destination & occupied) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
             Move move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, moveType);
             numberOfAttacks++;
             attack_info.moves.push_back(move);

@@ -1,0 +1,1478 @@
+depth: 2
+b7b5
+b8c6
+c7c6
+c8d7
+d8d7
+b8d7
+*******************
+before make move: 66
+right before quiet move: 66
+move origin: 49
+move destination: 33
+after quiet move: 66
+knights: 66
+depth: 1
+e1d1
+a2a3
+b2b3
+b2b4
+d2d3
+d2d4
+e2e3
+e2e4
+f2f3
+f2f4
+g2g3
+g2g4
+h2h3
+h2h4
+c3c4
+b1a3
+g1f3
+g1h3
+a4d1
+a4c2
+a4a3
+a4b3
+a4b4
+a4c4
+a4d4
+a4e4
+a4f4
+a4g4
+a4h4
+a4a5
+a4b5
+a4a6
+a4a7
+*******************
+before make move: 66
+right before quiet move: 66
+move origin: 4
+move destination: 3
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 8
+move destination: 16
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 9
+move destination: 17
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 9
+move destination: 25
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 11
+move destination: 19
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 11
+move destination: 27
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 12
+move destination: 20
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 12
+move destination: 28
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 13
+move destination: 21
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 13
+move destination: 29
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 14
+move destination: 22
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 14
+move destination: 30
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 15
+move destination: 23
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 15
+move destination: 31
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 18
+move destination: 26
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 1
+move destination: 16
+after quiet move: 65600
+before make move: 66
+right before quiet move: 66
+move origin: 6
+move destination: 21
+after quiet move: 2097154
+before make move: 66
+right before quiet move: 66
+move origin: 6
+move destination: 23
+after quiet move: 8388610
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 3
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 10
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 16
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 17
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 25
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 26
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 27
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 28
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 29
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 30
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 31
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 32
+after quiet move: 66
+before make move: 66
+pos: 33
+type: 0
+color: 1
+after capture move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 40
+after quiet move: 66
+before make move: 66
+pos: 48
+type: 0
+color: 1
+after capture move: 66
+b7b5: 33
+before make move: 66
+right before quiet move: 66
+move origin: 57
+move destination: 42
+after quiet move: 4398046511170
+knights: 4398046511170
+depth: 1
+e1d1
+a2a3
+b2b3
+b2b4
+d2d3
+d2d4
+e2e3
+e2e4
+f2f3
+f2f4
+g2g3
+g2g4
+h2h3
+h2h4
+c3c4
+b1a3
+g1f3
+g1h3
+c6b4
+c6d4
+c6a5
+c6e5
+c6a7
+c6e7
+c6b8
+c6d8
+a4d1
+a4c2
+a4a3
+a4b3
+a4b4
+a4c4
+a4d4
+a4e4
+a4f4
+a4g4
+a4h4
+a4a5
+a4b5
+a4a6
+a4a7
+*******************
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 4
+move destination: 3
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 8
+move destination: 16
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 9
+move destination: 17
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 9
+move destination: 25
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 11
+move destination: 19
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 11
+move destination: 27
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 12
+move destination: 20
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 12
+move destination: 28
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 13
+move destination: 21
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 13
+move destination: 29
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 14
+move destination: 22
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 14
+move destination: 30
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 15
+move destination: 23
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 15
+move destination: 31
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 18
+move destination: 26
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 1
+move destination: 16
+after quiet move: 4398046576704
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 6
+move destination: 21
+after quiet move: 4398048608258
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 6
+move destination: 23
+after quiet move: 4398054899714
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 42
+move destination: 25
+after quiet move: 33554498
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 42
+move destination: 27
+after quiet move: 134217794
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 42
+move destination: 32
+after quiet move: 4294967362
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 42
+move destination: 36
+after quiet move: 68719476802
+before make move: 4398046511170
+pos: 48
+type: 0
+color: 1
+after capture move: 281474976710722
+before make move: 4398046511170
+pos: 52
+type: 0
+color: 1
+after capture move: 4503599627370562
+before make move: 4398046511170
+pos: 57
+type: 2
+color: 1
+after capture move: 144115188075855938
+before make move: 4398046511170
+pos: 59
+type: 4
+color: 1
+after capture move: 576460752303423554
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 3
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 10
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 16
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 17
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 25
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 26
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 27
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 28
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 29
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 30
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 31
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 32
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 33
+after quiet move: 4398046511170
+before make move: 4398046511170
+right before quiet move: 4398046511170
+move origin: 24
+move destination: 40
+after quiet move: 4398046511170
+before make move: 4398046511170
+pos: 48
+type: 0
+color: 1
+after capture move: 4398046511170
+b8c6: 41
+before make move: 66
+right before quiet move: 66
+move origin: 50
+move destination: 42
+after quiet move: 66
+knights: 66
+depth: 1
+e1d1
+a2a3
+b2b3
+b2b4
+d2d3
+d2d4
+e2e3
+e2e4
+f2f3
+f2f4
+g2g3
+g2g4
+h2h3
+h2h4
+c3c4
+b1a3
+g1f3
+g1h3
+a4d1
+a4c2
+a4a3
+a4b3
+a4b4
+a4c4
+a4d4
+a4e4
+a4f4
+a4g4
+a4h4
+a4a5
+a4b5
+a4a6
+a4c6
+a4a7
+*******************
+before make move: 66
+right before quiet move: 66
+move origin: 4
+move destination: 3
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 8
+move destination: 16
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 9
+move destination: 17
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 9
+move destination: 25
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 11
+move destination: 19
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 11
+move destination: 27
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 12
+move destination: 20
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 12
+move destination: 28
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 13
+move destination: 21
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 13
+move destination: 29
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 14
+move destination: 22
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 14
+move destination: 30
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 15
+move destination: 23
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 15
+move destination: 31
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 18
+move destination: 26
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 1
+move destination: 16
+after quiet move: 65600
+before make move: 66
+right before quiet move: 66
+move origin: 6
+move destination: 21
+after quiet move: 2097154
+before make move: 66
+right before quiet move: 66
+move origin: 6
+move destination: 23
+after quiet move: 8388610
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 3
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 10
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 16
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 17
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 25
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 26
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 27
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 28
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 29
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 30
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 31
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 32
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 33
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 40
+after quiet move: 66
+before make move: 66
+pos: 42
+type: 0
+color: 1
+after capture move: 66
+before make move: 66
+pos: 48
+type: 0
+color: 1
+after capture move: 66
+c7c6: 34
+before make move: 66
+right before quiet move: 66
+move origin: 58
+move destination: 51
+after quiet move: 66
+knights: 66
+depth: 1
+e1d1
+a2a3
+b2b3
+b2b4
+d2d3
+d2d4
+e2e3
+e2e4
+f2f3
+f2f4
+g2g3
+g2g4
+h2h3
+h2h4
+c3c4
+b1a3
+g1f3
+g1h3
+d7h3
+d7g4
+d7b5
+d7f5
+d7c6
+d7e6
+d7c8
+d7e8
+a4d1
+a4c2
+a4a3
+a4b3
+a4b4
+a4c4
+a4d4
+a4e4
+a4f4
+a4g4
+a4h4
+a4a5
+a4b5
+a4a6
+a4c6
+a4a7
+*******************
+before make move: 66
+right before quiet move: 66
+move origin: 4
+move destination: 3
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 8
+move destination: 16
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 9
+move destination: 17
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 9
+move destination: 25
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 11
+move destination: 19
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 11
+move destination: 27
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 12
+move destination: 20
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 12
+move destination: 28
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 13
+move destination: 21
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 13
+move destination: 29
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 14
+move destination: 22
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 14
+move destination: 30
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 15
+move destination: 23
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 15
+move destination: 31
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 18
+move destination: 26
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 1
+move destination: 16
+after quiet move: 65600
+before make move: 66
+right before quiet move: 66
+move origin: 6
+move destination: 21
+after quiet move: 2097154
+before make move: 66
+right before quiet move: 66
+move origin: 6
+move destination: 23
+after quiet move: 8388610
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 23
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 30
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 33
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 37
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 42
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 44
+after quiet move: 66
+before make move: 66
+pos: 58
+type: 3
+color: 1
+after capture move: 66
+before make move: 66
+pos: 60
+type: 5
+color: 1
+after capture move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 3
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 10
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 16
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 17
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 25
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 26
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 27
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 28
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 29
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 30
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 31
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 32
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 33
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 40
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 42
+after quiet move: 66
+before make move: 66
+pos: 48
+type: 0
+color: 1
+after capture move: 66
+c8d7: 42
+before make move: 66
+right before quiet move: 66
+move origin: 59
+move destination: 51
+after quiet move: 66
+knights: 66
+depth: 1
+e1d1
+a2a3
+b2b3
+b2b4
+d2d3
+d2d4
+e2e3
+e2e4
+f2f3
+f2f4
+g2g3
+g2g4
+h2h3
+h2h4
+c3c4
+b1a3
+g1f3
+g1h3
+a4d1
+a4c2
+a4a3
+a4b3
+a4b4
+a4c4
+a4d4
+a4e4
+a4f4
+a4g4
+a4h4
+a4a5
+a4b5
+a4a6
+a4c6
+a4a7
+d7h3
+d7g4
+d7b5
+d7f5
+d7c6
+d7d6
+d7e6
+d7c7
+d7e7
+d7c8
+d7d8
+*******************
+before make move: 66
+right before quiet move: 66
+move origin: 4
+move destination: 3
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 8
+move destination: 16
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 9
+move destination: 17
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 9
+move destination: 25
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 11
+move destination: 19
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 11
+move destination: 27
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 12
+move destination: 20
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 12
+move destination: 28
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 13
+move destination: 21
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 13
+move destination: 29
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 14
+move destination: 22
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 14
+move destination: 30
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 15
+move destination: 23
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 15
+move destination: 31
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 18
+move destination: 26
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 1
+move destination: 16
+after quiet move: 65600
+before make move: 66
+right before quiet move: 66
+move origin: 6
+move destination: 21
+after quiet move: 2097154
+before make move: 66
+right before quiet move: 66
+move origin: 6
+move destination: 23
+after quiet move: 8388610
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 3
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 10
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 16
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 17
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 25
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 26
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 27
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 28
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 29
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 30
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 31
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 32
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 33
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 40
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 24
+move destination: 42
+after quiet move: 66
+before make move: 66
+pos: 48
+type: 0
+color: 1
+after capture move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 23
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 30
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 33
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 37
+after quiet move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 42
+after quiet move: 66
+before make move: 66
+pos: 43
+type: 0
+color: 1
+after capture move: 66
+before make move: 66
+right before quiet move: 66
+move origin: 51
+move destination: 44
+after quiet move: 66
+before make move: 66
+pos: 50
+type: 0
+color: 1
+after capture move: 66
+before make move: 66
+pos: 52
+type: 0
+color: 1
+after capture move: 66
+before make move: 66
+pos: 58
+type: 3
+color: 1
+after capture move: 66
+before make move: 66
+pos: 59
+type: 4
+color: 1
+after capture move: 66
+before make move: 66
+pos: 60
+type: 5
+color: 1
+after capture move: 66
+d8d7: 46
+before make move: 66
+right before quiet move: 66
+move origin: 57
+move destination: 51
+after quiet move: 2251799813685314
+knights: 2251799813685314
+depth: 1
+e1d1
+a2a3
+b2b3
+b2b4
+d2d3
+d2d4
+e2e3
+e2e4
+f2f3
+f2f4
+g2g3
+g2g4
+h2h3
+h2h4
+c3c4
+b1a3
+g1f3
+g1h3
+d7c5
+d7e5
+d7b6
+d7f6
+d7b8
+d7f8
+a4d1
+a4c2
+a4a3
+a4b3
+a4b4
+a4c4
+a4d4
+a4e4
+a4f4
+a4g4
+a4h4
+a4a5
+a4b5
+a4a6
+a4c6
+a4a7
+*******************
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 4
+move destination: 3
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 8
+move destination: 16
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 9
+move destination: 17
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 9
+move destination: 25
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 11
+move destination: 19
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 11
+move destination: 27
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 12
+move destination: 20
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 12
+move destination: 28
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 13
+move destination: 21
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 13
+move destination: 29
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 14
+move destination: 22
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 14
+move destination: 30
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 15
+move destination: 23
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 15
+move destination: 31
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 18
+move destination: 26
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 1
+move destination: 16
+after quiet move: 2251799813750848
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 6
+move destination: 21
+after quiet move: 2251799815782402
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 6
+move destination: 23
+after quiet move: 2251799822073858
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 51
+move destination: 34
+after quiet move: 17179869250
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 51
+move destination: 36
+after quiet move: 68719476802
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 51
+move destination: 41
+after quiet move: 2199023255618
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 51
+move destination: 45
+after quiet move: 35184372088898
+before make move: 2251799813685314
+pos: 57
+type: 2
+color: 1
+after capture move: 144115188075855938
+before make move: 2251799813685314
+pos: 61
+type: 3
+color: 1
+after capture move: 2305843009213694018
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 3
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 10
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 16
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 17
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 25
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 26
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 27
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 28
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 29
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 30
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 31
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 32
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 33
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 40
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+right before quiet move: 2251799813685314
+move origin: 24
+move destination: 42
+after quiet move: 2251799813685314
+before make move: 2251799813685314
+pos: 48
+type: 0
+color: 1
+after capture move: 2251799813685314
+b8d7: 40
+Nodes: 236

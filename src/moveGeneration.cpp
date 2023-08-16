@@ -16,6 +16,10 @@ u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
     if(depth == 0) return 1ULL; 
     
     std::vector<Move> moves = generateMoves(color);
+    std::cout << "depth: " << depth << std::endl;
+    printMoves(moves, 45);
+    std::cout << "*******************" << std::endl;
+
     for(int i = 0; i < moves.size(); i++) {
         Board copyBoard = this->board;
         makeMove(moves.at(i));
@@ -33,7 +37,8 @@ u64 MoveGeneration::perft(int depth, Color color) {
 }
 
 void MoveGeneration::makeMove(Move move) {
-    Bitboard *pieces;
+    std::cout << "before make move: " << this->board.whiteKnights << std::endl;
+    Bitboard *pieces; 
 
     switch(move.pieceType) {
         case PAWN:
@@ -65,7 +70,11 @@ void MoveGeneration::makeMove(Move move) {
     }
 
     if(move.moveType == QUIET || move.moveType == PAWN_PUSH) {
-        *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
+        std::cout << "right before quiet move: " << this->board.whiteKnights << std::endl;
+        std::cout << "move origin: " << move.origin << std::endl;
+        std::cout << "move destination: " << move.destination << std::endl;
+        *pieces = (*pieces & (~squareToBitboard(move.origin))) | squareToBitboard(move.destination);
+        std::cout << "after quiet move: " << this->board.whiteKnights << std::endl;
     } else if(move.moveType == CAPTURE) {
         Piece target = findPiece(move.destination);
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
@@ -93,6 +102,10 @@ void MoveGeneration::makeMove(Move move) {
             default:
                 break;
         }
+        std::cout << "pos: " << target.pos << std::endl;
+        std::cout << "type: " << target.type << std::endl;
+        std::cout << "color: " << target.color << std::endl;
+        std::cout << "after capture move: " << this->board.whiteKnights << std::endl;
     } else if (move.moveType == EN_PASSENT_CAPTURE) {
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         if(move.color == WHITE) {
@@ -105,8 +118,6 @@ void MoveGeneration::makeMove(Move move) {
             this->board.blackPawns ^= target;
         }
     }
-
-
 }
 
 std::vector<Move> MoveGeneration::generateMoves(Color color) {
@@ -370,6 +381,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
         
     //generate knight moves
     Bitboard knights = this->board.getKnights(color) & (~pinnedPiecesBitboard);
+    std::cout << "knights: " << knights << std::endl;
     while(knights != 0) {
         Square origin = __builtin_ctzll(knights);
         Bitboard knight = 1ULL << origin; 
@@ -407,6 +419,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
     //generate bishop moves
     Bitboard bishops = this->board.getBishops(color) & (~pinnedPiecesBitboard);
+    //std::cout << "bishops: " << bishops << std::endl;
     while(bishops != 0) {
         Square origin = __builtin_ctzll(bishops);
         Bitboard bishop = 1ULL << origin; 
@@ -726,36 +739,40 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
     int numberOfAttacks = 0;
     Attack_Info attack_info; 
 
+    Color oppositeColor = getOppositeColor(color);
+
     Pins pins = getPinnedPieces(getOppositeColor(color));
+
+    Bitboard occupied = this->board.getOccupiedBy(getOppositeColor(color));
 
     //std::cout << "absolute pins: " << pins.absolutePins << std::endl;
 
     //add bishop and diagonal queen moves
     Bitboard moves = generateBishopMoves(squareAsBitboard, color);
     Bitboard intersect = moves & (this->board.getBishops(getOppositeColor(color)) & (~pins.absolutePins));
-    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::BISHOP, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::BISHOP, oppositeColor, occupied, numberOfAttacks, attack_info);
 
     intersect = moves & (this->board.getQueens(getOppositeColor(color)) & (~pins.absolutePins));
-    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::QUEEN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::QUEEN, oppositeColor, occupied, numberOfAttacks, attack_info);
 
     //add rook and horizontal/vertical queen moves
     moves = generateRookMoves(squareAsBitboard, color);
     intersect = moves & (this->board.getRooks(getOppositeColor(color)) & (~pins.absolutePins));
-    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::ROOK, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::ROOK, oppositeColor, occupied, numberOfAttacks, attack_info);
 
     intersect = moves & (this->board.getQueens(getOppositeColor(color)) & (~pins.absolutePins));
-    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::QUEEN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::QUEEN, oppositeColor, occupied, numberOfAttacks, attack_info);
 
     //add knight moves
     moves = generateKnightMoves(squareAsBitboard, color);
     intersect = moves & (this->board.getKnights(getOppositeColor(color)) & (~pins.absolutePins));
-    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::KNIGHT, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
+    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::KNIGHT, oppositeColor, occupied, numberOfAttacks, attack_info);
 
     //add pawn moves
     moves = generatePawnAttacks(squareAsBitboard, color); //& this->board.getOccupiedBy(getOppositeColor(color));
     if((squareAsBitboard & this->board.getOccupiedBy(color)) != 0) {
         intersect = moves & (this->board.getPawns(getOppositeColor(color)) & (~pins.absolutePins));
-        convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::PAWN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
+        convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::PAWN, oppositeColor, occupied, numberOfAttacks, attack_info);
     }
 
     //add en passent moves
@@ -767,14 +784,14 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
             //en passent square is moved up one row and compared with attacked square
             if((moves << DirectionValues::NORTH) == squareAsBitboard){
                 //piece can be captured by en passent
-                Move move(pawn, (Square)__builtin_ctzll(moves), PieceType::PAWN, color, MoveType::EN_PASSENT_CAPTURE);
+                Move move(pawn, (Square)__builtin_ctzll(moves), PieceType::PAWN, oppositeColor, MoveType::EN_PASSENT_CAPTURE);
                 numberOfAttacks++;
                 attack_info.moves.push_back(move);
             }
         } else if(color == BLACK && moves != 0){
             //en passent square is moved down one row and compared with attacked square
             if((moves >> DirectionValues::SOUTH) == squareAsBitboard) {
-                Move move(pawn, (Square)__builtin_ctzll(moves), PieceType::PAWN, color, MoveType::EN_PASSENT_CAPTURE);
+                Move move(pawn, (Square)__builtin_ctzll(moves), PieceType::PAWN, oppositeColor, MoveType::EN_PASSENT_CAPTURE);
                 numberOfAttacks++;
                 attack_info.moves.push_back(move);
             }
