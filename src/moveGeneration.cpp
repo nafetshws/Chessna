@@ -137,6 +137,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
     //TODO: consider pinned pieces
     else if(check_info.numberOfChecks == 1) {
+        std::cout << "is in check" << std::endl;
         //Possiblites to react when in check:
         //1. move king out of check -> already in moves
         //2. capture the checking piece
@@ -156,11 +157,15 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             Bitboard kingAsSlidingPieceMoves; 
             //there could be multiple queens on the board -> look up pos of checking piece
             Bitboard enemyMoves;
+            Bitboard bishopIntersection = EMPTY;
             switch(checkingPieceType) {
                 case QUEEN:
                     //TODO: Check for problems!!!
-                    enemyMoves = generateQueenMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
-                    kingAsSlidingPieceMoves = generateQueenMoves(this->board.getKing(color), color);
+                    enemyMoves = generateBishopMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
+                    kingAsSlidingPieceMoves = generateBishopMoves(this->board.getKing(color), color);
+                    bishopIntersection = enemyMoves & kingAsSlidingPieceMoves;
+                    enemyMoves = generateRookMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
+                    kingAsSlidingPieceMoves = generateRookMoves(this->board.getKing(color), color);
                     break;
                 case ROOK:
                     enemyMoves = generateRookMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
@@ -176,7 +181,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             }
 
             //the intersection of the enemy pieces moves and the king as the sliding piece move mark the squares that can block the enemy piece
-            Bitboard intersectionRay = kingAsSlidingPieceMoves & enemyMoves;
+            Bitboard intersectionRay = (kingAsSlidingPieceMoves & enemyMoves) | bishopIntersection;
 
             //transform bitboard of squares to block the attacker into moves by the attacked player
             while(intersectionRay != 0) {

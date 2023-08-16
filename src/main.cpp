@@ -8,11 +8,11 @@
 
 int main(){
     //std::string fen = DEFAULT_FEN; 
-    std::string fen = "r1bqkbnr/pppppppp/n7/8/8/4P3/PPPP1PPP/RNBQKBNR b KQkq - 0 1"; 
+    std::string fen = "rnb1kbnr/pp1ppppp/2p5/q7/8/3P4/PPPKPPPP/RNBQ1BNR w HAkq - 0 1"; 
     Board board(fen);
     
     MoveGeneration moveGeneration(board);
-    u64 nodes = moveGeneration.perft(2, WHITE);
+    u64 nodes = moveGeneration.perft(1, WHITE);
 
     std::cout << "Nodes: " << nodes << std::endl;
 
