@@ -379,7 +379,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             bishopMoves = ~(1ULL << destination) & bishopMoves;
         }
         //remove bishop from
-        bishops = (~bishop) & bishop;
+        bishops = (~bishop) & bishops;
     }
 
     //generate queen moves
@@ -404,6 +404,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
 Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
     if(bishops == (CURRENT_POSITION)) bishops = this->board.getBishops(color); 
+
+    std::cout << "Bs: " << bishops << std::endl;
 
     Bitboard allSinlgeMoves = EMPTY;
     Bitboard totalMoves = EMPTY;
