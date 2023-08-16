@@ -137,7 +137,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
     //TODO: consider pinned pieces
     else if(check_info.numberOfChecks == 1) {
-        std::cout << "is in check" << std::endl;
         //Possiblites to react when in check:
         //1. move king out of check -> already in moves
         //2. capture the checking piece
@@ -158,34 +157,56 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             //there could be multiple queens on the board -> look up pos of checking piece
             Bitboard enemyMoves;
             Bitboard bishopIntersection = EMPTY;
+            Bitboard intersection = EMPTY;
+
+            Color oppositeColor = getOppositeColor(color);
+
+            std::vector<Direction> dirs = {SW, SE, NW, NE};
+            std::vector<Direction> oppositeDirs = {NE, NW, SE, SW};
+
+            std::vector<Direction> verticalDirs = {S, N, E, W};
+            std::vector<Direction> verticalOppositeDirs = {N, S, W, E};
+
             switch(checkingPieceType) {
                 case QUEEN:
-                    //TODO: Check for problems!!!
-                    enemyMoves = generateBishopMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
-                    kingAsSlidingPieceMoves = generateBishopMoves(this->board.getKing(color), color);
-                    bishopIntersection = enemyMoves & kingAsSlidingPieceMoves;
-                    enemyMoves = generateRookMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
-                    kingAsSlidingPieceMoves = generateRookMoves(this->board.getKing(color), color);
+                    for(int i = 0; i < dirs.size(); i++) {
+                        kingAsSlidingPieceMoves = getAllLegalMovesOf(this->board.getKing(color), dirs.at(i), color);
+                        enemyMoves = getAllLegalMovesOf(squareToBitboard(check_info.moves.at(0).origin), oppositeDirs.at(i), oppositeColor);
+
+                        //the intersection of the enemy pieces moves and the king as the sliding piece move mark the squares that can block the enemy piece
+                        intersection |= (kingAsSlidingPieceMoves & enemyMoves);
+
+                        kingAsSlidingPieceMoves = getAllLegalMovesOf(this->board.getKing(color), verticalDirs.at(i), color);
+                        enemyMoves = getAllLegalMovesOf(squareToBitboard(check_info.moves.at(0).origin), verticalOppositeDirs.at(i), oppositeColor);
+
+                        intersection |= (kingAsSlidingPieceMoves & enemyMoves);
+                    }
                     break;
                 case ROOK:
-                    enemyMoves = generateRookMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
-                    kingAsSlidingPieceMoves = generateRookMoves(this->board.getKing(color), color);
+                    for(int i = 0; i < dirs.size(); i++) {
+                        kingAsSlidingPieceMoves = getAllLegalMovesOf(this->board.getKing(color), verticalDirs.at(i), color);
+                        enemyMoves = getAllLegalMovesOf(squareToBitboard(check_info.moves.at(0).origin), verticalOppositeDirs.at(i), oppositeColor);
+
+                        intersection |= (kingAsSlidingPieceMoves & enemyMoves);
+                    }
+                    break;
                     break;
                 case BISHOP:
-                    enemyMoves = generateBishopMoves(1ULL << check_info.moves.at(0).origin, getOppositeColor(color));
-                    kingAsSlidingPieceMoves = generateBishopMoves(this->board.getKing(color), color);
+                    for(int i = 0; i < dirs.size(); i++) {
+                        kingAsSlidingPieceMoves = getAllLegalMovesOf(this->board.getKing(color), dirs.at(i), color);
+                        enemyMoves = getAllLegalMovesOf(squareToBitboard(check_info.moves.at(0).origin), oppositeDirs.at(i), oppositeColor);
+
+                        intersection |= (kingAsSlidingPieceMoves & enemyMoves);
+                    }
                     break;
                 default:
                     std::cout << "Error while calculating blocking pieces" << std::endl;
                     break;
             }
 
-            //the intersection of the enemy pieces moves and the king as the sliding piece move mark the squares that can block the enemy piece
-            Bitboard intersectionRay = (kingAsSlidingPieceMoves & enemyMoves) | bishopIntersection;
-
             //transform bitboard of squares to block the attacker into moves by the attacked player
-            while(intersectionRay != 0) {
-                Square destination = __builtin_ctzll(intersectionRay);
+            while(intersection != 0) {
+                Square destination = __builtin_ctzll(intersection);
                 Attack_Info a_info = isUnderAttack(destination, getOppositeColor(color));
                 moves.insert(moves.end(), a_info.moves.begin(), a_info.moves.end());
 
@@ -198,7 +219,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     pawns = pawns & (~squareToBitboard(pawn));
                 }
 
-                intersectionRay = ~(1ULL << destination) & intersectionRay;
+                intersection = ~(1ULL << destination) & intersection;
             }
 
         }
