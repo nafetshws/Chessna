@@ -405,8 +405,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 Bitboard MoveGeneration::generateBishopMoves(Bitboard bishops, Color color) {
     if(bishops == (CURRENT_POSITION)) bishops = this->board.getBishops(color); 
 
-    std::cout << "Bs: " << bishops << std::endl;
-
     Bitboard allSinlgeMoves = EMPTY;
     Bitboard totalMoves = EMPTY;
 
@@ -712,9 +710,11 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
     convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::KNIGHT, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
 
     //add pawn moves
-    moves = generatePawnAttacks(squareAsBitboard, color);
-    intersect = moves & (this->board.getPawns(getOppositeColor(color)) & (~pins.absolutePins));
-    convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::PAWN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
+    moves = generatePawnAttacks(squareAsBitboard, color); //& this->board.getOccupiedBy(getOppositeColor(color));
+    if((squareAsBitboard & this->board.getOccupiedBy(color)) != 0) {
+        intersect = moves & (this->board.getPawns(getOppositeColor(color)) & (~pins.absolutePins));
+        convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::PAWN, color, MoveType::CAPTURE, numberOfAttacks, attack_info);
+    }
 
     //add en passent moves
     Bitboard pawns = this->board.getPawns(getOppositeColor(color)) & (~pins.absolutePins);
