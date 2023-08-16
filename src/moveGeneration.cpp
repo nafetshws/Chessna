@@ -183,8 +183,19 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                 Square destination = __builtin_ctzll(intersectionRay);
                 Attack_Info a_info = isUnderAttack(destination, getOppositeColor(color));
                 moves.insert(moves.end(), a_info.moves.begin(), a_info.moves.end());
+
+                //check whether pawn pushes can block the attack
+                Bitboard pawns = this->board.getPawns(color);
+                while(pawns != 0) {
+                    Square pawn = __builtin_ctzll(pawns);
+                    Bitboard pawnMoves = generatePawnMoves(squareToBitboard(pawn), color);
+                    if((pawnMoves & squareToBitboard(destination)) != 0) moves.push_back(Move(pawn, destination, PieceType::PAWN, color, MoveType::PAWN_PUSH));
+                    pawns = pawns & (~squareToBitboard(pawn));
+                }
+
                 intersectionRay = ~(1ULL << destination) & intersectionRay;
             }
+
         }
         return moves;
     }
