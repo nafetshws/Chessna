@@ -8,8 +8,10 @@ MoveGeneration::MoveGeneration(Board board) {
     this->board = board;
 }
 
-u64 MoveGeneration::perft(int depth, Color color) {
+u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
+    u64 totalNodes = 0ULL;
     u64 nodes = 0ULL;
+
 
     if(depth == 0) return 1ULL; 
     
@@ -17,11 +19,17 @@ u64 MoveGeneration::perft(int depth, Color color) {
     for(int i = 0; i < moves.size(); i++) {
         Board copyBoard = this->board;
         makeMove(moves.at(i));
-        nodes += perft(depth-1, getOppositeColor(color));
+        nodes = runPerft(depth-1, maxDepth, getOppositeColor(color));
+        totalNodes += nodes;
+        if(depth == maxDepth) std::cout << printableMove(moves.at(i)) << ": " << nodes << std::endl;
         //unmake move
         this->board = copyBoard;
     }
-    return nodes;
+    return totalNodes;
+}
+
+u64 MoveGeneration::perft(int depth, Color color) {
+    return runPerft(depth, depth, color);
 }
 
 void MoveGeneration::makeMove(Move move) {
@@ -305,6 +313,23 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     * Generate mvoes if the king isn't in check
     */
 
+    //generate pawn moves
+    Bitboard pawns = this->board.getPawns(color) &(~pinnedPiecesBitboard);
+    while(pawns != 0) {
+        Square origin = __builtin_ctzll(pawns);
+        Bitboard pawn = 1ULL << origin; 
+        Bitboard pawnMoves = generatePawnMoves(pawn, color);
+
+        while(pawnMoves != 0) {
+            Square destination = __builtin_ctzll(pawnMoves);
+            moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::PAWN_PUSH));
+            //delete move from bitboard
+            pawnMoves = ~(1ULL << destination) & pawnMoves;
+        }
+        //remove pawn from bitboard
+        pawns = (~pawn) & pawns;
+    }
+        
     //generate knight moves
     Bitboard knights = this->board.getKnights(color) & (~pinnedPiecesBitboard);
     while(knights != 0) {
@@ -374,23 +399,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
         queens = (~queen) & queens;
     }
 
-    //generate pawn moves
-    Bitboard pawns = this->board.getPawns(color) &(~pinnedPiecesBitboard);
-    while(pawns != 0) {
-        Square origin = __builtin_ctzll(pawns);
-        Bitboard pawn = 1ULL << origin; 
-        Bitboard pawnMoves = generatePawnMoves(pawn, color);
-
-        while(pawnMoves != 0) {
-            Square destination = __builtin_ctzll(pawnMoves);
-            moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::PAWN_PUSH));
-            //delete move from bitboard
-            pawnMoves = ~(1ULL << destination) & pawnMoves;
-        }
-        //remove pawn from bitboard
-        pawns = (~pawn) & pawns;
-    }
-        
     return moves;
 }
 
@@ -555,7 +563,8 @@ Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
         //single push
         Bitboard pawnSinglePushes = (pawns << NORTH) & (~board.getOccupied());
         //double push
-        Bitboard pawnDoublePushes = ((pawns & RANK_2) << 2*NORTH) & (~board.getOccupied());
+        Bitboard pawnDoublePushes = ((pawns & RANK_2) << NORTH) & (~board.getOccupied());
+        pawnDoublePushes = (pawnDoublePushes << NORTH) & (~board.getOccupied());
         Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
 
         Bitboard attacks = (generatePawnAttacks(pawns, color) & this->board.getOccupiedByBlack()) | generateEnPassentMoves(pawns, color); 
@@ -567,7 +576,8 @@ Bitboard MoveGeneration::generatePawnMoves(Bitboard pawns, Color color) {
         //single push
         Bitboard pawnSinglePushes = (pawns >> SOUTH) & (~board.getOccupied());
         //double push
-        Bitboard pawnDoublePushes = ((pawns & RANK_7) >> 2*SOUTH) & (~board.getOccupied());
+        Bitboard pawnDoublePushes = ((pawns & RANK_7) >> SOUTH) & (~board.getOccupied());
+        pawnDoublePushes = (pawnDoublePushes >> SOUTH) & (~board.getOccupied());
         Bitboard pushes = (pawnSinglePushes | pawnDoublePushes);
 
         Bitboard attacks = (generatePawnAttacks(pawns, color) & this->board.getOccupiedByWhite()) | generateEnPassentMoves(pawns, color);
@@ -635,14 +645,18 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     if(isInCheck(color).numberOfChecks == 0) {
         //king castle ability
         if(isUnderAttack(this->board.getKing(color) << 1, color).numberOfAttacks == 0
-        && isUnderAttack(this->board.getKing(color) << 2, color).numberOfAttacks == 0) {
+        && isUnderAttack(this->board.getKing(color) << 2, color).numberOfAttacks == 0
+        && ((this->board.getKing(color) << 1) & this->board.getOccupied()) == 0
+        && ((this->board.getKing(color) << 2) & this->board.getOccupied()) == 0) {
             if(this->board.getKingSideCastleAbility(color)) {
                castle = castle | (this->board.getKing(color) << 2); 
             }        
         }
 
         if(isUnderAttack(this->board.getKing(color) >> 1, color).numberOfAttacks == 0
-        && isUnderAttack(this->board.getKing(color) >> 2, color).numberOfAttacks == 0) {
+        && isUnderAttack(this->board.getKing(color) >> 2, color).numberOfAttacks == 0
+        && ((this->board.getKing(color) >> 1) & this->board.getOccupied()) == 0
+        && ((this->board.getKing(color) >> 2) & this->board.getOccupied()) == 0) {
             if(this->board.getQueenSideCastleAbility(color)) {
                castle = castle | (this->board.getKing(color) >> 2); 
             }        

@@ -8,6 +8,7 @@
 std::string convertSquareToCoordinate(Square square); 
 Color getOppositeColor(Color color);
 void printMoves(std::vector<Move> moves, int max = 20);
+std::string printableMove(Move move);
 Bitboard squareToBitboard(Square square);
 Square bitboardToSquare(Bitboard b);
 std::vector<Square> convertBitboardToSquares(Bitboard bitboard);

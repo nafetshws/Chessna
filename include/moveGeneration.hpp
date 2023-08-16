@@ -66,6 +66,8 @@ class MoveGeneration {
         bool checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboard attackerPawn, Color color);
         Piece findPiece(Square s);
 
+        u64 runPerft(int depth, int maxDepth, Color color);
+
 };
 
 #endif

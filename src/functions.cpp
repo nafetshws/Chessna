@@ -54,6 +54,11 @@ void printMoves(std::vector<Move> moves, int max){
     }
 }
 
+std::string printableMove(Move move) {
+    std::string stringMove =  convertSquareToCoordinate(move.origin) + convertSquareToCoordinate(move.destination);
+    return stringMove;
+}
+
 Bitboard squareToBitboard(Square square) {
     return 1ULL << square;
 }
