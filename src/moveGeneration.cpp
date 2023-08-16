@@ -350,7 +350,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(knightMoves != 0) {
             Square destination = __builtin_ctzll(knightMoves);
-            moves.push_back(Move(origin, destination, PieceType::KNIGHT, color, MoveType::QUIET));
+            MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+            moves.push_back(Move(origin, destination, PieceType::KNIGHT, color, moveType));
             //delete move from bitboard
             knightMoves = ~(1ULL << destination) & knightMoves;
         }
@@ -368,7 +369,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(rookMoves != 0) {
             Square destination = __builtin_ctzll(rookMoves);
-            moves.push_back(Move(origin, destination, PieceType::ROOK, color, MoveType::QUIET));
+            MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+            moves.push_back(Move(origin, destination, PieceType::ROOK, color, moveType));
             //delete move from bitboard
             rookMoves = ~(1ULL << destination) & rookMoves;
         }
@@ -385,7 +387,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(bishopMoves != 0) {
             Square destination = __builtin_ctzll(bishopMoves);
-            moves.push_back(Move(origin, destination, PieceType::BISHOP, color, MoveType::QUIET));
+            MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+            moves.push_back(Move(origin, destination, PieceType::BISHOP, color, moveType));
             //delete move from bitboard
             bishopMoves = ~(1ULL << destination) & bishopMoves;
         }
@@ -402,7 +405,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(queenMoves != 0) {
             Square destination = __builtin_ctzll(queenMoves);
-            moves.push_back(Move(origin, destination, PieceType::QUEEN, color, MoveType::QUIET));
+            MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+            moves.push_back(Move(origin, destination, PieceType::QUEEN, color, moveType));
             //delete move from bitboard
             queenMoves = ~(1ULL << destination) & queenMoves;
         }
