@@ -80,7 +80,7 @@ void MoveGeneration::makeMove(Move move) {
                 break;
             case KNIGHT:
                 if(target.color == WHITE) this->board.whiteKnights ^= squareToBitboard(move.destination);
-                else this->board.whiteKnights ^= squareToBitboard(move.destination);
+                else this->board.blackKnights ^= squareToBitboard(move.destination);
                 break;
             case BISHOP:
                 if(target.color == WHITE) this->board.whiteBishops ^= squareToBitboard(move.destination);
