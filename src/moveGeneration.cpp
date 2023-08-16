@@ -333,7 +333,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(pawnMoves != 0) {
             Square destination = __builtin_ctzll(pawnMoves);
-            moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::PAWN_PUSH));
+            MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+            moves.push_back(Move(origin, destination, PieceType::PAWN, color, moveType));
             //delete move from bitboard
             pawnMoves = ~(1ULL << destination) & pawnMoves;
         }
