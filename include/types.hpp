@@ -31,7 +31,7 @@ enum MoveType {
     QUEEN_PROMOTION,
     CAPTURE,
     EN_PASSENT_CAPTURE,
-    PAWN_PUSH,
+    DOUBLE_PAWN_PUSH,
     NULL_MOVE,
     KING_CASTLE,
     QUEEN_CASTLE,
@@ -126,7 +126,10 @@ const Bitboard FILE_H = 0x8080808080808080;
 const Bitboard EMPTY = 0x0;
 const Bitboard RANK_1 = 0xff;
 const Bitboard RANK_2 = 0xff00;
+const Bitboard RANK_3 = 0xff0000;
+const Bitboard RANK_4 = 0xff000000;
 const Bitboard RANK_5 = 0xff00000000;
+const Bitboard RANK_6 = 0xff0000000000;
 const Bitboard RANK_7 = 0xff000000000000;
 const Bitboard RANK_8 = 0xff00000000000000;
 
