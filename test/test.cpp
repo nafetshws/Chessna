@@ -138,7 +138,7 @@ void test_enPassentCheckEvasion(){
 
 void test_enPassentCheckEvasion2(){
     MoveGeneration moveGeneration{Board("k7/8/8/5Pp1/7K/8/8/8 w - g6 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 5);
+    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 6);
 }
 
 void test_enPassentCheckEvasion3(){

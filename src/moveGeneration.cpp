@@ -114,7 +114,7 @@ void MoveGeneration::makeMove(Move move) {
             Square enPassentSquare = bitboardToSquare(bDestination >> SOUTH);
             this->board.enPassentTargetSquare = enPassentSquare;
         } else {
-            Square enPassentSquare = bitboardToSquare(bDestination >> NORTH);
+            Square enPassentSquare = bitboardToSquare(bDestination << NORTH);
             this->board.enPassentTargetSquare = enPassentSquare;
         }
     }
@@ -377,16 +377,18 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             if((squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ) {
                 moveType = MoveType::CAPTURE;
             // double pawn move: distance 16
-            } else if(abs(destination - origin) > 12){ 
+            } else if(abs(destination - origin) > 15){ 
                 moveType = MoveType::DOUBLE_PAWN_PUSH;
-            //if destination is empty and the distance is greater than 8 but not greate than 15 -> ep 
+            //if destination is empty and the distance is greater than 8 but not greater than 15 -> ep 
             } else if(abs(destination - origin) > 8){ 
                 moveType = MoveType::EN_PASSENT_CAPTURE;
             } else { 
                 moveType = MoveType::QUIET;
             } 
 
-            moves.push_back(Move(origin, destination, PieceType::PAWN, color, moveType));
+            Move move = Move(origin, destination, PieceType::PAWN, color, moveType);
+
+            moves.push_back(move);
             //delete move from bitboard
             pawnMoves = ~(1ULL << destination) & pawnMoves;
         }
@@ -545,11 +547,6 @@ Bitboard MoveGeneration::generatePawnAttacks(Bitboard pawns, Color color) {
 }
 
 bool MoveGeneration::checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboard attackerPawn, Color color) {
-
-    std::cout << "before: " << this->board.whitePawns << std::endl;
-    std::cout << "attacker: " << attackerPawn << std::endl;
-    std::cout << "target: " << targetPawn << std::endl;
-
     if(color == WHITE) {
         this->board.whitePawns = this->board.whitePawns & (~attackerPawn);
         this->board.blackPawns = this->board.blackPawns & (~targetPawn);
@@ -557,7 +554,6 @@ bool MoveGeneration::checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboa
         this->board.whitePawns = this->board.whitePawns & (~targetPawn);
         this->board.blackPawns = this->board.blackPawns & (~attackerPawn);
     }
-    std::cout << "after: " << this->board.whitePawns << std::endl;
 
     Color oppositeColor = getOppositeColor(color);
     bool enPassentPossible = false;
@@ -584,17 +580,17 @@ bool MoveGeneration::checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboa
         this->board.blackPawns = this->board.blackPawns | attackerPawn;
     }
 
-    std::cout << "after 2: " << this->board.whitePawns << std::endl;
     return enPassentPossible;
 }
 
 Bitboard MoveGeneration::generateEnPassentMoves(Bitboard pawns, Color color) {
     if(pawns == (CURRENT_POSITION)) pawns = this->board.getPawns(color) ;
 
+    //std::cout << "ep bitboard: " << this->board.enPassentTargetSquare << std::endl;
+
     Color oppositeColor = getOppositeColor(color);
 
     if(color == WHITE) {
-        std::cout << "color: white" << std::endl;
         //en passent
         bool enPassentPossible = false;
         Bitboard enPassentBitboard = EMPTY;
@@ -613,8 +609,6 @@ Bitboard MoveGeneration::generateEnPassentMoves(Bitboard pawns, Color color) {
         if(enPassentPossible) return enPassentBitboard;
         return 0ULL;
     } else {
-        std::cout << "color: black" << std::endl;
-        std::cout << "pawns: " << pawns << std::endl;
         //en passent
         bool enPassentPossible = false;
         Bitboard enPassentBitboard = EMPTY;
