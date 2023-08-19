@@ -16,6 +16,11 @@ u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
     if(depth == 0) return 1ULL; 
     
     std::vector<Move> moves = generateMoves(color);
+    //if(depth == 1) {
+    //    std::cout << "*****************" << std::endl;
+    //    printMoves(moves, 50);
+    //    std::cout << "*****************" << std::endl;
+    //}
 
     for(int i = 0; i < moves.size(); i++) {
         Board copyBoard = this->board;
@@ -763,7 +768,8 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
 
     Pins pins = getPinnedPieces(getOppositeColor(color));
 
-    Bitboard occupied = this->board.getOccupiedBy(getOppositeColor(color));
+    //Bitboard occupied = this->board.getOccupiedBy(getOppositeColor(color));
+    Bitboard occupied = this->board.getOccupiedBy(color);
 
     //add bishop and diagonal queen moves
     Bitboard moves = generateBishopMoves(squareAsBitboard, color);
