@@ -17,6 +17,12 @@ u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
     
     std::vector<Move> moves = generateMoves(color);
 
+    if(depth == 1) {
+        std::cout << "**********************" << std::endl;
+        printMoves(moves, 50);
+        std::cout << "**********************" << std::endl;
+    }
+
     for(int i = 0; i < moves.size(); i++) {
         Board copyBoard = this->board;
         makeMove(moves.at(i));
@@ -69,6 +75,7 @@ void MoveGeneration::makeMove(Move move) {
         *pieces = (*pieces & (~squareToBitboard(move.origin))) | squareToBitboard(move.destination);
         this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == CAPTURE) {
+        std::cout << "capture" << std::endl;
         Piece target = findPiece(move.destination);
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         switch(target.type) {
@@ -114,9 +121,11 @@ void MoveGeneration::makeMove(Move move) {
             Square enPassentSquare = bitboardToSquare(bDestination >> SOUTH);
             this->board.enPassentTargetSquare = enPassentSquare;
         } else {
+            std::cout << "black double pawn push: " << printableMove(move) << std::endl;
             Square enPassentSquare = bitboardToSquare(bDestination << NORTH);
             this->board.enPassentTargetSquare = enPassentSquare;
         }
+        *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
     }
 }
 
@@ -366,6 +375,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
     //generate pawn moves
     Bitboard pawns = this->board.getPawns(color) &(~pinnedPiecesBitboard);
+    std::cout << "pawns: " << pawns << std::endl;
+    std::cout << "enemy pawns: " << this->board.blackPawns << std::endl;
     while(pawns != 0) {
         Square origin = __builtin_ctzll(pawns);
         Bitboard pawn = 1ULL << origin; 
@@ -435,7 +446,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
     //generate bishop moves
     Bitboard bishops = this->board.getBishops(color) & (~pinnedPiecesBitboard);
-    //std::cout << "bishops: " << bishops << std::endl;
     while(bishops != 0) {
         Square origin = __builtin_ctzll(bishops);
         Bitboard bishop = 1ULL << origin; 
