@@ -9,6 +9,7 @@
 class MoveGeneration {
     public:
         Board board;
+        Bitboard ignoreOccupence;
 
         MoveGeneration(Board board);
 
