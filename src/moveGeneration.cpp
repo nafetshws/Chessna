@@ -379,6 +379,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(pawnMoves != 0) {
             Square destination = __builtin_ctzll(pawnMoves);
+
             MoveType moveType; 
             if((squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ) {
                 moveType = MoveType::CAPTURE;
@@ -386,7 +387,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             } else if(abs(destination - origin) > 15){ 
                 moveType = MoveType::DOUBLE_PAWN_PUSH;
             //if destination is empty and the distance is greater than 8 but not greater than 15 -> ep 
-            } else if(abs(destination - origin) > 8){ 
+            } else if(abs(destination - origin) == 7 || abs(destination - origin) == 9){ 
                 moveType = MoveType::EN_PASSENT_CAPTURE;
             } else { 
                 moveType = MoveType::QUIET;
