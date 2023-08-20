@@ -16,11 +16,11 @@ u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
     if(depth == 0) return 1ULL; 
     
     std::vector<Move> moves = generateMoves(color);
-    if(depth == 1) {
-        std::cout << "*****************" << std::endl;
-        printMoves(moves, 50);
-        std::cout << "*****************" << std::endl;
-    }
+    //if(depth == 1) {
+    //    std::cout << "*****************" << std::endl;
+    //    printMoves(moves, 50);
+    //    std::cout << "*****************" << std::endl;
+    //}
 
     for(int i = 0; i < moves.size(); i++) {
         Board copyBoard = this->board;
@@ -75,7 +75,6 @@ void MoveGeneration::makeMove(Move move) {
         *pieces = (*pieces & (~squareToBitboard(move.origin))) | squareToBitboard(move.destination);
         this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == CAPTURE) {
-        //std::cout << "before: " << this->board.blackPawns << std::endl;
         Piece target = findPiece(move.destination);
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         switch(target.type) {
@@ -103,7 +102,6 @@ void MoveGeneration::makeMove(Move move) {
                 break;
         }
         this->board.enPassentTargetSquare = -1;
-        //std::cout << "after: " << this->board.blackPawns << std::endl;
     } else if (move.moveType == EN_PASSENT_CAPTURE) {
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         if(move.color == WHITE) {
@@ -304,7 +302,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     //caputres only
                     if(color == BLACK && direction == Direction::SW) {
                         if(((pin.pinnedPiece >> SOUTH_WEST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
-                            moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << SOUTH_WEST), PAWN, color, MoveType::CAPTURE));
+                            moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_WEST), PAWN, color, MoveType::CAPTURE));
                         }
                     } else if(color == WHITE && direction == Direction::NE) {
                         if(((pin.pinnedPiece << NORTH_EAST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
@@ -328,10 +326,11 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     //pawn pushes only
                     if(color == BLACK && direction == Direction::S) {
                         Bitboard pawnSinglePushes = (pin.pinnedPiece >> SOUTH) & (~board.getOccupied());
-                        Bitboard pawnDoublePushes = ((pin.pinnedPiece & RANK_7) >> 2*SOUTH) & (~board.getOccupied());
+                        Bitboard pawnDoublePushes = ((pin.pinnedPiece & RANK_7) >> SOUTH) & (~board.getOccupied());
+                        pawnDoublePushes = (pawnDoublePushes >> SOUTH) & (~board.getOccupied());
                         Bitboard pawnMoves = pawnSinglePushes | pawnDoublePushes;
 
-                        Square pinnedPieceOriginSquare = (pin.pinnedPiece);
+                        Square pinnedPieceOriginSquare = bitboardToSquare(pin.pinnedPiece);
                         std::vector<Square> destinations = convertBitboardToSquares(pawnMoves);
 
                         for(Square destination : destinations) {
@@ -340,7 +339,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                         }
                     } else if(color == WHITE && direction == Direction::N) {
                         Bitboard pawnSinglePushes = (pin.pinnedPiece << NORTH) & (~board.getOccupied());
-                        Bitboard pawnDoublePushes = ((pin.pinnedPiece & RANK_2) << 2*NORTH) & (~board.getOccupied());
+                        Bitboard pawnDoublePushes = ((pin.pinnedPiece & RANK_2) << NORTH) & (~board.getOccupied());
+                        pawnDoublePushes = (pawnDoublePushes << NORTH) & (~board.getOccupied());
                         Bitboard pawnMoves = pawnSinglePushes | pawnDoublePushes;
 
                         Square pinnedPieceOriginSquare = (pin.pinnedPiece);
@@ -369,6 +369,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                 break; 
         }
     }
+
     /*
     * Generate mvoes if the king isn't in check
     */
@@ -397,6 +398,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             } 
 
             Move move = Move(origin, destination, PieceType::PAWN, color, moveType);
+
+            //std::cout << "pawn move: " << printableMove(move) << std::endl;
 
             moves.push_back(move);
             //delete move from bitboard
@@ -556,9 +559,6 @@ Bitboard MoveGeneration::generatePawnAttacks(Bitboard pawns, Color color) {
 }
 
 bool MoveGeneration::checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboard attackerPawn, Color color) {
-    std::cout << "before en passent check: " << this->board.blackPawns << std::endl;
-    std::cout << "t pawn: " << targetPawn << std::endl;
-    std::cout << "a pawn: " << attackerPawn << std::endl;
     if(color == WHITE) {
         this->board.whitePawns = this->board.whitePawns & (~attackerPawn);
         this->board.blackPawns = this->board.blackPawns & (~targetPawn);
@@ -591,8 +591,6 @@ bool MoveGeneration::checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboa
         this->board.whitePawns = this->board.whitePawns | targetPawn;
         this->board.blackPawns = this->board.blackPawns | attackerPawn;
     }
-
-    std::cout << "after en passent check: " << this->board.blackPawns << std::endl;
 
     return enPassentPossible;
 }
