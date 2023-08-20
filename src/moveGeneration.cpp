@@ -749,11 +749,12 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     Bitboard pseudoLegalMoves = attacks | castle;
 
     Bitboard legalMoves;
-    if(color == BLACK) {
-        legalMoves = (pseudoLegalMoves & ~this->board.getOccupiedByBlack()) & (~generateAttackedSquaresWithoutKing(WHITE)) & (~generateKingAttacks(CURRENT_POSITION, WHITE));
-    } else {
-        legalMoves = (pseudoLegalMoves & ~this->board.getOccupiedByWhite()) & (~generateAttackedSquaresWithoutKing(BLACK)) & (~generateKingAttacks(CURRENT_POSITION, BLACK));
-    }
+
+    legalMoves = (pseudoLegalMoves & ~this->board.getOccupiedBy(color)) & ~generateKingAttacks(CURRENT_POSITION, getOppositeColor(color));
+    this->ignoreOccupence |= legalMoves & this->board.getOccupiedBy(getOppositeColor(color));
+
+    if(color == WHITE) legalMoves &= ~generateAttackedSquaresWithoutKing(BLACK);
+    else legalMoves &= ~generateAttackedSquaresWithoutKing(WHITE);
 
     this->ignoreOccupence = EMPTY;
 

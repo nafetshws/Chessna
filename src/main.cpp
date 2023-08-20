@@ -8,7 +8,7 @@
 
 int main(){
     std::string fen = DEFAULT_FEN; 
-    //std::string fen = "rnb1kbnr/pppp1ppp/5q2/4p3/5P2/8/PPPPPKPP/RNBQ1BNR w HAkq - 0 1"; 
+    //std::string fen = "rnbq1bnr/ppppkppp/3Pp3/8/8/8/PPP1PPPP/RNBQKBNR b KQha - 0 1"; 
     Board board(fen);
     
     MoveGeneration moveGeneration(board);
