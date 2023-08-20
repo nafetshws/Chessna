@@ -16,11 +16,11 @@ u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
     if(depth == 0) return 1ULL; 
     
     std::vector<Move> moves = generateMoves(color);
-    //if(depth == 1) {
-    //    std::cout << "*****************" << std::endl;
-    //    printMoves(moves, 50);
-    //    std::cout << "*****************" << std::endl;
-    //}
+    if(depth == 1) {
+        std::cout << "*****************" << std::endl;
+        printMoves(moves, 50);
+        std::cout << "*****************" << std::endl;
+    }
 
     for(int i = 0; i < moves.size(); i++) {
         Board copyBoard = this->board;
@@ -70,10 +70,12 @@ void MoveGeneration::makeMove(Move move) {
             break;
     }
 
+
     if(move.moveType == QUIET) {
         *pieces = (*pieces & (~squareToBitboard(move.origin))) | squareToBitboard(move.destination);
         this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == CAPTURE) {
+        //std::cout << "before: " << this->board.blackPawns << std::endl;
         Piece target = findPiece(move.destination);
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         switch(target.type) {
@@ -101,6 +103,7 @@ void MoveGeneration::makeMove(Move move) {
                 break;
         }
         this->board.enPassentTargetSquare = -1;
+        //std::cout << "after: " << this->board.blackPawns << std::endl;
     } else if (move.moveType == EN_PASSENT_CAPTURE) {
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         if(move.color == WHITE) {
@@ -553,6 +556,9 @@ Bitboard MoveGeneration::generatePawnAttacks(Bitboard pawns, Color color) {
 }
 
 bool MoveGeneration::checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboard attackerPawn, Color color) {
+    std::cout << "before en passent check: " << this->board.blackPawns << std::endl;
+    std::cout << "t pawn: " << targetPawn << std::endl;
+    std::cout << "a pawn: " << attackerPawn << std::endl;
     if(color == WHITE) {
         this->board.whitePawns = this->board.whitePawns & (~attackerPawn);
         this->board.blackPawns = this->board.blackPawns & (~targetPawn);
@@ -586,6 +592,8 @@ bool MoveGeneration::checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboa
         this->board.blackPawns = this->board.blackPawns | attackerPawn;
     }
 
+    std::cout << "after en passent check: " << this->board.blackPawns << std::endl;
+
     return enPassentPossible;
 }
 
@@ -605,8 +613,8 @@ Bitboard MoveGeneration::generateEnPassentMoves(Bitboard pawns, Color color) {
                 Bitboard attackerPawn = enPassentBitboard >> SOUTH_EAST;
                 enPassentPossible = checkForEnPassenDiscoveredCheck(targetPawn, attackerPawn, color);
             } else if((((pawns & (~FILE_H) & RANK_5) << NORTH_EAST) & enPassentBitboard) == enPassentBitboard) {
-                Bitboard targetPawn = enPassentBitboard << SOUTH;
-                Bitboard attackerPawn = enPassentBitboard << SOUTH_WEST;
+                Bitboard targetPawn = enPassentBitboard >> SOUTH;
+                Bitboard attackerPawn = enPassentBitboard >> SOUTH_WEST;
                 enPassentPossible = checkForEnPassenDiscoveredCheck(targetPawn, attackerPawn, color);
             }
         }
