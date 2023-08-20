@@ -56,6 +56,10 @@ void printMoves(std::vector<Move> moves, int max){
 
 std::string printableMove(Move move) {
     std::string stringMove =  convertSquareToCoordinate(move.origin) + convertSquareToCoordinate(move.destination);
+    if(stringMove == "a67108865f5") {
+        std::cout << "origin: " << move.origin << std::endl;
+        std::cout << "destination: " << move.destination << std::endl;
+    }
     return stringMove;
 }
 

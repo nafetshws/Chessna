@@ -343,7 +343,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                         pawnDoublePushes = (pawnDoublePushes << NORTH) & (~board.getOccupied());
                         Bitboard pawnMoves = pawnSinglePushes | pawnDoublePushes;
 
-                        Square pinnedPieceOriginSquare = (pin.pinnedPiece);
+                        Square pinnedPieceOriginSquare = bitboardToSquare(pin.pinnedPiece);
                         std::vector<Square> destinations = convertBitboardToSquares(pawnMoves);
 
                         for(Square destination : destinations) {
@@ -398,8 +398,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             } 
 
             Move move = Move(origin, destination, PieceType::PAWN, color, moveType);
-
-            //std::cout << "pawn move: " << printableMove(move) << std::endl;
 
             moves.push_back(move);
             //delete move from bitboard
