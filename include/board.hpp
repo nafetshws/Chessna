@@ -32,6 +32,11 @@ struct Board {
     void removeKingSideCastleAbillity(Color color = BLACK);
     void removeQueenSideCastleAbillity(Color color = BLACK);
 
+    void makeQueenPromotion(Move move);
+    void makeRookPromotion(Move move);
+    void makeBishopPromotion(Move move);
+    void makeKnightPromotion(Move move);
+
     void printBoard(Bitboard board); 
     void prettyPrintBoard();
 

@@ -40,6 +40,7 @@ u64 MoveGeneration::perft(int depth, Color color) {
 
 void MoveGeneration::makeMove(Move move) {
     Bitboard *pieces; 
+    Bitboard t = move.moveType;
 
     switch(move.pieceType) {
         case PAWN:
@@ -73,7 +74,7 @@ void MoveGeneration::makeMove(Move move) {
     if(move.moveType == QUIET) {
         *pieces = (*pieces & (~squareToBitboard(move.origin))) | squareToBitboard(move.destination);
         this->board.enPassentTargetSquare = -1;
-    } else if(move.moveType == CAPTURE) {
+    } else if(move.moveType == CAPTURE || t == CAPTURE_BISHOP_PROMOTION || t == CAPTURE_KNIGHT_PROMOTION|| t == CAPTURE_ROOK_PROMOTION|| t == CAPTURE_QUEEN_PROMOTION) {
         Piece target = findPiece(move.destination);
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         switch(target.type) {
@@ -101,7 +102,27 @@ void MoveGeneration::makeMove(Move move) {
                 break;
         }
         this->board.enPassentTargetSquare = -1;
-    } else if (move.moveType == EN_PASSENT_CAPTURE) {
+
+        if(move.moveType != CAPTURE) {
+            switch(move.moveType) {
+                case CAPTURE_BISHOP_PROMOTION:
+                    this->board.makeBishopPromotion(move);
+                    break;
+                case CAPTURE_KNIGHT_PROMOTION:
+                    this->board.makeKnightPromotion(move);
+                    break;
+                case CAPTURE_ROOK_PROMOTION:
+                    this->board.makeRookPromotion(move);
+                    break;
+                case CAPTURE_QUEEN_PROMOTION:
+                    this->board.makeQueenPromotion(move);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    } else if (move.moveType == EN_PASSENT_CAPTURE || t == EP_BISHOP_PROMOTION || t == EP_KNIGHT_PROMOTION|| t == EP_ROOK_PROMOTION|| t == EP_QUEEN_PROMOTION) {
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         if(move.color == WHITE) {
             Bitboard enPassentSquare = squareToBitboard(this->board.enPassentTargetSquare);
@@ -123,10 +144,37 @@ void MoveGeneration::makeMove(Move move) {
             this->board.enPassentTargetSquare = enPassentSquare;
         }
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
+
+        if(move.moveType != EN_PASSENT_CAPTURE) {
+            switch(move.moveType) {
+                case EP_BISHOP_PROMOTION:
+                    this->board.makeBishopPromotion(move);
+                    break;
+                case EP_KNIGHT_PROMOTION:
+                    this->board.makeKnightPromotion(move);
+                    break;
+                case EP_ROOK_PROMOTION:
+                    this->board.makeRookPromotion(move);
+                    break;
+                case EP_QUEEN_PROMOTION:
+                    this->board.makeQueenPromotion(move);
+                    break;
+                default:
+                    break;
+            }
+        }
     } else if(move.moveType == KING_CASTLE) {
         this->board.castleKingSide(move.color);
     } else if(move.moveType == QUEEN_CASTLE) {
         this->board.castleQueenSide(move.color);
+    } else if(move.moveType == QUEEN_PROMOTION) {
+        this->board.makeQueenPromotion(move);
+    } else if(move.moveType == ROOK_PROMOTION) {
+        this->board.makeRookPromotion(move);
+    } else if(move.moveType == BISHOP_PROMOTION) {
+        this->board.makeBishopPromotion(move);
+    } else if(move.moveType == KNIGHT_PROMOTION) {
+        this->board.makeKnightPromotion(move);
     }
 
     if(move.pieceType == ROOK) {
@@ -262,8 +310,16 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     Square pawn = __builtin_ctzll(pawns);
                     Bitboard pawnMoves = generatePawnMoves(squareToBitboard(pawn), color);
                     if((pawnMoves & squareToBitboard(destination)) != 0) {
-                        MoveType moveType = abs(pawn - destination) > 8 ? MoveType::DOUBLE_PAWN_PUSH : MoveType::QUIET;
-                        moves.push_back(Move(pawn, destination, PieceType::PAWN, color, moveType));
+                        Bitboard promotionRank = (color == WHITE) ? RANK_8 : RANK_1;
+                        if((squareToBitboard(destination) & promotionRank) != 0) {
+                            moves.push_back(Move(pawn, destination, PieceType::PAWN, color, MoveType::QUEEN_PROMOTION));
+                            moves.push_back(Move(pawn, destination, PieceType::PAWN, color, MoveType::ROOK_PROMOTION));
+                            moves.push_back(Move(pawn, destination, PieceType::PAWN, color, MoveType::BISHOP_PROMOTION));
+                            moves.push_back(Move(pawn, destination, PieceType::PAWN, color, MoveType::KNIGHT_PROMOTION));
+                        } else {
+                            MoveType moveType = abs(pawn - destination) > 8 ? MoveType::DOUBLE_PAWN_PUSH : MoveType::QUIET;
+                            moves.push_back(Move(pawn, destination, PieceType::PAWN, color, moveType));
+                        }
                     }
                     pawns = pawns & (~squareToBitboard(pawn));
                 }
@@ -414,20 +470,47 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
             MoveType moveType; 
             if((squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ) {
-                moveType = MoveType::CAPTURE;
+                Bitboard promotionRank = (color == WHITE) ? RANK_8 : RANK_1;
+                if((squareToBitboard(destination) & promotionRank) != 0) {
+                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::CAPTURE_QUEEN_PROMOTION));
+                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::CAPTURE_ROOK_PROMOTION));
+                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::CAPTURE_BISHOP_PROMOTION));
+                    //moves.push_back(Move(pawn, destination, PieceType::PAWN, color, MoveType::CAPTURE_KNIGHT_PROMOTION));
+                    moveType = MoveType::CAPTURE_KNIGHT_PROMOTION;
+                } else {
+                    moveType = MoveType::CAPTURE;
+                }
             // double pawn move: distance 16
             } else if(abs(destination - origin) > 15){ 
                 moveType = MoveType::DOUBLE_PAWN_PUSH;
             //if destination is empty and the distance is greater than 8 but not greater than 15 -> ep 
             } else if(abs(destination - origin) == 7 || abs(destination - origin) == 9){ 
-                moveType = MoveType::EN_PASSENT_CAPTURE;
+                Bitboard promotionRank = (color == WHITE) ? RANK_8 : RANK_1;
+                if((squareToBitboard(destination) & promotionRank) != 0) {
+                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::EP_QUEEN_PROMOTION));
+                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::EP_ROOK_PROMOTION));
+                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::EP_BISHOP_PROMOTION));
+                    //moves.push_back(Move(pawn, destination, PieceType::PAWN, color, MoveType::EP_KNIGHT_PROMOTION));
+                    moveType = MoveType::EP_KNIGHT_PROMOTION;
+                } else {
+                    moveType = MoveType::EN_PASSENT_CAPTURE;
+                }
             } else { 
-                moveType = MoveType::QUIET;
+                Bitboard promotionRank = (color == WHITE) ? RANK_8 : RANK_1;
+                if((squareToBitboard(destination) & promotionRank) != 0) {
+                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::QUEEN_PROMOTION));
+                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::ROOK_PROMOTION));
+                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::BISHOP_PROMOTION));
+                    //moves.push_back(Move(pawn, destination, PieceType::PAWN, color, MoveType::KNIGHT_PROMOTION));
+                    moveType = MoveType::KNIGHT_PROMOTION;
+                } else {
+                    moveType = MoveType::QUIET;
+                }
             } 
 
             Move move = Move(origin, destination, PieceType::PAWN, color, moveType);
-
             moves.push_back(move);
+
             //delete move from bitboard
             pawnMoves = ~(1ULL << destination) & pawnMoves;
         }

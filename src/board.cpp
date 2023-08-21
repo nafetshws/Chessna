@@ -240,6 +240,47 @@ void Board::removeQueenSideCastleAbillity(Color color) {
     this->castlingAbillity.erase(std::remove(this->castlingAbillity.begin(), this->castlingAbillity.end(), charToremove));
 }
 
+
+void Board::makeRookPromotion(Move move) {
+    if(move.color == WHITE) {
+        this->whitePawns &= ~(squareToBitboard(move.origin));
+        this->whiteRooks |= squareToBitboard(move.destination);
+    } else {
+        this->blackPawns &= ~(squareToBitboard(move.origin));
+        this->blackRooks |= squareToBitboard(move.destination);
+    }
+}
+
+void Board::makeBishopPromotion(Move move) {
+    if(move.color == WHITE) {
+        this->whitePawns &= ~(squareToBitboard(move.origin));
+        this->whiteBishops |= squareToBitboard(move.destination);
+    } else {
+        this->blackPawns &= ~(squareToBitboard(move.origin));
+        this->blackBishops |= squareToBitboard(move.destination);
+    }
+}
+
+void Board::makeKnightPromotion(Move move) {
+    if(move.color == WHITE) {
+        this->whitePawns &= ~(squareToBitboard(move.origin));
+        this->whiteKnights |= squareToBitboard(move.destination);
+    } else {
+        this->blackPawns &= ~(squareToBitboard(move.origin));
+        this->blackKnights |= squareToBitboard(move.destination);
+    }
+}
+
+void Board::makeQueenPromotion(Move move) {
+    if(move.color == WHITE) {
+        this->whitePawns &= ~(squareToBitboard(move.origin));
+        this->whiteQueen |= squareToBitboard(move.destination);
+    } else {
+        this->blackPawns &= ~(squareToBitboard(move.origin));
+        this->whiteQueen |= squareToBitboard(move.destination);
+    }
+}
+
 void Board::printBoard(Bitboard board) {
     std::string boardAsString = std::to_string(board);
     std::cout << "Board: " << boardAsString << std::endl;

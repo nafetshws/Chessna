@@ -56,9 +56,15 @@ void printMoves(std::vector<Move> moves, int max){
 
 std::string printableMove(Move move) {
     std::string stringMove =  convertSquareToCoordinate(move.origin) + convertSquareToCoordinate(move.destination);
-    if(stringMove == "a67108865f5") {
-        std::cout << "origin: " << move.origin << std::endl;
-        std::cout << "destination: " << move.destination << std::endl;
+    MoveType t = move.moveType;
+    if(t == QUEEN_PROMOTION || t == CAPTURE_QUEEN_PROMOTION || t == EP_QUEEN_PROMOTION) {
+        stringMove += "q";
+    } else if(t == ROOK_PROMOTION || t == CAPTURE_ROOK_PROMOTION || t == EP_ROOK_PROMOTION) {
+        stringMove += "r";
+    } else if(t == KNIGHT_PROMOTION || t == CAPTURE_KNIGHT_PROMOTION || t == EP_KNIGHT_PROMOTION) {
+        stringMove += "n";
+    } else if(t == BISHOP_PROMOTION || t == CAPTURE_BISHOP_PROMOTION || t == EP_BISHOP_PROMOTION) {
+        stringMove += "b";
     }
     return stringMove;
 }
