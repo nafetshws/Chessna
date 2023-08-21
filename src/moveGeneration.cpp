@@ -839,8 +839,11 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
 
     if(isInCheck(color).numberOfChecks == 0) {
         //king castle ability
+        Bitboard pawnAttacks = generatePawnAttacks(this->board.getPawns(getOppositeColor(color)), getOppositeColor(color));
         if(isUnderAttack(this->board.getKing(color) << 1, color).numberOfAttacks == 0
         && isUnderAttack(this->board.getKing(color) << 2, color).numberOfAttacks == 0
+        && ((this->board.getKing(color) << 1) & pawnAttacks) == 0
+        && ((this->board.getKing(color) << 2) & pawnAttacks) == 0
         && ((this->board.getKing(color) << 1) & this->board.getOccupied()) == 0
         && ((this->board.getKing(color) << 2) & this->board.getOccupied()) == 0) {
             if(this->board.getKingSideCastleAbility(color)) {
@@ -850,6 +853,8 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
 
         if(isUnderAttack(this->board.getKing(color) >> 1, color).numberOfAttacks == 0
         && isUnderAttack(this->board.getKing(color) >> 2, color).numberOfAttacks == 0
+        && ((this->board.getKing(color) >> 1) & pawnAttacks) == 0
+        && ((this->board.getKing(color) >> 2) & pawnAttacks) == 0
         && ((this->board.getKing(color) >> 1) & this->board.getOccupied()) == 0
         && ((this->board.getKing(color) >> 2) & this->board.getOccupied()) == 0) {
             if(this->board.getQueenSideCastleAbility(color)) {
@@ -911,8 +916,13 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
 
     //add pawn moves
     moves = generatePawnAttacks(squareAsBitboard, color); //& this->board.getOccupiedBy(getOppositeColor(color));
+    //std::cout << "attacks (" << bitboardToSquare(squareAsBitboard) << "): " << moves << std::endl;
+    //std::cout << "square as bitboard: " << squareAsBitboard << std::endl;
     if((squareAsBitboard & this->board.getOccupiedBy(color)) != 0) {
-        intersect = moves & (this->board.getPawns(oppositeColor) & (~pins.absolutePins));
+        intersect = (moves & (this->board.getPawns(oppositeColor)) & (~pins.absolutePins));
+        //std::cout << "intersect: " << intersect << std::endl;
+        //std::cout << "moves: " << moves << std::endl;
+        //std::cout << "pawns: " << this->board.getPawns(oppositeColor) << std::endl;
         convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::PAWN, oppositeColor, occupied, numberOfAttacks, attack_info);
     }
 

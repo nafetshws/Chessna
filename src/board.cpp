@@ -196,7 +196,7 @@ bool Board::getQueenSideCastleAbility(Color color) {
 void Board::castleKingSide(Color color) {
     if(color == WHITE) {
         //check if castling is still available
-        if(this->castlingAbillity.find('K') != std::string::npos) return;
+        //if(this->castlingAbillity.find('K') != std::string::npos) return;
         //move king
         this->whiteKing = (this->whiteKing << 2);
         //move rook
@@ -204,7 +204,7 @@ void Board::castleKingSide(Color color) {
         //this->whiteRooks = (this->whiteRooks - squareToBitboard(7)) + squareToBitboard(5);
     } else {
         //check if castling is still available
-        if(this->castlingAbillity.find('k') != std::string::npos) return;
+        //if(this->castlingAbillity.find('k') != std::string::npos) return;
         //move king
         this->blackKing = (this->blackKing << 2);
         //move rook
@@ -215,14 +215,14 @@ void Board::castleKingSide(Color color) {
 void Board::castleQueenSide(Color color) {
     if(color == WHITE) {
         //check if castling is still available
-        if(this->castlingAbillity.find('Q') != std::string::npos) return;
+        //if(this->castlingAbillity.find('Q') != std::string::npos) return;
         //move king
         this->whiteKing = (this->whiteKing >> 2);
         //move rook
         this->whiteRooks += (1ULL << 3)-1;
     } else {
         //check if castling is still available
-        if(this->castlingAbillity.find('q') != std::string::npos) return;
+        //if(this->castlingAbillity.find('q') != std::string::npos) return;
         //move king
         this->blackKing = (this->blackKing >> 2);
         //move rook

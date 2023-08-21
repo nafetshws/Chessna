@@ -8,7 +8,7 @@
 
 int main(){
     //std::string fen = DEFAULT_FEN; 
-    std::string fen = "8/k5P1/8/8/8/8/8/K7 w - - 0 1"; 
+    std::string fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"; 
     Board board(fen);
     
     MoveGeneration moveGeneration(board);
@@ -16,7 +16,7 @@ int main(){
     //std::vector<Move> moves = moveGeneration.generateMoves(WHITE);
     //printMoves(moves);
 
-    u64 nodes = moveGeneration.perft(5, WHITE);
+    u64 nodes = moveGeneration.perft(3, WHITE);
 
     std::cout << "Nodes: " << nodes << std::endl;
 
