@@ -70,7 +70,6 @@ void MoveGeneration::makeMove(Move move) {
             break;
     }
 
-
     if(move.moveType == QUIET) {
         *pieces = (*pieces & (~squareToBitboard(move.origin))) | squareToBitboard(move.destination);
         this->board.enPassentTargetSquare = -1;
@@ -124,6 +123,29 @@ void MoveGeneration::makeMove(Move move) {
             this->board.enPassentTargetSquare = enPassentSquare;
         }
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
+    } else if(move.moveType == KING_CASTLE) {
+        this->board.castleKingSide(move.color);
+    } else if(move.moveType == QUEEN_CASTLE) {
+        this->board.castleQueenSide(move.color);
+    }
+
+    if(move.pieceType == ROOK) {
+        Bitboard h1 = 0x80;
+        Bitboard h8 = 0x8000000000000000; 
+        Bitboard a1 = 0x1;
+        Bitboard a8 = 0x100000000000000;
+
+        if(move.color == WHITE) {
+            if(move.origin == a1) this->board.removeQueenSideCastleAbillity(move.color);
+            else if(move.origin == h1) this->board.removeKingSideCastleAbillity(move.color);
+        } else {
+            if(move.origin == a8) this->board.removeQueenSideCastleAbillity(move.color);
+            else if(move.origin == h8) this->board.removeKingSideCastleAbillity(move.color);
+        }
+    } else if(move.pieceType == KING) {
+        //remove casting ability
+        this->board.removeKingSideCastleAbillity(move.color);
+        this->board.removeQueenSideCastleAbillity(move.color);
     }
 }
 
@@ -139,7 +161,13 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     //transform moves from bitboard into a vector
     while(kingMoves != 0) {
         Square destination = __builtin_ctzll(kingMoves);
+        //castle
         MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+        if(abs(destination - kingOrigin) == 2) {
+            moveType = (squareToBitboard(kingOrigin) << 2*EAST) == squareToBitboard(destination) ? MoveType::KING_CASTLE : MoveType::QUEEN_CASTLE;
+        } else {
+            moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+        }
         moves.push_back(Move(kingOrigin, destination, PieceType::KING, color, moveType));
         //delete move from bitboard
         kingMoves = ~(1ULL << destination) & kingMoves;

@@ -29,6 +29,8 @@ struct Board {
     bool getQueenSideCastleAbility(Color color = BLACK);
     void castleKingSide(Color color = BLACK);
     void castleQueenSide(Color color = BLACK);
+    void removeKingSideCastleAbillity(Color color = BLACK);
+    void removeQueenSideCastleAbillity(Color color = BLACK);
 
     void printBoard(Bitboard board); 
     void prettyPrintBoard();

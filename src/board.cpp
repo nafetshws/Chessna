@@ -200,14 +200,15 @@ void Board::castleKingSide(Color color) {
         //move king
         this->whiteKing = (this->whiteKing << 2);
         //move rook
-        this->whiteRooks -= (1ULL << 7) - (1ULL << 5);
+        this->whiteRooks -= (squareToBitboard(7)) - (squareToBitboard(5));
+        //this->whiteRooks = (this->whiteRooks - squareToBitboard(7)) + squareToBitboard(5);
     } else {
         //check if castling is still available
         if(this->castlingAbillity.find('k') != std::string::npos) return;
         //move king
         this->blackKing = (this->blackKing << 2);
         //move rook
-        this->blackRooks -= (1ULL << 63) - (1ULL << 61);
+        this->blackRooks -= (squareToBitboard(63)) - (squareToBitboard(61));
     }
 }
 
@@ -227,6 +228,16 @@ void Board::castleQueenSide(Color color) {
         //move rook
         this->blackRooks += (1ULL << 59) - (1ULL << 56);
     }
+}
+
+void Board::removeKingSideCastleAbillity(Color color) {
+    char charToremove = (color == WHITE) ? 'K' : 'k';
+    this->castlingAbillity.erase(std::remove(this->castlingAbillity.begin(), this->castlingAbillity.end(), charToremove));
+}
+
+void Board::removeQueenSideCastleAbillity(Color color) {
+    char charToremove = (color == WHITE) ? 'Q' : 'q';
+    this->castlingAbillity.erase(std::remove(this->castlingAbillity.begin(), this->castlingAbillity.end(), charToremove));
 }
 
 void Board::printBoard(Bitboard board) {
