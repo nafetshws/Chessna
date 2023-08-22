@@ -22,8 +22,8 @@ void Board::initBoard(std::string fen){
     //position has to be update by the length of the previous token +1 (white space)
     std::string piecePlacement = fen.substr(pos, fen.find(delimiter, pos));
     pos += piecePlacement.length()+1;
-    std::string sideToMove = fen.substr(pos, fen.find(delimiter, pos)-pos);
-    pos += sideToMove.length()+1;
+    std::string color = fen.substr(pos, fen.find(delimiter, pos)-pos);
+    pos += color.length()+1;
     std::string castlingAbillity = fen.substr(pos, fen.find(delimiter, pos)-pos);
     pos += castlingAbillity.length()+1;
     std::string enPassentTargetSquare = fen.substr(pos, fen.find(delimiter, pos)-pos);
@@ -172,7 +172,7 @@ void Board::initBoard(std::string fen){
     }
 
     //init rest of board state
-    this->sideToMove = sideToMove;
+    this->sideToMove = (color == "w") ? WHITE : BLACK;
     this->castlingAbillity = castlingAbillity;
     this->halfMoveClock = stoi(halfMoveClock);
     this->fullMoveCounter = stoi(fullMoveCounter);

@@ -8,7 +8,7 @@ struct Board {
     Bitboard whitePawns, whiteRooks, whiteKnights, whiteBishops, whiteQueen, whiteKing;
     Bitboard blackPawns, blackRooks, blackKnights, blackBishops, blackQueen, blackKing;
 
-    std::string sideToMove;
+    Color sideToMove;
     std::string castlingAbillity;
     Square enPassentTargetSquare;
     int halfMoveClock;

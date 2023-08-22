@@ -6,18 +6,31 @@
 #include "../include/types.hpp"
 #include "../include/functions.hpp"
 
-int main(){
-    //std::string fen = DEFAULT_FEN; 
-    std::string fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"; 
+int main(int argc, char *argv[]){
+    std::string fen; 
+    int depth = 3;
+
+    if(argc == 3) {
+        std::string input = argv[1];
+        if(input.compare("default") == 0) {
+            fen = DEFAULT_FEN;
+        } else {
+            std::cout << "is in else" << std::endl;
+            fen = argv[1];
+        }
+        int depth = std::stoi(argv[2]);
+    } else {
+        fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"; 
+    }
     Board board(fen);
-    
     MoveGeneration moveGeneration(board);
+
+    Color color = board.sideToMove;
 
     //std::vector<Move> moves = moveGeneration.generateMoves(WHITE);
     //printMoves(moves);
 
-    u64 nodes = moveGeneration.perft(3, WHITE);
-
+    u64 nodes = moveGeneration.perft(depth, color);
     std::cout << "Nodes: " << nodes << std::endl;
 
 

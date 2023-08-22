@@ -16,9 +16,9 @@ u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
     if(depth == 0) return 1ULL; 
     
     std::vector<Move> moves = generateMoves(color);
-    //if(depth == 1) {
+    //if(depth == 2) {
     //    std::cout << "*****************" << std::endl;
-    //    printMoves(moves, 50);
+    //    printMoves(moves, 60);
     //    std::cout << "*****************" << std::endl;
     //}
 
