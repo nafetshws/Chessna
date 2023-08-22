@@ -76,7 +76,6 @@ void MoveGeneration::makeMove(Move move) {
         this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == CAPTURE || t == CAPTURE_BISHOP_PROMOTION || t == CAPTURE_KNIGHT_PROMOTION|| t == CAPTURE_ROOK_PROMOTION|| t == CAPTURE_QUEEN_PROMOTION) {
         Piece target = findPiece(move.destination);
-        *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         switch(target.type) {
             case PAWN:
                 if(target.color == WHITE) this->board.whitePawns ^= squareToBitboard(move.destination);
@@ -120,6 +119,10 @@ void MoveGeneration::makeMove(Move move) {
                 default:
                     break;
             }
+            std::cout << "after: " << std::endl;
+            this->board.prettyPrintBoard();
+        } else {
+            *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         }
 
     } else if (move.moveType == EN_PASSENT_CAPTURE || t == EP_BISHOP_PROMOTION || t == EP_KNIGHT_PROMOTION|| t == EP_ROOK_PROMOTION|| t == EP_QUEEN_PROMOTION) {
