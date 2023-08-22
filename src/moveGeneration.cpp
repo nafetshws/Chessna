@@ -187,17 +187,12 @@ void MoveGeneration::makeMove(Move move) {
     }
 
     if(move.pieceType == ROOK) {
-        Bitboard h1 = 0x80;
-        Bitboard h8 = 0x8000000000000000; 
-        Bitboard a1 = 0x1;
-        Bitboard a8 = 0x100000000000000;
-
         if(move.color == WHITE) {
-            if(squareToBitboard(move.origin) == a1) this->board.removeQueenSideCastleAbillity(move.color);
-            else if(squareToBitboard(move.origin) == h1) this->board.removeKingSideCastleAbillity(move.color);
+            if(squareToBitboard(move.origin) == A1) this->board.removeQueenSideCastleAbillity(move.color);
+            else if(squareToBitboard(move.origin) == H1) this->board.removeKingSideCastleAbillity(move.color);
         } else {
-            if(squareToBitboard(move.origin) == a8) this->board.removeQueenSideCastleAbillity(move.color);
-            else if(squareToBitboard(move.origin) == h8) this->board.removeKingSideCastleAbillity(move.color);
+            if(squareToBitboard(move.origin) == A8) this->board.removeQueenSideCastleAbillity(move.color);
+            else if(squareToBitboard(move.origin) == H8) this->board.removeKingSideCastleAbillity(move.color);
         }
     } else if(move.pieceType == KING) {
         //remove casting ability

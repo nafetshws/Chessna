@@ -180,16 +180,16 @@ void Board::initBoard(std::string fen){
 
 bool Board::getKingSideCastleAbility(Color color) {
     if(color == WHITE) {
-        return this->castlingAbillity.find('K') != std::string::npos;
+        return (this->castlingAbillity.find('K') != std::string::npos) && (this->whiteRooks & H1) != 0;
     } else {
-        return this->castlingAbillity.find('k') != std::string::npos;
+        return (this->castlingAbillity.find('k') != std::string::npos) && (this->blackRooks & H8) != 0;
     }
 }
 bool Board::getQueenSideCastleAbility(Color color) {
     if(color == WHITE) {
-        return this->castlingAbillity.find('Q') != std::string::npos;
+        return (this->castlingAbillity.find('Q') != std::string::npos) && (this->whiteRooks & A1) != 0;
     } else {
-        return this->castlingAbillity.find('q') != std::string::npos;
+        return (this->castlingAbillity.find('q') != std::string::npos) && (this->blackRooks & A8) != 0;
     }
 }
 

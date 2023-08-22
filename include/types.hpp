@@ -130,6 +130,11 @@ struct Pins {
     Bitboard absolutePins;
 };
 
+const Bitboard H1 = 0x80;
+const Bitboard H8 = 0x8000000000000000; 
+const Bitboard A1 = 0x1;
+const Bitboard A8 = 0x100000000000000;
+
 const Bitboard FILE_A = 0x101010101010101;
 const Bitboard FILE_B = 0x202020202020202;
 const Bitboard FILE_G = 0x4040404040404040;
