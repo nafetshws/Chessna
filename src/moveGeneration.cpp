@@ -869,11 +869,11 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     Bitboard legalMoves;
 
     legalMoves = (pseudoLegalMoves & ~this->board.getOccupiedBy(color)) & ~generateKingAttacks(CURRENT_POSITION, getOppositeColor(color));
-    this->ignoreOccupence |= legalMoves & this->board.getOccupiedBy(getOppositeColor(color));
+    //this->ignoreOccupence |= legalMoves & this->board.getOccupiedBy(getOppositeColor(color));
 
     if(color == WHITE) legalMoves &= ~generateAttackedSquaresWithoutKing(BLACK);
     else legalMoves &= ~generateAttackedSquaresWithoutKing(WHITE);
-    
+
     this->ignoreOccupence = EMPTY;
 
     Bitboard legalMovesCopy = legalMoves;
@@ -885,7 +885,6 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
         //next move destination
         legalMovesCopy &= ~squareToBitboard(index);
     } 
-    
 
     return legalMoves;
 }
