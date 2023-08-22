@@ -878,8 +878,19 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
 
     if(color == WHITE) legalMoves &= ~generateAttackedSquaresWithoutKing(BLACK);
     else legalMoves &= ~generateAttackedSquaresWithoutKing(WHITE);
-
+    
     this->ignoreOccupence = EMPTY;
+
+    Bitboard legalMovesCopy = legalMoves;
+    while(legalMovesCopy != 0) {
+        Square index = __builtin_ctzll(legalMovesCopy);
+        Attack_Info a = isUnderAttack(index, color);
+        //remove move
+        if(a.numberOfAttacks != 0) legalMoves &= ~squareToBitboard(index);
+        //next move destination
+        legalMovesCopy &= ~squareToBitboard(index);
+    } 
+    
 
     return legalMoves;
 }
