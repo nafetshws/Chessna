@@ -865,6 +865,7 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
         && ((this->board.getKing(color) >> 1) & pawnAttacks) == 0
         && ((this->board.getKing(color) >> 2) & pawnAttacks) == 0
         && ((this->board.getKing(color) >> 1) & this->board.getOccupied()) == 0
+        && ((this->board.getKing(color) >> 3) & this->board.getOccupied()) == 0
         && ((this->board.getKing(color) >> 2) & this->board.getOccupied()) == 0) {
             if(this->board.getQueenSideCastleAbility(color)) {
                castle = castle | (this->board.getKing(color) >> 2); 
