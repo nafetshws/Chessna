@@ -127,11 +127,11 @@ void MoveGeneration::makeMove(Move move) {
         if(move.color == WHITE) {
             Bitboard enPassentSquare = squareToBitboard(this->board.enPassentTargetSquare);
             Bitboard target = enPassentSquare >> SOUTH;
-            this->board.blackPawns ^= target;
+            this->board.blackPawns &= ~target;
         } else {
             Bitboard enPassentSquare = squareToBitboard(this->board.enPassentTargetSquare);
             Bitboard target = enPassentSquare << NORTH;
-            this->board.blackPawns ^= target;
+            this->board.whitePawns &= ~target;
         }
         this->board.enPassentTargetSquare = -1;
 
@@ -234,7 +234,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     * Generate moves when <<color>> is in check
     */
     Check_Info check_info = isInCheck(color);
-    std::cout << "checks: " << check_info.numberOfChecks << std::endl;
     //if the king is in double check he has to move
     if(check_info.numberOfChecks >= 2) return moves;
     else if(check_info.numberOfChecks == 1) {
@@ -906,9 +905,7 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
 
     //add bishop and diagonal queen moves
     Bitboard moves = generateBishopMoves(squareAsBitboard, color);
-    std::cout << "b moves: " << moves << std::endl;
     Bitboard intersect = moves & (this->board.getBishops(oppositeColor) & (~pins.absolutePins));
-    std::cout << "pins: " << pins.absolutePins << std::endl;
     convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::BISHOP, oppositeColor, occupied, numberOfAttacks, attack_info);
 
     intersect = moves & (this->board.getQueens(oppositeColor) & (~pins.absolutePins));
@@ -929,13 +926,8 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
 
     //add pawn moves
     moves = generatePawnAttacks(squareAsBitboard, color); //& this->board.getOccupiedBy(getOppositeColor(color));
-    //std::cout << "attacks (" << bitboardToSquare(squareAsBitboard) << "): " << moves << std::endl;
-    //std::cout << "square as bitboard: " << squareAsBitboard << std::endl;
     if((squareAsBitboard & this->board.getOccupiedBy(color)) != 0) {
         intersect = (moves & (this->board.getPawns(oppositeColor)) & (~pins.absolutePins));
-        //std::cout << "intersect: " << intersect << std::endl;
-        //std::cout << "moves: " << moves << std::endl;
-        //std::cout << "pawns: " << this->board.getPawns(oppositeColor) << std::endl;
         convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::PAWN, oppositeColor, occupied, numberOfAttacks, attack_info);
     }
 
