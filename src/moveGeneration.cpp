@@ -134,16 +134,6 @@ void MoveGeneration::makeMove(Move move) {
             this->board.blackPawns ^= target;
         }
         this->board.enPassentTargetSquare = -1;
-    } else if (move.moveType == DOUBLE_PAWN_PUSH) {
-        Bitboard bDestination = squareToBitboard(move.destination);
-        if(move.color == WHITE) {
-            Square enPassentSquare = bitboardToSquare(bDestination >> SOUTH);
-            this->board.enPassentTargetSquare = enPassentSquare;
-        } else {
-            Square enPassentSquare = bitboardToSquare(bDestination << NORTH);
-            this->board.enPassentTargetSquare = enPassentSquare;
-        }
-        *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
 
         if(move.moveType != EN_PASSENT_CAPTURE) {
             switch(move.moveType) {
@@ -163,18 +153,37 @@ void MoveGeneration::makeMove(Move move) {
                     break;
             }
         }
+    } else if (move.moveType == DOUBLE_PAWN_PUSH) {
+        Bitboard bDestination = squareToBitboard(move.destination);
+        if(move.color == WHITE) {
+            Square enPassentSquare = bitboardToSquare(bDestination >> SOUTH);
+            this->board.enPassentTargetSquare = enPassentSquare;
+        } else {
+            Square enPassentSquare = bitboardToSquare(bDestination << NORTH);
+            this->board.enPassentTargetSquare = enPassentSquare;
+        }
+        *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
+
     } else if(move.moveType == KING_CASTLE) {
         this->board.castleKingSide(move.color);
+        this->board.removeKingSideCastleAbillity(move.color);
+        this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == QUEEN_CASTLE) {
         this->board.castleQueenSide(move.color);
+        this->board.removeQueenSideCastleAbillity(move.color);
+        this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == QUEEN_PROMOTION) {
         this->board.makeQueenPromotion(move);
+        this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == ROOK_PROMOTION) {
         this->board.makeRookPromotion(move);
+        this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == BISHOP_PROMOTION) {
         this->board.makeBishopPromotion(move);
+        this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == KNIGHT_PROMOTION) {
         this->board.makeKnightPromotion(move);
+        this->board.enPassentTargetSquare = -1;
     }
 
     if(move.pieceType == ROOK) {
@@ -184,11 +193,11 @@ void MoveGeneration::makeMove(Move move) {
         Bitboard a8 = 0x100000000000000;
 
         if(move.color == WHITE) {
-            if(move.origin == a1) this->board.removeQueenSideCastleAbillity(move.color);
-            else if(move.origin == h1) this->board.removeKingSideCastleAbillity(move.color);
+            if(squareToBitboard(move.origin) == a1) this->board.removeQueenSideCastleAbillity(move.color);
+            else if(squareToBitboard(move.origin) == h1) this->board.removeKingSideCastleAbillity(move.color);
         } else {
-            if(move.origin == a8) this->board.removeQueenSideCastleAbillity(move.color);
-            else if(move.origin == h8) this->board.removeKingSideCastleAbillity(move.color);
+            if(squareToBitboard(move.origin) == a8) this->board.removeQueenSideCastleAbillity(move.color);
+            else if(squareToBitboard(move.origin) == h8) this->board.removeKingSideCastleAbillity(move.color);
         }
     } else if(move.pieceType == KING) {
         //remove casting ability
