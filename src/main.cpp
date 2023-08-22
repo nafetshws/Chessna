@@ -19,8 +19,8 @@ int main(int argc, char *argv[]){
         }
         depth = std::stoi(argv[2]);
     } else {
-        depth = 3;
-        fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"; 
+        depth = 1;
+        fen = "r3k2r/p1p1qpb1/bn1ppnp1/1B1PN3/1p2P3/2N2Q1p/PPPB1PPP/R4K1R b kq - 0 1"; 
     }
     Board board(fen);
     MoveGeneration moveGeneration(board);

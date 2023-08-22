@@ -234,11 +234,9 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     * Generate moves when <<color>> is in check
     */
     Check_Info check_info = isInCheck(color);
-
+    std::cout << "checks: " << check_info.numberOfChecks << std::endl;
     //if the king is in double check he has to move
     if(check_info.numberOfChecks >= 2) return moves;
-
-    //TODO: consider pinned pieces
     else if(check_info.numberOfChecks == 1) {
         //Possiblites to react when in check:
         //1. move king out of check -> already in moves
@@ -898,14 +896,19 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
 
     Color oppositeColor = getOppositeColor(color);
 
+    //TODO: unnecessary calculation -> remove to improve speed
     Pins pins = getPinnedPieces(getOppositeColor(color));
+
+    if(squareAsBitboard == this->board.getKing(color)) pins.absolutePins = 0;
 
     //Bitboard occupied = this->board.getOccupiedBy(getOppositeColor(color));
     Bitboard occupied = this->board.getOccupiedBy(color);
 
     //add bishop and diagonal queen moves
     Bitboard moves = generateBishopMoves(squareAsBitboard, color);
+    std::cout << "b moves: " << moves << std::endl;
     Bitboard intersect = moves & (this->board.getBishops(oppositeColor) & (~pins.absolutePins));
+    std::cout << "pins: " << pins.absolutePins << std::endl;
     convertBitbaordToMoves(intersect, squareAsBitboard, PieceType::BISHOP, oppositeColor, occupied, numberOfAttacks, attack_info);
 
     intersect = moves & (this->board.getQueens(oppositeColor) & (~pins.absolutePins));
