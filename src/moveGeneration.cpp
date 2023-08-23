@@ -343,8 +343,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     Pins pinnedPieces = getPinnedPieces(color);
     Bitboard pinnedPiecesBitboard = pinnedPieces.absolutePins;
 
-    std::cout << "pins: " << pinnedPiecesBitboard << std::endl;
-
     for(Pin pin : pinnedPieces.pins) {
         Direction direction = pin.direction;
         Square pinnedPieceOriginSquare = __builtin_ctzll(pin.pinnedPiece);

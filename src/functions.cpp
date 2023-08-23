@@ -92,10 +92,28 @@ void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType 
     if(intersect != 0) {
         std::vector<Square> origins = convertBitboardToSquares(intersect);
         for(int i = 0; i < origins.size(); i++) {
-            MoveType moveType = (destination & occupied) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
-            Move move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, moveType);
-            numberOfAttacks++;
-            attack_info.moves.push_back(move);
+            Bitboard promotionRank = (color == WHITE) ? RANK_8 : RANK_1;
+            if(pieceType == PieceType::PAWN && (destination & promotionRank) != 0) {
+                if((destination & occupied) != 0) {
+                    //capture promotion
+                    attack_info.moves.push_back(Move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, MoveType::CAPTURE_BISHOP_PROMOTION));
+                    attack_info.moves.push_back(Move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, MoveType::CAPTURE_KNIGHT_PROMOTION));
+                    attack_info.moves.push_back(Move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, MoveType::CAPTURE_ROOK_PROMOTION));
+                    attack_info.moves.push_back(Move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, MoveType::CAPTURE_QUEEN_PROMOTION));
+                } else {
+                    //normal promotion
+                    attack_info.moves.push_back(Move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, MoveType::BISHOP_PROMOTION));
+                    attack_info.moves.push_back(Move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, MoveType::KNIGHT_PROMOTION));
+                    attack_info.moves.push_back(Move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, MoveType::ROOK_PROMOTION));
+                    attack_info.moves.push_back(Move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, MoveType::QUEEN_PROMOTION));
+                }
+                numberOfAttacks += 4;
+            } else {
+                MoveType moveType = (destination & occupied) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+                Move move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, moveType);
+                numberOfAttacks++;
+                attack_info.moves.push_back(move);
+            }
         }
     }
 }
