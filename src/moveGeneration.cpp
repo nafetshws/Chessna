@@ -119,13 +119,12 @@ void MoveGeneration::makeMove(Move move) {
                 default:
                     break;
             }
-            std::cout << "after: " << std::endl;
-            this->board.prettyPrintBoard();
         } else {
             *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         }
 
     } else if (move.moveType == EN_PASSENT_CAPTURE || t == EP_BISHOP_PROMOTION || t == EP_KNIGHT_PROMOTION|| t == EP_ROOK_PROMOTION|| t == EP_QUEEN_PROMOTION) {
+        //TODO: remove promotion!!! NOT POSSIBLE
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         if(move.color == WHITE) {
             Bitboard enPassentSquare = squareToBitboard(this->board.enPassentTargetSquare);
@@ -177,6 +176,7 @@ void MoveGeneration::makeMove(Move move) {
         this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == QUEEN_PROMOTION) {
         this->board.makeQueenPromotion(move);
+        this->board.prettyPrintBoard();
         this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == ROOK_PROMOTION) {
         this->board.makeRookPromotion(move);
@@ -202,6 +202,8 @@ void MoveGeneration::makeMove(Move move) {
         this->board.removeKingSideCastleAbillity(move.color);
         this->board.removeQueenSideCastleAbillity(move.color);
     }
+
+
 }
 
 std::vector<Move> MoveGeneration::generateMoves(Color color) {

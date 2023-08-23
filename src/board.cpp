@@ -277,7 +277,7 @@ void Board::makeQueenPromotion(Move move) {
         this->whiteQueen |= squareToBitboard(move.destination);
     } else {
         this->blackPawns &= ~(squareToBitboard(move.origin));
-        this->whiteQueen |= squareToBitboard(move.destination);
+        this->blackQueen |= squareToBitboard(move.destination);
     }
 }
 
