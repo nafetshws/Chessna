@@ -7,6 +7,7 @@
 MoveGeneration::MoveGeneration(Board board) {
     this->board = board;
     this->ignoreOccupence = EMPTY;
+    this->generatingKingMoves = false;
 }
 
 u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
@@ -873,12 +874,12 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     Bitboard legalMoves;
 
     legalMoves = (pseudoLegalMoves & ~this->board.getOccupiedBy(color)) & ~generateKingAttacks(CURRENT_POSITION, getOppositeColor(color));
-    //this->ignoreOccupence |= legalMoves & this->board.getOccupiedBy(getOppositeColor(color));
 
     if(color == WHITE) legalMoves &= ~generateAttackedSquaresWithoutKing(BLACK);
     else legalMoves &= ~generateAttackedSquaresWithoutKing(WHITE);
 
     Bitboard legalMovesCopy = legalMoves;
+    this->generatingKingMoves = true;
     while(legalMovesCopy != 0) {
         Square index = __builtin_ctzll(legalMovesCopy);
         Attack_Info a = isUnderAttack(index, color);
@@ -887,6 +888,8 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
         //next move destination
         legalMovesCopy &= ~squareToBitboard(index);
     } 
+
+    this->generatingKingMoves = true;
 
     this->ignoreOccupence = EMPTY;
 
@@ -908,6 +911,7 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
     Pins pins = getPinnedPieces(getOppositeColor(color));
 
     if(squareAsBitboard == this->board.getKing(color)) pins.absolutePins = 0;
+    if(this->generatingKingMoves) pins.absolutePins = 0;
 
     //Bitboard occupied = this->board.getOccupiedBy(getOppositeColor(color));
     Bitboard occupied = this->board.getOccupiedBy(color);

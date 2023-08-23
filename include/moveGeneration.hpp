@@ -10,6 +10,7 @@ class MoveGeneration {
     public:
         Board board;
         Bitboard ignoreOccupence;
+        bool generatingKingMoves;
 
         MoveGeneration(Board board);
 
