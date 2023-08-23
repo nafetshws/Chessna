@@ -842,6 +842,7 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
 
     //castling
     Bitboard castle = EMPTY;
+    this->generatingKingMoves = true;
 
     if(isInCheck(color).numberOfChecks == 0) {
         //king castle ability
@@ -869,6 +870,7 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
             }        
         }
     }
+    this->generatingKingMoves = false;
     Bitboard pseudoLegalMoves = attacks | castle;
 
     Bitboard legalMoves;
