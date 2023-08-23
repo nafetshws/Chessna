@@ -107,7 +107,8 @@ void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType 
                     attack_info.moves.push_back(Move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, MoveType::ROOK_PROMOTION));
                     attack_info.moves.push_back(Move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, MoveType::QUEEN_PROMOTION));
                 }
-                numberOfAttacks += 4;
+                //+4 malfunctions -> probably because 4 attacks mean the king has to move
+                numberOfAttacks++; 
             } else {
                 MoveType moveType = (destination & occupied) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
                 Move move(origins.at(i), (Square)__builtin_ctzll(destination), pieceType, color, moveType);
@@ -117,4 +118,3 @@ void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType 
         }
     }
 }
-
