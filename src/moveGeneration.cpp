@@ -176,7 +176,6 @@ void MoveGeneration::makeMove(Move move) {
         this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == QUEEN_PROMOTION) {
         this->board.makeQueenPromotion(move);
-        this->board.prettyPrintBoard();
         this->board.enPassentTargetSquare = -1;
     } else if(move.moveType == ROOK_PROMOTION) {
         this->board.makeRookPromotion(move);
@@ -879,8 +878,6 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     if(color == WHITE) legalMoves &= ~generateAttackedSquaresWithoutKing(BLACK);
     else legalMoves &= ~generateAttackedSquaresWithoutKing(WHITE);
 
-    this->ignoreOccupence = EMPTY;
-
     Bitboard legalMovesCopy = legalMoves;
     while(legalMovesCopy != 0) {
         Square index = __builtin_ctzll(legalMovesCopy);
@@ -890,6 +887,8 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
         //next move destination
         legalMovesCopy &= ~squareToBitboard(index);
     } 
+
+    this->ignoreOccupence = EMPTY;
 
     return legalMoves;
 }
