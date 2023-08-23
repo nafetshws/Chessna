@@ -889,7 +889,7 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
         legalMovesCopy &= ~squareToBitboard(index);
     } 
 
-    this->generatingKingMoves = true;
+    this->generatingKingMoves = false;
 
     this->ignoreOccupence = EMPTY;
 
