@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include "../include/board.hpp"
 #include "../include/moveGeneration.hpp"
@@ -222,9 +223,52 @@ void test_moveGeneration() {
     test_enPassent_discoveredCheck3();
 }
 
+void perft_test(std::string fen, u64 expectedRes) {
+    Board board(fen);
+    MoveGeneration mG(board);
+
+    int depth = 6;
+
+    Color color = board.sideToMove;
+    std::cout << "testing fen: " << fen << std::endl;
+    //disable console output
+    std::cout.setstate(std::ios_base::failbit);
+    u64 nodes = mG.perft(depth, color);
+    std::cout.clear();
+    IS_EQUAL(nodes, expectedRes);
+}
+
+void test_perftsuite() {
+    std::string line;
+    std::ifstream file("test/perftsuite.epd");
+
+    while(std::getline(file, line)) {
+        std::string d6;
+        std::string delimter = " ;";
+        int pos = 0;
+
+        std::string fen = line.substr(pos, line.find(delimter, pos) - pos);
+        pos += fen.length()+1;
+        std::size_t strPos = line.find("D6");
+
+        if(strPos != std::string::npos) {
+            d6 = line.substr(strPos);
+            u64 nodes = std::stoull(d6.substr(3));
+            
+            //test engine
+            perft_test(fen, nodes);
+        }
+
+
+    }
+
+    file.close();
+}
+
 //function to execute all tests
 void test_all() {
-    test_moveGeneration();
+    //test_moveGeneration();
+    test_perftsuite();
 }
 
 int main() {
