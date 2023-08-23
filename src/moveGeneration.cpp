@@ -343,6 +343,8 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     Pins pinnedPieces = getPinnedPieces(color);
     Bitboard pinnedPiecesBitboard = pinnedPieces.absolutePins;
 
+    std::cout << "pins: " << pinnedPiecesBitboard << std::endl;
+
     for(Pin pin : pinnedPieces.pins) {
         Direction direction = pin.direction;
         Square pinnedPieceOriginSquare = __builtin_ctzll(pin.pinnedPiece);
@@ -413,7 +415,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
                 } else if (pin.pinnedPieceType == PAWN) {
                     //pawn pushes only
-                    if(color == BLACK && direction == Direction::S) {
+                    if(color == BLACK) {
                         Bitboard pawnSinglePushes = (pin.pinnedPiece >> SOUTH) & (~board.getOccupied());
                         Bitboard pawnDoublePushes = ((pin.pinnedPiece & RANK_7) >> SOUTH) & (~board.getOccupied());
                         pawnDoublePushes = (pawnDoublePushes >> SOUTH) & (~board.getOccupied());
@@ -426,7 +428,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                             MoveType moveType = MoveType::DOUBLE_PAWN_PUSH; 
                             moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
                         }
-                    } else if(color == WHITE && direction == Direction::N) {
+                    } else if(color == WHITE) {
                         Bitboard pawnSinglePushes = (pin.pinnedPiece << NORTH) & (~board.getOccupied());
                         Bitboard pawnDoublePushes = ((pin.pinnedPiece & RANK_2) << NORTH) & (~board.getOccupied());
                         pawnDoublePushes = (pawnDoublePushes << NORTH) & (~board.getOccupied());
