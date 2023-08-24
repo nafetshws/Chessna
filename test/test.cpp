@@ -258,8 +258,6 @@ void test_perftsuite() {
             //test engine
             perft_test(fen, nodes);
         }
-
-
     }
 
     file.close();

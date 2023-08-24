@@ -360,18 +360,33 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     //add moves to pins
                     for(Square destination : destinations) {
                         MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
-
                         moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
                     }
                 //if the pawn is pinned it can only capture the pinner
                 } else if (pin.pinnedPieceType == PAWN) {
                     if(color == BLACK && direction == Direction::SE) {
                         if(((pin.pinnedPiece >> SOUTH_EAST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
-                            moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_EAST), PAWN, color, MoveType::CAPTURE));
+                            Bitboard promotionRank = RANK_1;
+                            if((promotionRank & (pin.pinnedPiece >> SOUTH_EAST)) != 0) {
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_EAST), PAWN, color, MoveType::CAPTURE_BISHOP_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_EAST), PAWN, color, MoveType::CAPTURE_KNIGHT_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_EAST), PAWN, color, MoveType::CAPTURE_ROOK_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_EAST), PAWN, color, MoveType::CAPTURE_QUEEN_PROMOTION));
+                            } else {
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_EAST), PAWN, color, MoveType::CAPTURE));
+                            }
                         }
                     } else if(color == WHITE && direction == Direction::NW) {
                         if(((pin.pinnedPiece << NORTH_WEST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
-                            moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_WEST), PAWN, color, MoveType::CAPTURE));
+                            Bitboard promotionRank = RANK_8;
+                            if((promotionRank & (pin.pinnedPiece << NORTH_WEST)) != 0) {
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_WEST), PAWN, color, MoveType::CAPTURE_BISHOP_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_WEST), PAWN, color, MoveType::CAPTURE_KNIGHT_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_WEST), PAWN, color, MoveType::CAPTURE_ROOK_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_WEST), PAWN, color, MoveType::CAPTURE_QUEEN_PROMOTION));
+                            } else {
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_WEST), PAWN, color, MoveType::CAPTURE));
+                            }
                         }
                     } 
                 }
@@ -384,7 +399,6 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
                     for(Square destination : destinations) {
                         MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
-
                         moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
                     }
 
@@ -392,11 +406,29 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     //caputres only
                     if(color == BLACK && direction == Direction::SW) {
                         if(((pin.pinnedPiece >> SOUTH_WEST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
-                            moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_WEST), PAWN, color, MoveType::CAPTURE));
+                            Bitboard promotionRank = RANK_1;
+
+                            if((promotionRank & (pin.pinnedPiece >> SOUTH_WEST)) != 0) {
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_WEST), PAWN, color, MoveType::CAPTURE_BISHOP_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_WEST), PAWN, color, MoveType::CAPTURE_KNIGHT_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_WEST), PAWN, color, MoveType::CAPTURE_ROOK_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_WEST), PAWN, color, MoveType::CAPTURE_QUEEN_PROMOTION));
+                            } else {
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_WEST), PAWN, color, MoveType::CAPTURE));
+                            }
                         }
                     } else if(color == WHITE && direction == Direction::NE) {
                         if(((pin.pinnedPiece << NORTH_EAST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
-                            moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_EAST), PAWN, color, MoveType::CAPTURE));
+                            Bitboard promotionRank = RANK_8;
+                            
+                            if((promotionRank & (pin.pinnedPiece << NORTH_EAST)) != 0) {
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_EAST), PAWN, color, MoveType::CAPTURE_BISHOP_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_EAST), PAWN, color, MoveType::CAPTURE_KNIGHT_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_EAST), PAWN, color, MoveType::CAPTURE_ROOK_PROMOTION));
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_EAST), PAWN, color, MoveType::CAPTURE_QUEEN_PROMOTION));
+                            } else {
+                                moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_EAST), PAWN, color, MoveType::CAPTURE));
+                            }
                         }
                     } 
                 }
