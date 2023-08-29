@@ -1,7 +1,2 @@
-# Chess AI
-
-## Chess rules
-- en passant
-- 50 move draw
-- castle
-- repetition draw
+# Chess engine
+This is a simple chess engine that isn't very good.
