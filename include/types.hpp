@@ -35,11 +35,6 @@ enum MoveType {
     CAPTURE_ROOK_PROMOTION,
     CAPTURE_QUEEN_PROMOTION,
 
-    EP_BISHOP_PROMOTION,
-    EP_KNIGHT_PROMOTION,
-    EP_ROOK_PROMOTION,
-    EP_QUEEN_PROMOTION,
-
     CAPTURE,
     EN_PASSENT_CAPTURE,
     DOUBLE_PAWN_PUSH,
@@ -58,6 +53,7 @@ struct Piece {
 
 struct Move {
     Move(Square _origin, Square _destination, PieceType _pieceType, Color _color, MoveType _moveType) : origin(_origin), destination(_destination), pieceType(_pieceType), color(_color), moveType(_moveType) {}
+    Move(): origin(-1), destination(-1), pieceType(UNOCCUPIED), color(WHITE), moveType(QUIET) {}
 
     Square origin;
     Square destination;

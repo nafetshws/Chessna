@@ -263,8 +263,7 @@ void Board::makeMove(Move move) {
             *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         }
 
-    } else if (move.moveType == EN_PASSENT_CAPTURE || t == EP_BISHOP_PROMOTION || t == EP_KNIGHT_PROMOTION|| t == EP_ROOK_PROMOTION|| t == EP_QUEEN_PROMOTION) {
-        //TODO: remove promotion!!! NOT POSSIBLE
+    } else if (move.moveType == EN_PASSENT_CAPTURE) {
         *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
         if(move.color == WHITE) {
             Bitboard enPassentSquare = squareToBitboard(this->enPassentTargetSquare);
@@ -275,26 +274,8 @@ void Board::makeMove(Move move) {
             Bitboard target = enPassentSquare << NORTH;
             this->whitePawns &= ~target;
         }
-        this->enPassentTargetSquare = -1;
 
-        if(move.moveType != EN_PASSENT_CAPTURE) {
-            switch(move.moveType) {
-                case EP_BISHOP_PROMOTION:
-                    this->makeBishopPromotion(move);
-                    break;
-                case EP_KNIGHT_PROMOTION:
-                    this->makeKnightPromotion(move);
-                    break;
-                case EP_ROOK_PROMOTION:
-                    this->makeRookPromotion(move);
-                    break;
-                case EP_QUEEN_PROMOTION:
-                    this->makeQueenPromotion(move);
-                    break;
-                default:
-                    break;
-            }
-        }
+        this->enPassentTargetSquare = -1;
     } else if (move.moveType == DOUBLE_PAWN_PUSH) {
         Bitboard bDestination = squareToBitboard(move.destination);
         if(move.color == WHITE) {

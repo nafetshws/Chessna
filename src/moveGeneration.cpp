@@ -357,16 +357,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                 moveType = MoveType::DOUBLE_PAWN_PUSH;
             //if destination is empty and the distance is greater than 8 but not greater than 15 -> ep 
             } else if(abs(destination - origin) == 7 || abs(destination - origin) == 9){ 
-                Bitboard promotionRank = (color == WHITE) ? RANK_8 : RANK_1;
-                if((squareToBitboard(destination) & promotionRank) != 0) {
-                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::EP_QUEEN_PROMOTION));
-                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::EP_ROOK_PROMOTION));
-                    moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::EP_BISHOP_PROMOTION));
-                    //moves.push_back(Move(pawn, destination, PieceType::PAWN, color, MoveType::EP_KNIGHT_PROMOTION));
-                    moveType = MoveType::EP_KNIGHT_PROMOTION;
-                } else {
-                    moveType = MoveType::EN_PASSENT_CAPTURE;
-                }
+                moveType = MoveType::EN_PASSENT_CAPTURE;
             } else { 
                 Bitboard promotionRank = (color == WHITE) ? RANK_8 : RANK_1;
                 if((squareToBitboard(destination) & promotionRank) != 0) {
