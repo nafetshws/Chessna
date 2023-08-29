@@ -17,7 +17,12 @@ struct Board {
 
     Board(std::string fen);
     Board();
+
     void initBoard(std::string fen = DEFAULT_FEN);
+    Piece findPiece(Square s);
+
+    void makeMove(Move move);
+
     Bitboard getOccupied();
     Bitboard getOccupiedByWhite();
     Bitboard getOccupiedByBlack();

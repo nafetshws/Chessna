@@ -10,6 +10,12 @@ MoveGeneration::MoveGeneration(Board board) {
     this->generatingKingMoves = false;
 }
 
+MoveGeneration::MoveGeneration() {
+    this->board = Board();
+    this->ignoreOccupence = EMPTY;
+    this->generatingKingMoves = false;
+}
+
 u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
     u64 totalNodes = 0ULL;
     u64 nodes = 0ULL;
@@ -17,15 +23,10 @@ u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
     if(depth == 0) return 1ULL; 
     
     std::vector<Move> moves = generateMoves(color);
-    //if(depth == 2) {
-    //    std::cout << "*****************" << std::endl;
-    //    printMoves(moves, 60);
-    //    std::cout << "*****************" << std::endl;
-    //}
 
     for(int i = 0; i < moves.size(); i++) {
         Board copyBoard = this->board;
-        makeMove(moves.at(i));
+        this->board.makeMove(moves.at(i));
         nodes = runPerft(depth-1, maxDepth, getOppositeColor(color));
         totalNodes += nodes;
         if(depth == maxDepth) std::cout << printableMove(moves.at(i)) << ": " << nodes << std::endl;
@@ -37,173 +38,6 @@ u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
 
 u64 MoveGeneration::perft(int depth, Color color) {
     return runPerft(depth, depth, color);
-}
-
-void MoveGeneration::makeMove(Move move) {
-    Bitboard *pieces; 
-    Bitboard t = move.moveType;
-
-    switch(move.pieceType) {
-        case PAWN:
-            if(move.color == WHITE) pieces = &this->board.whitePawns;
-            else pieces = &this->board.blackPawns; 
-            break;
-        case ROOK:
-            if(move.color == WHITE) pieces = &this->board.whiteRooks;
-            else pieces = &this->board.blackRooks; 
-            break;
-        case KNIGHT:
-            if(move.color == WHITE) pieces = &this->board.whiteKnights;
-            else pieces = &this->board.blackKnights; 
-            break;
-        case BISHOP:
-            if(move.color == WHITE) pieces = &this->board.whiteBishops;
-            else pieces = &this->board.blackBishops; 
-            break;
-        case QUEEN:
-            if(move.color == WHITE) pieces = &this->board.whiteQueen;
-            else pieces = &this->board.blackQueen; 
-            break;
-        case KING:
-            if(move.color == WHITE) pieces = &this->board.whiteKing;
-            else pieces = &this->board.blackKing; 
-            break;
-        default:
-            break;
-    }
-
-    if(move.moveType == QUIET) {
-        *pieces = (*pieces & (~squareToBitboard(move.origin))) | squareToBitboard(move.destination);
-        this->board.enPassentTargetSquare = -1;
-    } else if(move.moveType == CAPTURE || t == CAPTURE_BISHOP_PROMOTION || t == CAPTURE_KNIGHT_PROMOTION|| t == CAPTURE_ROOK_PROMOTION|| t == CAPTURE_QUEEN_PROMOTION) {
-        Piece target = findPiece(move.destination);
-        switch(target.type) {
-            case PAWN:
-                if(target.color == WHITE) this->board.whitePawns ^= squareToBitboard(move.destination);
-                else this->board.blackPawns ^= squareToBitboard(move.destination);
-                break;
-            case ROOK:
-                if(target.color == WHITE) this->board.whiteRooks ^= squareToBitboard(move.destination);
-                else this->board.blackRooks ^= squareToBitboard(move.destination);
-                break;
-            case KNIGHT:
-                if(target.color == WHITE) this->board.whiteKnights ^= squareToBitboard(move.destination);
-                else this->board.blackKnights ^= squareToBitboard(move.destination);
-                break;
-            case BISHOP:
-                if(target.color == WHITE) this->board.whiteBishops ^= squareToBitboard(move.destination);
-                else this->board.blackBishops ^= squareToBitboard(move.destination);
-                break;
-            case QUEEN:
-                if(target.color == WHITE) this->board.whiteQueen ^= squareToBitboard(move.destination);
-                else this->board.blackQueen ^= squareToBitboard(move.destination);
-                break;
-            default:
-                break;
-        }
-        this->board.enPassentTargetSquare = -1;
-
-        if(move.moveType != CAPTURE) {
-            switch(move.moveType) {
-                case CAPTURE_BISHOP_PROMOTION:
-                    this->board.makeBishopPromotion(move);
-                    break;
-                case CAPTURE_KNIGHT_PROMOTION:
-                    this->board.makeKnightPromotion(move);
-                    break;
-                case CAPTURE_ROOK_PROMOTION:
-                    this->board.makeRookPromotion(move);
-                    break;
-                case CAPTURE_QUEEN_PROMOTION:
-                    this->board.makeQueenPromotion(move);
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
-        }
-
-    } else if (move.moveType == EN_PASSENT_CAPTURE || t == EP_BISHOP_PROMOTION || t == EP_KNIGHT_PROMOTION|| t == EP_ROOK_PROMOTION|| t == EP_QUEEN_PROMOTION) {
-        //TODO: remove promotion!!! NOT POSSIBLE
-        *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
-        if(move.color == WHITE) {
-            Bitboard enPassentSquare = squareToBitboard(this->board.enPassentTargetSquare);
-            Bitboard target = enPassentSquare >> SOUTH;
-            this->board.blackPawns &= ~target;
-        } else {
-            Bitboard enPassentSquare = squareToBitboard(this->board.enPassentTargetSquare);
-            Bitboard target = enPassentSquare << NORTH;
-            this->board.whitePawns &= ~target;
-        }
-        this->board.enPassentTargetSquare = -1;
-
-        if(move.moveType != EN_PASSENT_CAPTURE) {
-            switch(move.moveType) {
-                case EP_BISHOP_PROMOTION:
-                    this->board.makeBishopPromotion(move);
-                    break;
-                case EP_KNIGHT_PROMOTION:
-                    this->board.makeKnightPromotion(move);
-                    break;
-                case EP_ROOK_PROMOTION:
-                    this->board.makeRookPromotion(move);
-                    break;
-                case EP_QUEEN_PROMOTION:
-                    this->board.makeQueenPromotion(move);
-                    break;
-                default:
-                    break;
-            }
-        }
-    } else if (move.moveType == DOUBLE_PAWN_PUSH) {
-        Bitboard bDestination = squareToBitboard(move.destination);
-        if(move.color == WHITE) {
-            Square enPassentSquare = bitboardToSquare(bDestination >> SOUTH);
-            this->board.enPassentTargetSquare = enPassentSquare;
-        } else {
-            Square enPassentSquare = bitboardToSquare(bDestination << NORTH);
-            this->board.enPassentTargetSquare = enPassentSquare;
-        }
-        *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
-
-    } else if(move.moveType == KING_CASTLE) {
-        this->board.castleKingSide(move.color);
-        this->board.removeKingSideCastleAbillity(move.color);
-        this->board.enPassentTargetSquare = -1;
-    } else if(move.moveType == QUEEN_CASTLE) {
-        this->board.castleQueenSide(move.color);
-        this->board.removeQueenSideCastleAbillity(move.color);
-        this->board.enPassentTargetSquare = -1;
-    } else if(move.moveType == QUEEN_PROMOTION) {
-        this->board.makeQueenPromotion(move);
-        this->board.enPassentTargetSquare = -1;
-    } else if(move.moveType == ROOK_PROMOTION) {
-        this->board.makeRookPromotion(move);
-        this->board.enPassentTargetSquare = -1;
-    } else if(move.moveType == BISHOP_PROMOTION) {
-        this->board.makeBishopPromotion(move);
-        this->board.enPassentTargetSquare = -1;
-    } else if(move.moveType == KNIGHT_PROMOTION) {
-        this->board.makeKnightPromotion(move);
-        this->board.enPassentTargetSquare = -1;
-    }
-
-    if(move.pieceType == ROOK) {
-        if(move.color == WHITE) {
-            if(squareToBitboard(move.origin) == A1) this->board.removeQueenSideCastleAbillity(move.color);
-            else if(squareToBitboard(move.origin) == H1) this->board.removeKingSideCastleAbillity(move.color);
-        } else {
-            if(squareToBitboard(move.origin) == A8) this->board.removeQueenSideCastleAbillity(move.color);
-            else if(squareToBitboard(move.origin) == H8) this->board.removeKingSideCastleAbillity(move.color);
-        }
-    } else if(move.pieceType == KING) {
-        //remove casting ability
-        this->board.removeKingSideCastleAbillity(move.color);
-        this->board.removeQueenSideCastleAbillity(move.color);
-    }
-
-
 }
 
 std::vector<Move> MoveGeneration::generateMoves(Color color) {
@@ -1016,24 +850,6 @@ Bitboard MoveGeneration::generateAttackedSquares(Color color) {
 
 Bitboard MoveGeneration::generateAttackedSquaresWithoutKing(Color color) {
     return generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
-}
-
-Piece MoveGeneration::findPiece(Square s) {
-    Bitboard position = squareToBitboard(s);
-    Color color;
-    PieceType pieceType = UNOCCUPIED;
-    
-    if((position & this->board.getOccupiedBy(WHITE)) != 0) color = WHITE;
-    else color = BLACK;
-
-    if((this->board.getPawns(color) & position) != 0) pieceType = PAWN;
-    if((this->board.getRooks(color) & position) != 0) pieceType = ROOK;
-    if((this->board.getKnights(color) & position) != 0) pieceType = KNIGHT;
-    if((this->board.getBishops(color) & position) != 0) pieceType = BISHOP;
-    if((this->board.getQueens(color) & position) != 0) pieceType = QUEEN;
-    if((this->board.getKing(color) & position) != 0) pieceType = KING;
-
-    return Piece(s, pieceType, color);
 }
 
 Bitboard MoveGeneration::checkForPinnedPieces(Bitboard kingMoves, Bitboard pieceMoves, Bitboard piece2Moves, PieceType pieceType, PieceType piece2Type, Direction direction, Color color, Pins &pins) {

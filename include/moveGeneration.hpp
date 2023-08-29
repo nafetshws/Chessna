@@ -13,11 +13,10 @@ class MoveGeneration {
         bool generatingKingMoves;
 
         MoveGeneration(Board board);
+        MoveGeneration();
 
         std::vector<Move> generateMoves(Color color = BLACK);
         u64 perft (int depth, Color color);
-        void makeMove(Move move);
-        void unmakeMove(Move move);
 
         Bitboard generateRookMoves(Bitboard rooks = CURRENT_POSITION, Color color = BLACK);
         Bitboard generateBishopMoves(Bitboard bishops = CURRENT_POSITION, Color color = BLACK);
@@ -66,7 +65,6 @@ class MoveGeneration {
 
         Bitboard checkForPinnedPieces(Bitboard kingMoves, Bitboard pieceMoves, Bitboard piece2Moves, PieceType pieceType, PieceType piece2Type, Direction direction, Color color, Pins &pins); 
         bool checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboard attackerPawn, Color color);
-        Piece findPiece(Square s);
 
         u64 runPerft(int depth, int maxDepth, Color color);
 
