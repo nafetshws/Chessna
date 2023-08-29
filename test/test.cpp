@@ -223,11 +223,9 @@ void test_moveGeneration() {
     test_enPassent_discoveredCheck3();
 }
 
-void perft_test(std::string fen, u64 expectedRes) {
+void perft_test(std::string fen, u64 expectedRes, int depth) {
     Board board(fen);
     MoveGeneration mG(board);
-
-    int depth = 6;
 
     Color color = board.sideToMove;
     std::cout << "testing fen: " << fen << std::endl;
@@ -238,7 +236,7 @@ void perft_test(std::string fen, u64 expectedRes) {
     IS_EQUAL(nodes, expectedRes);
 }
 
-void test_perftsuite() {
+void test_perftsuite(int depth) {
     std::string line;
     std::ifstream file("test/perftsuite.epd");
 
@@ -249,27 +247,81 @@ void test_perftsuite() {
 
         std::string fen = line.substr(pos, line.find(delimter, pos) - pos);
         pos += fen.length()+1;
-        std::size_t strPos = line.find("D6");
+        std::size_t strPos = line.find("D" + std::to_string(depth));
 
         if(strPos != std::string::npos) {
             d6 = line.substr(strPos);
             u64 nodes = std::stoull(d6.substr(3));
             
             //test engine
-            perft_test(fen, nodes);
+            perft_test(fen, nodes, depth);
         }
     }
 
     file.close();
 }
 
-//function to execute all tests
-void test_all() {
-    //test_moveGeneration();
-    test_perftsuite();
+void quick_perft(bool quick) {
+    std::vector<std::string> test_fens = {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+        "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1",
+        "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",
+        "r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1", //mirror position
+        "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8",
+        "r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10"
+    };
+
+    std::vector<u64> totalNodesD6 = {
+        119060324,
+        193690690,
+        11030083,
+        15833292,
+        15833292, //mirror position
+        89941194,
+        164075551
+    };
+
+    std::vector<u64> totalNodesD5 = {
+        4865609,
+        4085603,
+        674624,
+        422333,
+        422333, //mirror position
+        2103487,
+        3894594
+    };
+
+    std::vector<int> depths = {
+        6,
+        5,
+        6,
+        5,
+        5,
+        5,
+        5
+    };
+
+    for(int i = 0; i < test_fens.size(); i++) {
+        if(quick) perft_test(test_fens.at(i), totalNodesD5.at(i), depths.at(i)-1);
+        else perft_test(test_fens.at(i), totalNodesD6.at(i), depths.at(i));
+    }
 }
 
-int main() {
-    test_all();
+//function to execute all tests
+void test_all() {
+    test_moveGeneration();
+    test_perftsuite(6);
+}
+
+int main(int argc, char* argv[]) {
+    if(argc == 1) {
+        test_all();
+    } else {
+        std::string input = argv[1];
+        if(input.compare("quick") == 0) quick_perft(true);
+        else if(input.compare("middle") == 0) quick_perft(false); 
+        else if(input.compare("full") == 0) test_perftsuite(6);
+    }
     return 0;
 }
