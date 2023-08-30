@@ -6,20 +6,22 @@
 #include "../include/moveGeneration.hpp"
 #include "../include/evaluation.hpp"
 
+const int positiveInfinity = 999999;
+const int negativeInfinity = -positiveInfinity;
+
 class Search {
     public:
         Board board;
         Move bestMove;
+        int bestScore;
         MoveGeneration moveGeneration;
         Evaluation evaluation;
         Color sideToMove;
 
-        Search(Board board);
-        int alphaBeta(int alpha, int beta, int depth);
+        u64 visitedNodes;
 
-    private:
-        const int positiveInfinity = 999999;
-        const int negativeInfinity = -positiveInfinity;
+        Search(Board board);
+        int alphaBeta(int alpha, int beta, int depth, int depthFromRoot);
 
 };
 

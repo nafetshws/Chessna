@@ -322,6 +322,9 @@ void Board::makeMove(Move move) {
         this->removeKingSideCastleAbillity(move.color);
         this->removeQueenSideCastleAbillity(move.color);
     }
+
+    //switch side to move
+    this->sideToMove = getOppositeColor(this->sideToMove);
 }
 
 Piece Board::findPiece(Square s) {
