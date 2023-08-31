@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <chrono>
 #include "../include/functions.hpp"
 #include "../include/types.hpp"
 
@@ -117,4 +118,12 @@ void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType 
             }
         }
     }
+}
+
+u64 getCurrentTime() {
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
+
+float getTimeDifference(u64 before, u64 after) {
+    return ((after - before)/(float)1000000000);
 }
