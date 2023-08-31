@@ -176,6 +176,16 @@ void Board::initBoard(std::string fen){
     this->castlingAbillity = castlingAbillity;
     this->halfMoveClock = stoi(halfMoveClock);
     this->fullMoveCounter = stoi(fullMoveCounter);
+
+    //move generation state
+    this->clearState();
+}
+
+void Board::clearState() {
+    this->pinnedPieces = Pins();
+    this->enemeyPinnedPieces = Pins();
+    this->calculatedPinnedPieces = false;
+    this->calculatedEnemeyPinnedPieces = false;
 }
 
 void Board::makeMove(Move move) {
@@ -325,6 +335,15 @@ void Board::makeMove(Move move) {
 
     //switch side to move
     this->sideToMove = getOppositeColor(this->sideToMove);
+    //set half move counter
+    MoveType mt = move.moveType;
+    if(move.pieceType == PAWN || mt == CAPTURE || mt == EN_PASSENT_CAPTURE || mt == KING_CASTLE || mt == QUEEN_CASTLE) this->halfMoveClock = 0;
+    else halfMoveClock++;
+    //set full move counter
+    if(move.color == BLACK) fullMoveCounter++;
+
+    //clear state for move gen
+    this->clearState();
 }
 
 Piece Board::findPiece(Square s) {

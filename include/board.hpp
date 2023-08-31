@@ -14,11 +14,18 @@ struct Board {
     int halfMoveClock;
     int fullMoveCounter;
 
+    //State for move generation
+    Pins pinnedPieces;
+    Pins enemeyPinnedPieces;
+    bool calculatedPinnedPieces;
+    bool calculatedEnemeyPinnedPieces;
+
 
     Board(std::string fen);
     Board();
 
     void initBoard(std::string fen = DEFAULT_FEN);
+    void clearState();
     Piece findPiece(Square s);
 
     void makeMove(Move move);
