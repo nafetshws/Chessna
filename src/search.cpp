@@ -18,7 +18,7 @@ Search::Search(Board board) {
 int Search::negaMax(int depth) {
     if(depth == 0) {
         this->visitedNodes++;
-        return this->evaluation.evaluatePosition(this->moveGeneration.board);
+        return this->evaluation.evaluatePosition(this->board);
     }
 
     std::vector<Move> moves = moveGeneration.generateMoves(this->board, this->board.sideToMove);
@@ -26,7 +26,7 @@ int Search::negaMax(int depth) {
     int maxScore = negativeInfinity;
 
     for(int i = 0; i < moves.size(); i++) {
-        Board copyBoard = this->moveGeneration.board;
+        Board copyBoard = this->board;
         this->board.makeMove(moves.at(i));
         int score = -this->negaMax(depth-1);
         this->board = copyBoard;

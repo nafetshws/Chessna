@@ -21,7 +21,6 @@ void runMoveGeneration(std::string fen, int depth) {
     float nodesPerS = nodes/getTimeDifference(before, after);
 
     std::cout << "Nodes: " << nodes << std::endl;
-    std::cout << "other Nodes: " << moveGeneration.nodes << std::endl;
     std::cout << "time: " << getTimeDifference(before, after) << std::endl;
     std::cout << "nodes/s: " << nodesPerS<< std::endl;
 }
@@ -60,8 +59,8 @@ int main(int argc, char *argv[]){
         fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/P1N2Q2/1PPBBPpP/2KR3R b kq - 0 1"; 
     }
 
-    //runMoveGeneration(fen, depth);
-    runSearch(fen, depth);
+    runMoveGeneration(fen, depth);
+    //runSearch(fen, depth);
 
     return 0;
 }
