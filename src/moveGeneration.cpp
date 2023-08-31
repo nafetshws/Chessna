@@ -8,20 +8,25 @@ MoveGeneration::MoveGeneration(Board board) {
     this->board = board;
     this->ignoreOccupence = EMPTY;
     this->generatingKingMoves = false;
+    this->nodes = 0;
 }
 
 MoveGeneration::MoveGeneration() {
     this->board = Board();
     this->ignoreOccupence = EMPTY;
     this->generatingKingMoves = false;
+    this->nodes = 0;
 }
 
 u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
     u64 totalNodes = 0ULL;
     u64 nodes = 0ULL;
 
-    if(depth == 0) return 1ULL; 
-    
+    if(depth == 0) { 
+        this->nodes++;
+        return 1ULL; 
+    }
+
     std::vector<Move> moves = generateMoves(color);
 
     for(int i = 0; i < moves.size(); i++) {

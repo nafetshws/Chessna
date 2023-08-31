@@ -6,6 +6,42 @@
 #include "../include/types.hpp"
 #include "../include/functions.hpp"
 #include "../include/search.hpp"
+#include <chrono>
+
+void runMoveGeneration(std::string fen, int depth) {
+    Board board(fen);
+    MoveGeneration moveGeneration(board);
+
+    Color color = board.sideToMove;
+
+    u64 before = getCurrentTime();
+    u64 nodes = moveGeneration.perft(depth, color);
+    u64 after = getCurrentTime();
+
+    float nodesPerS = nodes/getTimeDifference(before, after);
+
+    std::cout << "Nodes: " << nodes << std::endl;
+    std::cout << "other Nodes: " << moveGeneration.nodes << std::endl;
+    std::cout << "time: " << getTimeDifference(before, after) << std::endl;
+    std::cout << "nodes/s: " << nodesPerS<< std::endl;
+}
+
+void runSearch(std::string fen, int depth) {
+    Board board(fen);
+
+    Search search(board);
+
+    u64 before = getCurrentTime(); 
+    //int eval = search.alphaBeta(negativeInfinity, positiveInfinity, depth, 0);
+    int eval = search.negaMax(depth);
+    u64 after = getCurrentTime(); 
+    float dt = getTimeDifference(before, after);
+    std::cout << "eval: " << eval << std::endl;
+    std::cout << "best move: " << printableMove(search.bestMove) << std::endl;
+    std::cout << "visited nodes: " << search.visitedNodes << std::endl;
+    std::cout << "time (in s): " << dt << std::endl;
+    std::cout << "nodes/s: " << (search.visitedNodes / dt) << std::endl;
+}
 
 int main(int argc, char *argv[]){
     std::string fen; 
@@ -24,27 +60,8 @@ int main(int argc, char *argv[]){
         fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/P1N2Q2/1PPBBPpP/2KR3R b kq - 0 1"; 
     }
 
-
-    //Board board(fen);
-    //MoveGeneration moveGeneration(board);
-
-    //Color color = board.sideToMove;
-
-    //std::vector<Move> moves = moveGeneration.generateMoves(WHITE);
-    //printMoves(moves);
-
-    //u64 nodes = moveGeneration.perft(depth, color);
-    //std::cout << "Nodes: " << nodes << std::endl;
-
-    Board board(DEFAULT_FEN);
-
-    Search search(board);
-
-    int eval = search.alphaBeta(negativeInfinity, positiveInfinity, 6, 0);
-    std::cout << "eval: " << eval << std::endl;
-    std::cout << "best move: " << printableMove(search.bestMove) << std::endl;
-    std::cout << "visited nodes: " << search.visitedNodes << std::endl;
-
+    //runMoveGeneration(fen, depth);
+    runSearch(fen, depth);
 
     return 0;
 }

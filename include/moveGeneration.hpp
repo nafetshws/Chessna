@@ -12,6 +12,8 @@ class MoveGeneration {
         Bitboard ignoreOccupence;
         bool generatingKingMoves;
 
+        u64 nodes;
+
         MoveGeneration(Board board);
         MoveGeneration();
 

@@ -15,6 +15,29 @@ Search::Search(Board board) {
     this->visitedNodes = 0;
 }
 
+int Search::negaMax(int depth) {
+    if(depth == 0) {
+        this->visitedNodes++;
+        return this->evaluation.evaluatePosition(this->moveGeneration.board);
+    }
+
+    std::vector<Move> moves = moveGeneration.generateMoves(this->moveGeneration.board.sideToMove);
+
+    int maxScore = negativeInfinity;
+
+    for(int i = 0; i < moves.size(); i++) {
+        Board copyBoard = this->moveGeneration.board;
+        this->moveGeneration.board.makeMove(moves.at(i));
+        int score = -this->negaMax(depth-1);
+        this->moveGeneration.board = copyBoard;
+
+        if(score > maxScore) {
+            maxScore = score;
+        }
+    }
+    return maxScore;
+}
+
 int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     if(depth == 0) return this->evaluation.evaluatePosition(this->board); //return evaluation of the position
 
@@ -29,9 +52,9 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
         this->board = copyBoard;
 
         // Beta-cutoff: opponent will have chosen a different path down the tree as the move is too good
-        if(score >= beta) {
-            return beta;
-        }
+        //if(score >= beta) {
+        //    return beta;
+        //}
 
         //found new best move
         if(score > alpha) {
