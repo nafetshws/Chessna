@@ -18,7 +18,7 @@ int Evaluation::evaluatePosition(Board board) {
         KNIGHT_VALUE*(this->popcount(board.getKnights(c)) - this->popcount(board.getKnights(oC))) + 
         PAWN_VALUE*(this->popcount(board.getPawns(c)) - this->popcount(board.getPawns(oC)));
 
-    int positionScore = 0; 
+    int positionScore = 
         calculatePositionScore(board.getKing(c), kingMiddlGamePositionEvaluation) - calculatePositionScore(board.getKing(oC), kingMiddlGamePositionEvaluation) +
         calculatePositionScore(board.getQueens(c), queenPositionEvaluation) - calculatePositionScore(board.getQueens(oC), queenPositionEvaluation) + 
         calculatePositionScore(board.getRooks(c), rookPositionEvaluation) - calculatePositionScore(board.getRooks(oC), rookPositionEvaluation) + 
