@@ -31,8 +31,8 @@ void runSearch(std::string fen, int depth) {
     Search search(board);
 
     u64 before = getCurrentTime(); 
-    //int eval = search.alphaBeta(negativeInfinity, positiveInfinity, depth, 0);
-    int eval = search.negaMax(depth);
+    int eval = search.alphaBeta(negativeInfinity, positiveInfinity, depth, 0);
+    //int eval = search.negaMax(depth);
     u64 after = getCurrentTime(); 
     float dt = getTimeDifference(before, after);
     std::cout << "eval: " << eval << std::endl;
@@ -59,8 +59,8 @@ int main(int argc, char *argv[]){
         fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/P1N2Q2/1PPBBPpP/2KR3R b kq - 0 1"; 
     }
 
-    runMoveGeneration(fen, depth);
-    //runSearch(fen, depth);
+    //runMoveGeneration(fen, depth);
+    runSearch(fen, depth);
 
     return 0;
 }
