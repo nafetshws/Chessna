@@ -27,7 +27,7 @@ u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
         return 1ULL; 
     }
 
-    std::vector<Move> moves = generateMoves(color);
+    std::vector<Move> moves = generateMoves(this->board, color);
 
     for(int i = 0; i < moves.size(); i++) {
         Board copyBoard = this->board;
@@ -45,24 +45,24 @@ u64 MoveGeneration::perft(int depth, Color color) {
     return runPerft(depth, depth, color);
 }
 
-std::vector<Move> MoveGeneration::generateMoves(Color color) {
+std::vector<Move> MoveGeneration::generateMoves(Board board, Color color) {
     std::vector<Move> moves;
     //TODO
     //move types are not accurate!!
 
     //generate all king moves
     Bitboard kingMoves = generateKingMoves(CURRENT_POSITION, color);
-    Square kingOrigin = __builtin_ctzll(this->board.getKing(color));
+    Square kingOrigin = __builtin_ctzll(board.getKing(color));
 
     //transform moves from bitboard into a vector
     while(kingMoves != 0) {
         Square destination = __builtin_ctzll(kingMoves);
         //castle
-        MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+        MoveType moveType = (squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
         if(abs(destination - kingOrigin) == 2) {
             moveType = (squareToBitboard(kingOrigin) << 2*EAST) == squareToBitboard(destination) ? MoveType::KING_CASTLE : MoveType::QUEEN_CASTLE;
         } else {
-            moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+            moveType = (squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
         }
         moves.push_back(Move(kingOrigin, destination, PieceType::KING, color, moveType));
         //delete move from bitboard
@@ -109,13 +109,13 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             switch(checkingPieceType) {
                 case QUEEN:
                     for(int i = 0; i < dirs.size(); i++) {
-                        kingAsSlidingPieceMoves = getAllLegalMovesOf(this->board.getKing(color), dirs.at(i), color);
+                        kingAsSlidingPieceMoves = getAllLegalMovesOf(board.getKing(color), dirs.at(i), color);
                         enemyMoves = getAllLegalMovesOf(squareToBitboard(check_info.moves.at(0).origin), oppositeDirs.at(i), oppositeColor);
 
                         //the intersection of the enemy pieces moves and the king as the sliding piece move mark the squares that can block the enemy piece
                         intersection |= (kingAsSlidingPieceMoves & enemyMoves);
 
-                        kingAsSlidingPieceMoves = getAllLegalMovesOf(this->board.getKing(color), verticalDirs.at(i), color);
+                        kingAsSlidingPieceMoves = getAllLegalMovesOf(board.getKing(color), verticalDirs.at(i), color);
                         enemyMoves = getAllLegalMovesOf(squareToBitboard(check_info.moves.at(0).origin), verticalOppositeDirs.at(i), oppositeColor);
 
                         intersection |= (kingAsSlidingPieceMoves & enemyMoves);
@@ -123,7 +123,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     break;
                 case ROOK:
                     for(int i = 0; i < dirs.size(); i++) {
-                        kingAsSlidingPieceMoves = getAllLegalMovesOf(this->board.getKing(color), verticalDirs.at(i), color);
+                        kingAsSlidingPieceMoves = getAllLegalMovesOf(board.getKing(color), verticalDirs.at(i), color);
                         enemyMoves = getAllLegalMovesOf(squareToBitboard(check_info.moves.at(0).origin), verticalOppositeDirs.at(i), oppositeColor);
 
                         intersection |= (kingAsSlidingPieceMoves & enemyMoves);
@@ -132,7 +132,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     break;
                 case BISHOP:
                     for(int i = 0; i < dirs.size(); i++) {
-                        kingAsSlidingPieceMoves = getAllLegalMovesOf(this->board.getKing(color), dirs.at(i), color);
+                        kingAsSlidingPieceMoves = getAllLegalMovesOf(board.getKing(color), dirs.at(i), color);
                         enemyMoves = getAllLegalMovesOf(squareToBitboard(check_info.moves.at(0).origin), oppositeDirs.at(i), oppositeColor);
 
                         intersection |= (kingAsSlidingPieceMoves & enemyMoves);
@@ -150,7 +150,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                 moves.insert(moves.end(), a_info.moves.begin(), a_info.moves.end());
 
                 //check whether pawn pushes can block the attack
-                Bitboard pawns = this->board.getPawns(color);
+                Bitboard pawns = board.getPawns(color);
                 while(pawns != 0) {
                     Square pawn = __builtin_ctzll(pawns);
                     Bitboard pawnMoves = generatePawnMoves(squareToBitboard(pawn), color);
@@ -198,13 +198,13 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
                     //add moves to pins
                     for(Square destination : destinations) {
-                        MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+                        MoveType moveType = (squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
                         moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
                     }
                 //if the pawn is pinned it can only capture the pinner
                 } else if (pin.pinnedPieceType == PAWN) {
                     if(color == BLACK && direction == Direction::SE) {
-                        if(((pin.pinnedPiece >> SOUTH_EAST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
+                        if(((pin.pinnedPiece >> SOUTH_EAST) & board.getOccupiedBy(getOppositeColor(color))) != 0) {
                             Bitboard promotionRank = RANK_1;
                             if((promotionRank & (pin.pinnedPiece >> SOUTH_EAST)) != 0) {
                                 moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece >> SOUTH_EAST), PAWN, color, MoveType::CAPTURE_BISHOP_PROMOTION));
@@ -216,7 +216,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                             }
                         }
                     } else if(color == WHITE && direction == Direction::NW) {
-                        if(((pin.pinnedPiece << NORTH_WEST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
+                        if(((pin.pinnedPiece << NORTH_WEST) & board.getOccupiedBy(getOppositeColor(color))) != 0) {
                             Bitboard promotionRank = RANK_8;
                             if((promotionRank & (pin.pinnedPiece << NORTH_WEST)) != 0) {
                                 moves.push_back(Move(pinnedPieceOriginSquare, bitboardToSquare(pin.pinnedPiece << NORTH_WEST), PAWN, color, MoveType::CAPTURE_BISHOP_PROMOTION));
@@ -237,14 +237,14 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     std::vector<Square> destinations = convertBitboardToSquares(legalMoves);
 
                     for(Square destination : destinations) {
-                        MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+                        MoveType moveType = (squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
                         moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
                     }
 
                 } else if (pin.pinnedPieceType == PAWN) {
                     //caputres only
                     if(color == BLACK && direction == Direction::SW) {
-                        if(((pin.pinnedPiece >> SOUTH_WEST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
+                        if(((pin.pinnedPiece >> SOUTH_WEST) & board.getOccupiedBy(getOppositeColor(color))) != 0) {
                             Bitboard promotionRank = RANK_1;
 
                             if((promotionRank & (pin.pinnedPiece >> SOUTH_WEST)) != 0) {
@@ -257,7 +257,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                             }
                         }
                     } else if(color == WHITE && direction == Direction::NE) {
-                        if(((pin.pinnedPiece << NORTH_EAST) & this->board.getOccupiedBy(getOppositeColor(color))) != 0) {
+                        if(((pin.pinnedPiece << NORTH_EAST) & board.getOccupiedBy(getOppositeColor(color))) != 0) {
                             Bitboard promotionRank = RANK_8;
                             
                             if((promotionRank & (pin.pinnedPiece << NORTH_EAST)) != 0) {
@@ -278,7 +278,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     std::vector<Square> destinations = convertBitboardToSquares(legalMoves);
 
                     for(Square destination : destinations) {
-                        MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+                        MoveType moveType = (squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
 
                         moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
                     }
@@ -320,7 +320,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
                     std::vector<Square> destinations = convertBitboardToSquares(legalMoves);
 
                     for(Square destination : destinations) {
-                        MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+                        MoveType moveType = (squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
 
                         moves.push_back(Move(pinnedPieceOriginSquare, destination, pin.pinnedPieceType, color, moveType));
                     }
@@ -336,7 +336,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     */
 
     //generate pawn moves
-    Bitboard pawns = this->board.getPawns(color) &(~pinnedPiecesBitboard);
+    Bitboard pawns = board.getPawns(color) &(~pinnedPiecesBitboard);
     while(pawns != 0) {
         Square origin = __builtin_ctzll(pawns);
         Bitboard pawn = 1ULL << origin; 
@@ -346,7 +346,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
             Square destination = __builtin_ctzll(pawnMoves);
 
             MoveType moveType; 
-            if((squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ) {
+            if((squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ) {
                 Bitboard promotionRank = (color == WHITE) ? RANK_8 : RANK_1;
                 if((squareToBitboard(destination) & promotionRank) != 0) {
                     moves.push_back(Move(origin, destination, PieceType::PAWN, color, MoveType::CAPTURE_QUEEN_PROMOTION));
@@ -387,7 +387,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     }
         
     //generate knight moves
-    Bitboard knights = this->board.getKnights(color) & (~pinnedPiecesBitboard);
+    Bitboard knights = board.getKnights(color) & (~pinnedPiecesBitboard);
     while(knights != 0) {
         Square origin = __builtin_ctzll(knights);
         Bitboard knight = 1ULL << origin; 
@@ -395,7 +395,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(knightMoves != 0) {
             Square destination = __builtin_ctzll(knightMoves);
-            MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+            MoveType moveType = (squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
             moves.push_back(Move(origin, destination, PieceType::KNIGHT, color, moveType));
             //delete move from bitboard
             knightMoves = ~(1ULL << destination) & knightMoves;
@@ -405,7 +405,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     }
 
     //generate rook moves
-    Bitboard rooks = this->board.getRooks(color) & (~pinnedPiecesBitboard);
+    Bitboard rooks = board.getRooks(color) & (~pinnedPiecesBitboard);
 
     while(rooks != 0) {
         Square origin = __builtin_ctzll(rooks);
@@ -414,7 +414,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(rookMoves != 0) {
             Square destination = __builtin_ctzll(rookMoves);
-            MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+            MoveType moveType = (squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
             moves.push_back(Move(origin, destination, PieceType::ROOK, color, moveType));
             //delete move from bitboard
             rookMoves = ~(1ULL << destination) & rookMoves;
@@ -424,7 +424,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     }
 
     //generate bishop moves
-    Bitboard bishops = this->board.getBishops(color) & (~pinnedPiecesBitboard);
+    Bitboard bishops = board.getBishops(color) & (~pinnedPiecesBitboard);
     while(bishops != 0) {
         Square origin = __builtin_ctzll(bishops);
         Bitboard bishop = 1ULL << origin; 
@@ -432,7 +432,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(bishopMoves != 0) {
             Square destination = __builtin_ctzll(bishopMoves);
-            MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+            MoveType moveType = (squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
             moves.push_back(Move(origin, destination, PieceType::BISHOP, color, moveType));
             //delete move from bitboard
             bishopMoves = ~(1ULL << destination) & bishopMoves;
@@ -442,7 +442,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
     }
 
     //generate queen moves
-    Bitboard queens = this->board.getQueens(color) &(~pinnedPiecesBitboard);
+    Bitboard queens = board.getQueens(color) &(~pinnedPiecesBitboard);
     while(queens != 0) {
         Square origin = __builtin_ctzll(queens);
         Bitboard queen = 1ULL << origin; 
@@ -450,7 +450,7 @@ std::vector<Move> MoveGeneration::generateMoves(Color color) {
 
         while(queenMoves != 0) {
             Square destination = __builtin_ctzll(queenMoves);
-            MoveType moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
+            MoveType moveType = (squareToBitboard(destination) & board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
             moves.push_back(Move(origin, destination, PieceType::QUEEN, color, moveType));
             //delete move from bitboard
             queenMoves = ~(1ULL << destination) & queenMoves;

@@ -17,7 +17,7 @@ class MoveGeneration {
         MoveGeneration(Board board);
         MoveGeneration();
 
-        std::vector<Move> generateMoves(Color color = BLACK);
+        std::vector<Move> generateMoves(Board board, Color color = BLACK);
         u64 perft (int depth, Color color);
 
         Bitboard generateRookMoves(Bitboard rooks = CURRENT_POSITION, Color color = BLACK);

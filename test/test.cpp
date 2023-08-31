@@ -109,42 +109,42 @@ void test_isInCheck3() {
 
 void test_moveGenerationInDoubleCheck() {
     MoveGeneration moveGeneration{Board("8/4k3/6N1/4Q3/4R3/8/4K3/8 w - - 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 3);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, BLACK).size(), 3);
 }
 
 void test_moveGenerationInDoubleCheck2() {
     MoveGeneration moveGeneration{Board("rnb1k2r/pppppppp/8/4q3/4r3/2bP1n2/PPP2PPP/RNBQKBNR w KQkq - 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 0);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, WHITE).size(), 0);
 }
 
 void test_moveGenerationInSinlgeCheck() {
     MoveGeneration moveGeneration{Board("rnb1k2r/pppppppp/8/8/8/2bP4/PPP2PPP/RNBQKBNR w KQkq - 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 6);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, WHITE).size(), 6);
 }
 
 void test_moveGenerationInSinlgeCheck2() {
     MoveGeneration moveGeneration{Board("r1b1k2r/pppppppp/8/8/8/3P1n2/PPP2PPP/RNBQKBNR w KQkq - 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 4);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, WHITE).size(), 4);
 }
 
 void test_moveGenerationInSinlgeCheck3() {
     MoveGeneration moveGeneration{Board("r1b1k2r/pppppppp/8/8/8/3P4/PPPp1PPP/RNBQKBNR w KQkq - 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 5);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, WHITE).size(), 5);
 }
 
 void test_enPassentCheckEvasion(){
     MoveGeneration moveGeneration{Board("8/8/8/2k5/3Pp3/8/8/3K4 b - d3 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 9);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, BLACK).size(), 9);
 }
 
 void test_enPassentCheckEvasion2(){
     MoveGeneration moveGeneration{Board("k7/8/8/5Pp1/7K/8/8/8 w - g6 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 6);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, WHITE).size(), 6);
 }
 
 void test_enPassentCheckEvasion3(){
     MoveGeneration moveGeneration{Board("8/8/8/k7/2Pp4/8/8/3KQ3 b - c3 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 4);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, BLACK).size(), 4);
 }
 
 void test_getPinnedPieces(){
@@ -155,33 +155,33 @@ void test_getPinnedPieces(){
 
 void test_pinnedPiecesMoveGeneration() {
     MoveGeneration moveGeneration{Board("4k3/5p2/2b3B1/4r3/Q7/8/8/2K1R3 b - - 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 14);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, BLACK).size(), 14);
 }
 
 void test_pinnedPiecesMoveGeneration2() {
     MoveGeneration moveGeneration{Board("6k1/8/3r4/6b1/1q1BN3/2P5/3KR2r/r7 w - - 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 3);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, WHITE).size(), 3);
 }
 
 
 void test_pinnedPiecesMoveGeneration3() {
     MoveGeneration moveGeneration{Board("6k1/8/3r4/6b1/1q1BN3/2P5/3KR3/r7 w - - 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 4);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, WHITE).size(), 4);
 }
 
 void test_enPassent_discoveredCheck() {
     MoveGeneration moveGeneration{Board("8/8/8/8/k2Pp2Q/8/8/4K3 w - d3 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 6);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, BLACK).size(), 6);
 }
 
 void test_enPassent_discoveredCheck2() {
     MoveGeneration moveGeneration{Board("8/8/8/8/k1pPp2Q/8/8/4K3 w - d3 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(BLACK).size(), 9);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, BLACK).size(), 9);
 }
 
 void test_enPassent_discoveredCheck3() {
     MoveGeneration moveGeneration{Board("5k2/8/8/K2Pp2r/8/8/8/8 w - d3 0 1")};
-    IS_EQUAL(moveGeneration.generateMoves(WHITE).size(), 6);
+    IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, WHITE).size(), 6);
 }
 
 //function to execute all move generation tests

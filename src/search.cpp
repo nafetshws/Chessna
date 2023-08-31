@@ -21,15 +21,15 @@ int Search::negaMax(int depth) {
         return this->evaluation.evaluatePosition(this->moveGeneration.board);
     }
 
-    std::vector<Move> moves = moveGeneration.generateMoves(this->moveGeneration.board.sideToMove);
+    std::vector<Move> moves = moveGeneration.generateMoves(this->board, this->board.sideToMove);
 
     int maxScore = negativeInfinity;
 
     for(int i = 0; i < moves.size(); i++) {
         Board copyBoard = this->moveGeneration.board;
-        this->moveGeneration.board.makeMove(moves.at(i));
+        this->board.makeMove(moves.at(i));
         int score = -this->negaMax(depth-1);
-        this->moveGeneration.board = copyBoard;
+        this->board = copyBoard;
 
         if(score > maxScore) {
             maxScore = score;
@@ -41,7 +41,7 @@ int Search::negaMax(int depth) {
 int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     if(depth == 0) return this->evaluation.evaluatePosition(this->board); //return evaluation of the position
 
-    std::vector<Move> moves = moveGeneration.generateMoves(this->board.sideToMove);
+    std::vector<Move> moves = moveGeneration.generateMoves(this->board, this->board.sideToMove);
     for(int i = 0; i < moves.size(); i++) {
         this->visitedNodes++;
         //copy board to undo move
