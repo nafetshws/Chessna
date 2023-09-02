@@ -13,10 +13,10 @@ class MoveGeneration {
         bool generatingKingMoves;
 
         //state
-        Pins pinnedPieces;
-        Pins enemeyPinnedPieces;
-        bool calculatedPinnedPieces;
-        bool calculatedEnemeyPinnedPieces;
+        Pins pinnedPiecesWhite;
+        Pins pinnedPiecesBlack;
+        bool calculatedPinnedPiecesWhite;
+        bool calculatedPinnedPiecesBlack;
 
 
         u64 nodes;

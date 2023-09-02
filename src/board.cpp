@@ -176,7 +176,6 @@ void Board::initBoard(const std::string &fen){
     this->castlingAbillity = castlingAbillity;
     this->halfMoveClock = stoi(halfMoveClock);
     this->fullMoveCounter = stoi(fullMoveCounter);
-
 }
 
 void Board::makeMove(Move move) {
@@ -309,7 +308,7 @@ void Board::makeMove(Move move) {
             this->enPassentTargetSquare = -1;
             break;
         }
-        case CAPTURE_QUEEN_PROMOTION: CAPTURE_ROOK_PROMOTION: CAPTURE_KNIGHT_PROMOTION: CAPTURE_BISHOP_PROMOTION: {
+        case CAPTURE_QUEEN_PROMOTION: case CAPTURE_ROOK_PROMOTION: case CAPTURE_KNIGHT_PROMOTION: case CAPTURE_BISHOP_PROMOTION: {
             Piece target = findPiece(move.destination);
             switch(target.type) {
                 case PAWN:
@@ -353,7 +352,6 @@ void Board::makeMove(Move move) {
                 default:
                     break;
             }
-
             break;
         }
         default:

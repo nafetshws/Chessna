@@ -41,10 +41,10 @@ u64 MoveGeneration::perft(int depth, Color color) {
 }
 
 void MoveGeneration::clearState() {
-    this->pinnedPieces = Pins();
-    this->enemeyPinnedPieces = Pins();
-    this->calculatedPinnedPieces = false;
-    this->calculatedEnemeyPinnedPieces = false;
+    this->pinnedPiecesWhite = Pins();
+    this->pinnedPiecesBlack = Pins();
+    this->calculatedPinnedPiecesWhite = false;
+    this->calculatedPinnedPiecesBlack = false;
 }
 
 std::vector<Move> MoveGeneration::generateMoves(Board &board, Color color) {
@@ -183,14 +183,18 @@ std::vector<Move> MoveGeneration::generateMoves(Board &board, Color color) {
     * Generate moves by pinned pieces and append them to the pinnedPieces Bitboard
     */
 
-
-    Pins pinnedPieces; 
-    if(!this->calculatedPinnedPieces) {
+   Pins pinnedPieces; 
+    if((color == WHITE) ? !this->calculatedPinnedPiecesWhite : !this->calculatedPinnedPiecesBlack) {
         pinnedPieces = getPinnedPieces(color);
-        this->pinnedPieces = pinnedPieces;
-        this->calculatedPinnedPieces = true;
+        if(color == WHITE) {
+            this->pinnedPiecesWhite = pinnedPieces;
+            this->calculatedPinnedPiecesWhite = true;
+        } else {
+            this->pinnedPiecesBlack = pinnedPieces;
+            this->calculatedPinnedPiecesBlack = true;
+        }
     } else {
-        pinnedPieces = this->pinnedPieces;
+        pinnedPieces = (color == WHITE) ? this->pinnedPiecesWhite : this->pinnedPiecesBlack;
     }
 
     Bitboard pinnedPiecesBitboard = pinnedPieces.absolutePins;
@@ -784,12 +788,17 @@ Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color
     Color oppositeColor = getOppositeColor(color);
 
     Pins pins; 
-    if(!this->calculatedEnemeyPinnedPieces) {
-        pins = getPinnedPieces(getOppositeColor(color));
-        this->pinnedPieces = pins;
-        this->calculatedEnemeyPinnedPieces = true;
+    if((color == WHITE) ? !this->calculatedPinnedPiecesBlack : !this->calculatedPinnedPiecesWhite) {
+        pins = getPinnedPieces(oppositeColor);
+        if(color == WHITE) {
+            this->pinnedPiecesBlack = pins;
+            this->calculatedPinnedPiecesBlack = true;
+        } else {
+            this->pinnedPiecesWhite = pins;
+            this->calculatedPinnedPiecesWhite = true;
+        }
     } else {
-        pins = this->enemeyPinnedPieces;
+        pins = (color == WHITE) ? this->pinnedPiecesBlack : this->pinnedPiecesWhite;
     }
 
     if(squareAsBitboard == this->board.getKing(color)) pins.absolutePins = 0;
