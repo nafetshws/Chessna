@@ -5,7 +5,7 @@
 #include "../include/types.hpp"
 #include "../include/functions.hpp"
 
-Board::Board(std::string fen) {
+Board::Board(const std::string &fen) {
     initBoard(fen);
 }
 
@@ -13,7 +13,7 @@ Board::Board() {
     initBoard(DEFAULT_FEN);
 }
 
-void Board::initBoard(std::string fen){
+void Board::initBoard(const std::string &fen){
 
     std::string delimiter = " ";
     int pos = 0;
@@ -177,15 +177,6 @@ void Board::initBoard(std::string fen){
     this->halfMoveClock = stoi(halfMoveClock);
     this->fullMoveCounter = stoi(fullMoveCounter);
 
-    //move generation state
-    this->clearState();
-}
-
-void Board::clearState() {
-    this->pinnedPieces = Pins();
-    this->enemeyPinnedPieces = Pins();
-    this->calculatedPinnedPieces = false;
-    this->calculatedEnemeyPinnedPieces = false;
 }
 
 void Board::makeMove(Move move) {
@@ -341,9 +332,6 @@ void Board::makeMove(Move move) {
     else halfMoveClock++;
     //set full move counter
     if(move.color == BLACK) fullMoveCounter++;
-
-    //clear state for move gen
-    this->clearState();
 }
 
 Piece Board::findPiece(Square s) {

@@ -12,13 +12,22 @@ class MoveGeneration {
         Bitboard ignoreOccupence;
         bool generatingKingMoves;
 
+        //state
+        Pins pinnedPieces;
+        Pins enemeyPinnedPieces;
+        bool calculatedPinnedPieces;
+        bool calculatedEnemeyPinnedPieces;
+
+
         u64 nodes;
 
         MoveGeneration(Board board);
         MoveGeneration();
 
-        std::vector<Move> generateMoves(Board board, Color color = BLACK);
+        std::vector<Move> generateMoves(Board &board, Color color = BLACK);
         u64 perft (int depth, Color color);
+
+        void clearState();
 
         Bitboard generateRookMoves(Bitboard rooks = CURRENT_POSITION, Color color = BLACK);
         Bitboard generateBishopMoves(Bitboard bishops = CURRENT_POSITION, Color color = BLACK);
