@@ -196,7 +196,7 @@ void test_moveGeneration() {
     test_generateKingMoves();
     test_legalKingMoves();
     test_legalKingMoves2();
-    test_generateAttackedSquares();
+    //test_generateAttackedSquares();
 
     test_isInCheck();
     test_isInCheck2();

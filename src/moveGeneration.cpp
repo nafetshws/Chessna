@@ -9,6 +9,7 @@ MoveGeneration::MoveGeneration(Board board) {
     this->ignoreOccupence = EMPTY;
     this->generatingKingMoves = false;
     this->underAttackCounter = 0;
+    this->clearState();
 }
 
 MoveGeneration::MoveGeneration() {
@@ -16,6 +17,7 @@ MoveGeneration::MoveGeneration() {
     this->ignoreOccupence = EMPTY;
     this->generatingKingMoves = false;
     this->underAttackCounter = 0;
+    this->clearState();
 }
 
 u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
@@ -59,11 +61,15 @@ std::vector<Move> MoveGeneration::generateMoves(Board &board, Color color) {
     std::vector<Move> moves;
     this->clearState();
 
+    //attack bitboard is necessary for king moveGen -> king needs to be removed
+    this->ignoreOccupence = this->board.getKing(color);
+
     if(color == WHITE) {
-        this->attackedByBlack = this->generateAttackedSquaresWithoutKing(BLACK);
+        this->attackedByBlack = this->generateAttackedSquares(BLACK);
     } else {
-        this->attackedByWhite = this->generateAttackedSquaresWithoutKing(WHITE);
+        this->attackedByWhite = this->generateAttackedSquares(WHITE);
     }
+    this->ignoreOccupence = EMPTY; 
 
     this->check_info = isInCheck(color);
 
@@ -696,12 +702,7 @@ Bitboard MoveGeneration::generateKnightMoves(Bitboard knights, Color color) {
 
     Bitboard attacks = generateKnightAttacks(knights, color);
 
-    Bitboard moves;
-    if(color == BLACK) {
-        moves = (attacks & ~this->board.getOccupiedByBlack());
-    } else {
-        moves = (attacks & ~this->board.getOccupiedByWhite());
-    }
+    Bitboard moves = (attacks & ~(this->board.getOccupiedBy(color) & ~ignoreOccupence));
 
     return moves;
 }
@@ -727,69 +728,72 @@ Bitboard MoveGeneration::generateKingAttacks(Bitboard king, Color color) {
 Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     if(king == (CURRENT_POSITION)) king = this->board.getKing(color); 
 
-    //WARNING: without king could cause problem: enemy king can stop you from castling
+    this->ignoreOccupence = this->board.getKing(color);
+
+    //calculate attacked squares if not already done
     if(color == WHITE) {
-        if(this->attackedByBlack == EMPTY) this->attackedByBlack = this->generateAttackedSquaresWithoutKing(BLACK);
+        if(this->attackedByBlack == EMPTY) this->attackedByBlack = this->generateAttackedSquares(BLACK);
     } else {
-        if(this->attackedByWhite == EMPTY) this->attackedByWhite = this->generateAttackedSquaresWithoutKing(WHITE);
+        if(this->attackedByWhite == EMPTY) this->attackedByWhite = this->generateAttackedSquares(WHITE);
     }
 
-    this->ignoreOccupence = this->board.getKing(color);
 
     Bitboard attacks = generateKingAttacks(king, color);
 
     //castling
     Bitboard castle = EMPTY;
-    this->generatingKingMoves = true;
 
     if(check_info.numberOfChecks == 0) {
         //king castle ability
         Bitboard enemyAttacks = (color == WHITE) ? attackedByBlack : attackedByWhite;
         Bitboard occupied = this->board.getOccupied();
+        Bitboard kingPosition = this->board.getKing(color);
 
-        if((enemyAttacks & (this->board.getKing(color) << 1)) == 0
-        && (enemyAttacks & (this->board.getKing(color) << 2)) == 0
-        && ((this->board.getKing(color) << 1) & occupied) == 0
-        && ((this->board.getKing(color) << 2) & occupied) == 0) {
+        //check whether the king side castle squares are attacked by the enemy
+        if((enemyAttacks & (kingPosition << 1)) == 0
+        && (enemyAttacks & (kingPosition << 2)) == 0
+        && ((kingPosition << 1) & occupied) == 0
+        && ((kingPosition << 2) & occupied) == 0) {
             if(this->board.getKingSideCastleAbility(color)) {
-               castle = castle | (this->board.getKing(color) << 2); 
+               castle = castle | (kingPosition << 2); 
             }        
         }
 
-        if((enemyAttacks & (this->board.getKing(color) >> 1)) == 0
-        && (enemyAttacks & (this->board.getKing(color) >> 2)) == 0
-        && ((this->board.getKing(color) >> 1) & occupied) == 0
-        && ((this->board.getKing(color) >> 2) & occupied) == 0
-        && ((this->board.getKing(color) >> 3) & occupied) == 0) {
+        //check whether the queen side castle squares are attacked by the enemy
+        if((enemyAttacks & (kingPosition >> 1)) == 0
+        && (enemyAttacks & (kingPosition >> 2)) == 0
+        && ((kingPosition >> 1) & occupied) == 0
+        && ((kingPosition >> 2) & occupied) == 0
+        && ((kingPosition >> 3) & occupied) == 0) {
             if(this->board.getQueenSideCastleAbility(color)) {
-               castle = castle | (this->board.getKing(color) >> 2); 
+               castle = castle | (kingPosition >> 2); 
             }        
         }
     }
-    this->generatingKingMoves = false;
     Bitboard pseudoLegalMoves = attacks | castle;
 
     Bitboard legalMoves;
 
     legalMoves = (pseudoLegalMoves & ~this->board.getOccupiedBy(color)) & ~generateKingAttacks(CURRENT_POSITION, getOppositeColor(color));
 
-    if(color == WHITE) legalMoves &= ~generateAttackedSquaresWithoutKing(BLACK);
-    else legalMoves &= ~generateAttackedSquaresWithoutKing(WHITE);
+    //remove squares that are attacked by the enemy
+    if(color == WHITE) legalMoves &= ~attackedByBlack;
+    else legalMoves &= ~attackedByWhite;
 
-    Bitboard legalMovesCopy = legalMoves;
     this->generatingKingMoves = true;
-    while(legalMovesCopy != 0) {
-        Square index = __builtin_ctzll(legalMovesCopy);
+
+    //check if captured piece is protected
+    Bitboard captures = legalMoves & this->board.getOccupiedBy(getOppositeColor(color));
+    while(captures != 0) {
+        Square index = __builtin_ctzll(captures);
         Attack_Info a = isUnderAttack(index, color);
         //remove move
-        this->underAttackCounter++;
         if(a.numberOfAttacks != 0) legalMoves &= ~squareToBitboard(index);
-        //next move destination
-        legalMovesCopy &= ~squareToBitboard(index);
+
+        captures &= ~squareToBitboard(index);
     } 
 
     this->generatingKingMoves = false;
-
     this->ignoreOccupence = EMPTY;
 
     return legalMoves;
@@ -888,7 +892,7 @@ Check_Info MoveGeneration::isInCheck(Color color) {
 
 
 Bitboard MoveGeneration::generateAttackedSquares(Color color) {
-    return generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generateKingMoves(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
+    return generateRookMoves(CURRENT_POSITION, color) | generateBishopMoves(CURRENT_POSITION, color) | generateQueenMoves(CURRENT_POSITION, color) | generateKnightMoves(CURRENT_POSITION, color) | generateKingAttacks(CURRENT_POSITION, color) | generatePawnAttacks(CURRENT_POSITION, color);
 }
 
 Bitboard MoveGeneration::generateAttackedSquaresWithoutKing(Color color) {
