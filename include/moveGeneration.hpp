@@ -21,6 +21,8 @@ class MoveGeneration {
         //attacks
         Bitboard attackedByWhite;
         Bitboard attackedByBlack;
+        //check
+        Check_Info check_info;
 
         u64 underAttackCounter;
 

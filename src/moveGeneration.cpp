@@ -51,6 +51,7 @@ void MoveGeneration::clearState() {
     //attacks
     this->attackedByWhite = EMPTY;
     this->attackedByBlack = EMPTY;
+    this->check_info = Check_Info();
 }
 
 std::vector<Move> MoveGeneration::generateMoves(Board &board, Color color) {
@@ -63,6 +64,8 @@ std::vector<Move> MoveGeneration::generateMoves(Board &board, Color color) {
     } else {
         this->attackedByWhite = this->generateAttackedSquaresWithoutKing(WHITE);
     }
+
+    this->check_info = isInCheck(color);
 
     //generate all king moves
     Bitboard kingMoves = generateKingMoves(CURRENT_POSITION, color);
@@ -86,7 +89,6 @@ std::vector<Move> MoveGeneration::generateMoves(Board &board, Color color) {
     /*
     * Generate moves when <<color>> is in check
     */
-    Check_Info check_info = isInCheck(color);
     //if the king is in double check he has to move
     if(check_info.numberOfChecks >= 2) return moves;
     else if(check_info.numberOfChecks == 1) {
@@ -740,7 +742,7 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     Bitboard castle = EMPTY;
     this->generatingKingMoves = true;
 
-    if(isInCheck(color).numberOfChecks == 0) {
+    if(check_info.numberOfChecks == 0) {
         //king castle ability
         Bitboard enemyAttacks = (color == WHITE) ? attackedByBlack : attackedByWhite;
         Bitboard occupied = this->board.getOccupied();
