@@ -12,12 +12,17 @@ class MoveGeneration {
         Bitboard ignoreOccupence;
         bool generatingKingMoves;
 
-        //state
+        //State
+        //pins
         Pins pinnedPiecesWhite;
         Pins pinnedPiecesBlack;
         bool calculatedPinnedPiecesWhite;
         bool calculatedPinnedPiecesBlack;
+        //attacks
+        Bitboard attackedByWhite;
+        Bitboard attackedByBlack;
 
+        u64 underAttackCounter;
 
         u64 nodes;
 

@@ -21,6 +21,7 @@ void runMoveGeneration(std::string fen, int depth) {
     float nodesPerS = nodes/getTimeDifference(before, after);
 
     std::cout << "Nodes: " << nodes << std::endl;
+    std::cout << "attack: " << moveGeneration.underAttackCounter << std::endl;
     std::cout << "time: " << getTimeDifference(before, after) << std::endl;
     std::cout << "nodes/s: " << nodesPerS<< std::endl;
 }
@@ -50,6 +51,8 @@ int main(int argc, char *argv[]){
         std::string input = argv[1];
         if(input.compare("default") == 0) {
             fen = DEFAULT_FEN;
+        } else if(input.compare("middle") == 0) {
+            fen = "r3k2r/pppq1pp1/2np1n1p/2b1p1B1/2B1P1b1/2NP1N1P/PPPQ1PP1/R3K2R w KQkq - 0 1";
         } else {
             fen = argv[1];
         }

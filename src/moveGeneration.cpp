@@ -8,12 +8,14 @@ MoveGeneration::MoveGeneration(Board board) {
     this->board = board;
     this->ignoreOccupence = EMPTY;
     this->generatingKingMoves = false;
+    this->underAttackCounter = 0;
 }
 
 MoveGeneration::MoveGeneration() {
     this->board = Board();
     this->ignoreOccupence = EMPTY;
     this->generatingKingMoves = false;
+    this->underAttackCounter = 0;
 }
 
 u64 MoveGeneration::runPerft(int depth, int maxDepth, Color color) {
@@ -41,17 +43,26 @@ u64 MoveGeneration::perft(int depth, Color color) {
 }
 
 void MoveGeneration::clearState() {
+    //pins
     this->pinnedPiecesWhite = Pins();
     this->pinnedPiecesBlack = Pins();
     this->calculatedPinnedPiecesWhite = false;
     this->calculatedPinnedPiecesBlack = false;
+    //attacks
+    this->attackedByWhite = EMPTY;
+    this->attackedByBlack = EMPTY;
 }
 
 std::vector<Move> MoveGeneration::generateMoves(Board &board, Color color) {
     this->board = board;
     std::vector<Move> moves;
-
     this->clearState();
+
+    if(color == WHITE) {
+        this->attackedByBlack = this->generateAttackedSquaresWithoutKing(BLACK);
+    } else {
+        this->attackedByWhite = this->generateAttackedSquaresWithoutKing(WHITE);
+    }
 
     //generate all king moves
     Bitboard kingMoves = generateKingMoves(CURRENT_POSITION, color);
@@ -714,6 +725,13 @@ Bitboard MoveGeneration::generateKingAttacks(Bitboard king, Color color) {
 Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
     if(king == (CURRENT_POSITION)) king = this->board.getKing(color); 
 
+    //WARNING: without king could cause problem: enemy king can stop you from castling
+    if(color == WHITE) {
+        if(this->attackedByBlack == EMPTY) this->attackedByBlack = this->generateAttackedSquaresWithoutKing(BLACK);
+    } else {
+        if(this->attackedByWhite == EMPTY) this->attackedByWhite = this->generateAttackedSquaresWithoutKing(WHITE);
+    }
+
     this->ignoreOccupence = this->board.getKing(color);
 
     Bitboard attacks = generateKingAttacks(king, color);
@@ -724,25 +742,23 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
 
     if(isInCheck(color).numberOfChecks == 0) {
         //king castle ability
-        Bitboard pawnAttacks = generatePawnAttacks(this->board.getPawns(getOppositeColor(color)), getOppositeColor(color));
-        if(isUnderAttack(this->board.getKing(color) << 1, color).numberOfAttacks == 0
-        && isUnderAttack(this->board.getKing(color) << 2, color).numberOfAttacks == 0
-        && ((this->board.getKing(color) << 1) & pawnAttacks) == 0
-        && ((this->board.getKing(color) << 2) & pawnAttacks) == 0
-        && ((this->board.getKing(color) << 1) & this->board.getOccupied()) == 0
-        && ((this->board.getKing(color) << 2) & this->board.getOccupied()) == 0) {
+        Bitboard enemyAttacks = (color == WHITE) ? attackedByBlack : attackedByWhite;
+        Bitboard occupied = this->board.getOccupied();
+
+        if((enemyAttacks & (this->board.getKing(color) << 1)) == 0
+        && (enemyAttacks & (this->board.getKing(color) << 2)) == 0
+        && ((this->board.getKing(color) << 1) & occupied) == 0
+        && ((this->board.getKing(color) << 2) & occupied) == 0) {
             if(this->board.getKingSideCastleAbility(color)) {
                castle = castle | (this->board.getKing(color) << 2); 
             }        
         }
 
-        if(isUnderAttack(this->board.getKing(color) >> 1, color).numberOfAttacks == 0
-        && isUnderAttack(this->board.getKing(color) >> 2, color).numberOfAttacks == 0
-        && ((this->board.getKing(color) >> 1) & pawnAttacks) == 0
-        && ((this->board.getKing(color) >> 2) & pawnAttacks) == 0
-        && ((this->board.getKing(color) >> 1) & this->board.getOccupied()) == 0
-        && ((this->board.getKing(color) >> 3) & this->board.getOccupied()) == 0
-        && ((this->board.getKing(color) >> 2) & this->board.getOccupied()) == 0) {
+        if((enemyAttacks & (this->board.getKing(color) >> 1)) == 0
+        && (enemyAttacks & (this->board.getKing(color) >> 2)) == 0
+        && ((this->board.getKing(color) >> 1) & occupied) == 0
+        && ((this->board.getKing(color) >> 2) & occupied) == 0
+        && ((this->board.getKing(color) >> 3) & occupied) == 0) {
             if(this->board.getQueenSideCastleAbility(color)) {
                castle = castle | (this->board.getKing(color) >> 2); 
             }        
@@ -764,6 +780,7 @@ Bitboard MoveGeneration::generateKingMoves(Bitboard king, Color color) {
         Square index = __builtin_ctzll(legalMovesCopy);
         Attack_Info a = isUnderAttack(index, color);
         //remove move
+        this->underAttackCounter++;
         if(a.numberOfAttacks != 0) legalMoves &= ~squareToBitboard(index);
         //next move destination
         legalMovesCopy &= ~squareToBitboard(index);
@@ -782,6 +799,7 @@ Attack_Info MoveGeneration::isUnderAttack(Square square, Color color) {
 }
 
 Attack_Info MoveGeneration::isUnderAttack(Bitboard squareAsBitboard, Color color) {
+    //this->underAttackCounter++;
     int numberOfAttacks = 0;
     Attack_Info attack_info; 
 
