@@ -5,8 +5,7 @@ FILES = src/main.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/
 
 TEST_OUT = build/test.obj
 OUT = build/main.obj
-
-CC_FLAGS = -std=c++11
+CC_FLAGS = -std=c++11 -O3
 
 BUILD_DIR = ./build
 
