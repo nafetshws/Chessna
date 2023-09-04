@@ -182,6 +182,9 @@ void Board::makeMove(Move move) {
     Bitboard *pieces; 
     Bitboard t = move.moveType;
 
+    Bitboard originAsBitboard = squareToBitboard(move.origin);
+    Bitboard destinationAsBitboard = squareToBitboard(move.destination);
+
     switch(move.pieceType) {
         case PAWN:
             if(move.color == WHITE) pieces = &this->whitePawns;
@@ -213,7 +216,7 @@ void Board::makeMove(Move move) {
 
     switch(move.moveType) {
         case QUIET: {
-            *pieces = (*pieces & (~squareToBitboard(move.origin))) | squareToBitboard(move.destination);
+            *pieces = (*pieces & (~originAsBitboard)) | destinationAsBitboard;
             this->enPassentTargetSquare = -1;
             break;
         }
@@ -221,35 +224,35 @@ void Board::makeMove(Move move) {
             Piece target = findPiece(move.destination);
             switch(target.type) {
                 case PAWN:
-                    if(target.color == WHITE) this->whitePawns ^= squareToBitboard(move.destination);
-                    else this->blackPawns ^= squareToBitboard(move.destination);
+                    if(target.color == WHITE) this->whitePawns ^= destinationAsBitboard;
+                    else this->blackPawns ^= destinationAsBitboard;
                     break;
                 case ROOK:
-                    if(target.color == WHITE) this->whiteRooks ^= squareToBitboard(move.destination);
-                    else this->blackRooks ^= squareToBitboard(move.destination);
+                    if(target.color == WHITE) this->whiteRooks ^= destinationAsBitboard;
+                    else this->blackRooks ^= destinationAsBitboard;
                     break;
                 case KNIGHT:
-                    if(target.color == WHITE) this->whiteKnights ^= squareToBitboard(move.destination);
-                    else this->blackKnights ^= squareToBitboard(move.destination);
+                    if(target.color == WHITE) this->whiteKnights ^= destinationAsBitboard;
+                    else this->blackKnights ^= destinationAsBitboard;
                     break;
                 case BISHOP:
-                    if(target.color == WHITE) this->whiteBishops ^= squareToBitboard(move.destination);
-                    else this->blackBishops ^= squareToBitboard(move.destination);
+                    if(target.color == WHITE) this->whiteBishops ^= destinationAsBitboard;
+                    else this->blackBishops ^= destinationAsBitboard;
                     break;
                 case QUEEN:
-                    if(target.color == WHITE) this->whiteQueen ^= squareToBitboard(move.destination);
-                    else this->blackQueen ^= squareToBitboard(move.destination);
+                    if(target.color == WHITE) this->whiteQueen ^= destinationAsBitboard;
+                    else this->blackQueen ^= destinationAsBitboard;
                     break;
                 default:
                     break;
             }
 
-            *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
+            *pieces = *pieces & (~originAsBitboard) | destinationAsBitboard;
             this->enPassentTargetSquare = -1;
             break;
         }
         case DOUBLE_PAWN_PUSH: {
-            Bitboard bDestination = squareToBitboard(move.destination);
+            Bitboard bDestination = destinationAsBitboard;
             if(move.color == WHITE) {
                 Square enPassentSquare = bitboardToSquare(bDestination >> SOUTH);
                 this->enPassentTargetSquare = enPassentSquare;
@@ -257,7 +260,7 @@ void Board::makeMove(Move move) {
                 Square enPassentSquare = bitboardToSquare(bDestination << NORTH);
                 this->enPassentTargetSquare = enPassentSquare;
             }
-            *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
+            *pieces = *pieces & (~originAsBitboard) | destinationAsBitboard;
 
             break;
         }
@@ -279,7 +282,7 @@ void Board::makeMove(Move move) {
             break;
         }
         case EN_PASSENT_CAPTURE: {
-            *pieces = *pieces & (~squareToBitboard(move.origin)) | squareToBitboard(move.destination);
+            *pieces = *pieces & (~originAsBitboard) | destinationAsBitboard;
             if(move.color == WHITE) {
                 Bitboard enPassentSquare = squareToBitboard(this->enPassentTargetSquare);
                 Bitboard target = enPassentSquare >> SOUTH;
@@ -312,24 +315,24 @@ void Board::makeMove(Move move) {
             Piece target = findPiece(move.destination);
             switch(target.type) {
                 case PAWN:
-                    if(target.color == WHITE) this->whitePawns ^= squareToBitboard(move.destination);
-                    else this->blackPawns ^= squareToBitboard(move.destination);
+                    if(target.color == WHITE) this->whitePawns ^= destinationAsBitboard;
+                    else this->blackPawns ^= destinationAsBitboard;
                     break;
                 case ROOK:
-                    if(target.color == WHITE) this->whiteRooks ^= squareToBitboard(move.destination);
-                    else this->blackRooks ^= squareToBitboard(move.destination);
+                    if(target.color == WHITE) this->whiteRooks ^= destinationAsBitboard;
+                    else this->blackRooks ^= destinationAsBitboard;
                     break;
                 case KNIGHT:
-                    if(target.color == WHITE) this->whiteKnights ^= squareToBitboard(move.destination);
-                    else this->blackKnights ^= squareToBitboard(move.destination);
+                    if(target.color == WHITE) this->whiteKnights ^= destinationAsBitboard;
+                    else this->blackKnights ^= destinationAsBitboard;
                     break;
                 case BISHOP:
-                    if(target.color == WHITE) this->whiteBishops ^= squareToBitboard(move.destination);
-                    else this->blackBishops ^= squareToBitboard(move.destination);
+                    if(target.color == WHITE) this->whiteBishops ^= destinationAsBitboard;
+                    else this->blackBishops ^= destinationAsBitboard;
                     break;
                 case QUEEN:
-                    if(target.color == WHITE) this->whiteQueen ^= squareToBitboard(move.destination);
-                    else this->blackQueen ^= squareToBitboard(move.destination);
+                    if(target.color == WHITE) this->whiteQueen ^= destinationAsBitboard;
+                    else this->blackQueen ^= destinationAsBitboard;
                     break;
                 default:
                     break;
@@ -360,11 +363,11 @@ void Board::makeMove(Move move) {
 
     if(move.pieceType == ROOK) {
         if(move.color == WHITE) {
-            if(squareToBitboard(move.origin) == A1) this->removeQueenSideCastleAbillity(move.color);
-            else if(squareToBitboard(move.origin) == H1) this->removeKingSideCastleAbillity(move.color);
+            if(originAsBitboard == A1) this->removeQueenSideCastleAbillity(move.color);
+            else if(originAsBitboard == H1) this->removeKingSideCastleAbillity(move.color);
         } else {
-            if(squareToBitboard(move.origin) == A8) this->removeQueenSideCastleAbillity(move.color);
-            else if(squareToBitboard(move.origin) == H8) this->removeKingSideCastleAbillity(move.color);
+            if(originAsBitboard == A8) this->removeQueenSideCastleAbillity(move.color);
+            else if(originAsBitboard == H8) this->removeKingSideCastleAbillity(move.color);
         }
     } else if(move.pieceType == KING) {
         //remove casting ability

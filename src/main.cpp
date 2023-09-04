@@ -62,8 +62,16 @@ int main(int argc, char *argv[]){
         fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/P1N2Q2/1PPBBPpP/2KR3R b kq - 0 1"; 
     }
 
+    //runMoveGeneration(DEFAULT_FEN, 6);
+
     runMoveGeneration(fen, depth);
     //runSearch(fen, depth);
+
+    //Board board("r3k2r/pppq1pp1/2np1n1p/2b1p1B1/2B1P1b1/2NP1N1P/PPPQ1PP1/R3K2R w KQkq - 0 1");
+    //MoveGeneration mg(board);
+
+    //std::vector<Move> moves = mg.generateMoves(board, WHITE);
+    //printMoves(moves);
 
     return 0;
 }
