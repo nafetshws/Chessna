@@ -89,7 +89,7 @@ const std::vector<int> kingEndGamePositionEvaluation = {
 
 class Evaluation {
     public:
-        int sideToMove;
+        int perspective;
 
         Evaluation();
 

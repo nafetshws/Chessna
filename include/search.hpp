@@ -22,7 +22,7 @@ class Search {
 
         Search(Board board);
         int alphaBeta(int alpha, int beta, int depth, int depthFromRoot);
-        int negaMax(int depth);
+        int negaMax(int depth, int depthFromRoot);
 
 };
 
