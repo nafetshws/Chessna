@@ -1,14 +1,14 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <chrono>
+
 #include "../include/board.hpp"
 #include "../include/moveGeneration.hpp"
 #include "../include/types.hpp"
 #include "../include/functions.hpp"
 #include "../include/search.hpp"
-#include "../include/evaluation.hpp"
-
-#include <chrono>
+#include "../include/gameInterface.hpp"
 
 void runMoveGeneration(std::string fen, int depth) {
     Board board(fen);
@@ -38,11 +38,17 @@ void runSearch(std::string fen, int depth) {
     //int eval = search.negaMax(depth, 0);
     u64 after = getCurrentTime(); 
     float dt = getTimeDifference(before, after);
-    std::cout << "eval: " << eval << std::endl;
+    std::cout << "eval: " << search.bestScore << std::endl;
     std::cout << "best move: " << printableMove(search.bestMove) << std::endl;
     std::cout << "visited nodes: " << search.visitedNodes << std::endl;
     std::cout << "time (in s): " << dt << std::endl;
     std::cout << "nodes/s: " << (search.visitedNodes / dt) << std::endl;
+}
+
+void playAgainstEngine() {
+    GameInterface gameInterface; 
+
+    gameInterface.play(WHITE);
 }
 
 int main(int argc, char *argv[]){
