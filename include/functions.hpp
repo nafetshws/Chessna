@@ -6,6 +6,7 @@
 #include "types.hpp"
 
 std::string convertSquareToCoordinate(Square square); 
+Square convertCoordinateToSquare(std::string coordinate);
 Color getOppositeColor(Color color);
 void printMoves(std::vector<Move> moves, int max = 40);
 std::string printableMove(Move move);

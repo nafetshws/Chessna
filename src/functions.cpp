@@ -42,6 +42,44 @@ std::string convertSquareToCoordinate(Square square) {
     return coordinate;
 }
 
+Square convertCoordinateToSquare(std::string coordinate) {
+    char file = coordinate.at(0);
+    int row = std::stoi(std::string(1, coordinate.at(1)));
+
+    int square = (row - 1) * 8;
+
+    switch(file) {
+        case 'a':
+            square += 0;
+            break;
+        case 'b':
+            square += 1;
+            break;
+        case 'c':
+            square += 2;
+            break;
+        case 'd':
+            square += 3;
+            break;
+        case 'e':
+            square += 4;
+            break;
+        case 'f':
+            square += 5;
+            break;
+        case 'g':
+            square += 6;
+            break;
+        case 'h':
+            square += 7;
+            break;
+        default:
+            return -1;
+            break;
+    }
+    return square;
+}
+
 Color getOppositeColor(Color color) {
     if(color == WHITE) return BLACK;
     return WHITE;
