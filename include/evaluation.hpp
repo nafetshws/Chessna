@@ -10,7 +10,7 @@ const int BISHOP_VAUE = 330; //B > N to encourage keeping bishop paires
 const int KNIGHT_VALUE = 320; // N, B > 3P to not trade a knight/bishop for 3 pawns
 const int PAWN_VALUE = 100;
 
-const std::vector<int> pawnPositionEvaluation = {
+const std::vector<int> pawnPositionEvaluationWhite = {
     0,  0,  0,  0,  0,  0,  0,  0,
     50, 50, 50, 50, 50, 50, 50, 50,
     10, 10, 20, 30, 30, 20, 10, 10,
@@ -21,7 +21,18 @@ const std::vector<int> pawnPositionEvaluation = {
     0,  0,  0,  0,  0,  0,  0,  0
 };
 
-const std::vector<int> knightPositionEvaluation = {
+const std::vector<int> pawnPositionEvaluationBlack = {
+    0,  0,  0,  0,  0,  0,  0,  0,
+    5, 10, 10,-20,-20, 10, 10,  5,
+    5, -5,-10,  0,  0,-10, -5,  5,
+    0,  0,  0, 20, 20,  0,  0,  0,
+    5,  5, 10, 25, 25, 10,  5,  5,
+    10, 10, 20, 30, 30, 20, 10, 10,
+    50, 50, 50, 50, 50, 50, 50, 50,
+    0,  0,  0,  0,  0,  0,  0,  0
+};
+
+const std::vector<int> knightPositionEvaluationWhite = {
     -50,-40,-30,-30,-30,-30,-40,-50,
     -40,-20,  0,  0,  0,  0,-20,-40,
     -30,  0, 10, 15, 15, 10,  0,-30,
@@ -32,7 +43,18 @@ const std::vector<int> knightPositionEvaluation = {
     -50,-40,-30,-30,-30,-30,-40,-50,
 };
 
-const std::vector<int> bishopPositionEvaluation = {
+const std::vector<int> knightPositionEvaluationBlack = {
+    -50,-40,-30,-30,-30,-30,-40,-50,
+    -40,-20,  0,  5,  5,  0,-20,-40,
+    -30,  5, 10, 15, 15, 10,  5,-30,
+    -30,  0, 15, 20, 20, 15,  0,-30,
+    -30,  5, 15, 20, 20, 15,  5,-30,
+    -30,  0, 10, 15, 15, 10,  0,-30,
+    -40,-20,  0,  0,  0,  0,-20,-40,
+    -50,-40,-30,-30,-30,-30,-40,-50,
+};
+
+const std::vector<int> bishopPositionEvaluationWhite = {
     -20,-10,-10,-10,-10,-10,-10,-20,
     -10,  0,  0,  0,  0,  0,  0,-10,
     -10,  0,  5, 10, 10,  5,  0,-10,
@@ -43,7 +65,18 @@ const std::vector<int> bishopPositionEvaluation = {
     -20,-10,-10,-10,-10,-10,-10,-20,
 };
 
-const std::vector<int> rookPositionEvaluation = {
+const std::vector<int> bishopPositionEvaluationBlack = {
+    -20,-10,-10,-10,-10,-10,-10,-20,
+    -10,  5,  0,  0,  0,  0,  5,-10,
+    -10, 10, 10, 10, 10, 10, 10,-10,
+    -10,  0, 10, 10, 10, 10,  0,-10,
+    -10,  5,  5, 10, 10,  5,  5,-10,
+    -10,  0,  5, 10, 10,  5,  0,-10,
+    -10,  0,  0,  0,  0,  0,  0,-10,
+    -20,-10,-10,-10,-10,-10,-10,-20,
+};
+
+const std::vector<int> rookPositionEvaluationWhite = {
     0,  0,  0,  0,  0,  0,  0,  0,
     5, 10, 10, 10, 10, 10, 10,  5,
    -5,  0,  0,  0,  0,  0,  0, -5,
@@ -54,7 +87,18 @@ const std::vector<int> rookPositionEvaluation = {
     0,  0,  0,  5,  5,  0,  0,  0
 };
 
-const std::vector<int> queenPositionEvaluation = {
+const std::vector<int> rookPositionEvaluationBlack = {
+    0,  0,  0,  5,  5,  0,  0,  0,
+   -5,  0,  0,  0,  0,  0,  0, -5,
+   -5,  0,  0,  0,  0,  0,  0, -5,
+   -5,  0,  0,  0,  0,  0,  0, -5,
+   -5,  0,  0,  0,  0,  0,  0, -5,
+   -5,  0,  0,  0,  0,  0,  0, -5,
+    5, 10, 10, 10, 10, 10, 10,  5,
+    0,  0,  0,  0,  0,  0,  0,  0,
+};
+
+const std::vector<int> queenPositionEvaluationWhite = {
     -20,-10,-10, -5, -5,-10,-10,-20,
     -10,  0,  0,  0,  0,  0,  0,-10,
     -10,  0,  5,  5,  5,  5,  0,-10,
@@ -65,7 +109,18 @@ const std::vector<int> queenPositionEvaluation = {
     -20,-10,-10, -5, -5,-10,-10,-20
 };
 
-const std::vector<int> kingMiddlGamePositionEvaluation = {
+const std::vector<int> queenPositionEvaluationBlack = {
+    -20,-10,-10, -5, -5,-10,-10,-20,
+    -10,  0,  5,  0,  0,  0,  0,-10,
+    -10,  5,  5,  5,  5,  5,  0,-10,
+    0,  0,  5,  5,  5,  5,  0, -5,
+    -5,  0,  5,  5,  5,  5,  0, -5,
+    -10,  0,  5,  5,  5,  5,  0,-10,
+    -10,  0,  0,  0,  0,  0,  0,-10,
+    -20,-10,-10, -5, -5,-10,-10,-20,
+};
+
+const std::vector<int> kingMiddlGamePositionEvaluationWhite = {
     -30,-40,-40,-50,-50,-40,-40,-30,
     -30,-40,-40,-50,-50,-40,-40,-30,
     -30,-40,-40,-50,-50,-40,-40,-30,
@@ -76,7 +131,18 @@ const std::vector<int> kingMiddlGamePositionEvaluation = {
     20, 30, 10,  0,  0, 10, 30, 20
 };
 
-const std::vector<int> kingEndGamePositionEvaluation = {
+const std::vector<int> kingMiddlGamePositionEvaluationBlack = {
+    20, 30, 10,  0,  0, 10, 30, 20,
+    20, 20,  0,  0,  0,  0, 20, 20,
+    -10,-20,-20,-20,-20,-20,-20,-10,
+    -20,-30,-30,-40,-40,-30,-30,-20,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+    -30,-40,-40,-50,-50,-40,-40,-30,
+};
+
+const std::vector<int> kingEndGamePositionEvaluationWhite = {
     -50,-40,-30,-20,-20,-30,-40,-50,
     -30,-20,-10,  0,  0,-10,-20,-30,
     -30,-10, 20, 30, 30, 20,-10,-30,
@@ -87,6 +153,17 @@ const std::vector<int> kingEndGamePositionEvaluation = {
     -50,-30,-30,-30,-30,-30,-30,-50
 };
 
+const std::vector<int> kingEndGamePositionEvaluationBlack = {
+    -50,-30,-30,-30,-30,-30,-30,-50
+    -30,-30,  0,  0,  0,  0,-30,-30,
+    -30,-10, 20, 30, 30, 20,-10,-30,
+    -30,-10, 30, 40, 40, 30,-10,-30,
+    -30,-10, 30, 40, 40, 30,-10,-30,
+    -30,-10, 20, 30, 30, 20,-10,-30,
+    -30,-20,-10,  0,  0,-10,-20,-30,
+    -50,-40,-30,-20,-20,-30,-40,-50,
+};
+
 class Evaluation {
     public:
         int perspective;
@@ -95,7 +172,7 @@ class Evaluation {
 
         int evaluatePosition(Board board);
         int popcount(Bitboard bitboard);
-        int calculatePositionScore(Bitboard pieces, std::vector<int> values);
+        int calculatePositionScore(Bitboard pieces, const std::vector<int>& values);
 
 };
 

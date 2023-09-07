@@ -6,6 +6,8 @@
 #include "../include/types.hpp"
 #include "../include/functions.hpp"
 #include "../include/search.hpp"
+#include "../include/evaluation.hpp"
+
 #include <chrono>
 
 void runMoveGeneration(std::string fen, int depth) {
@@ -58,8 +60,8 @@ int main(int argc, char *argv[]){
         }
         depth = std::stoi(argv[2]);
     } else {
-        depth = 2;
-        fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/P1N2Q2/1PPBBPpP/2KR3R b kq - 0 1"; 
+        depth = 5;
+        fen = "rnb1kbnr/p1qppppp/1pp5/8/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 0 1"; 
     }
 
     //runMoveGeneration(DEFAULT_FEN, 6);
