@@ -31,7 +31,7 @@ class MoveGeneration {
         MoveGeneration(Board board);
         MoveGeneration();
 
-        std::vector<Move> generateMoves(const Board &board, Color color = BLACK);
+        std::vector<Move> generateMoves(const Board &board, Color color = BLACK, bool generateOnlyCaptures = false);
         u64 perft (int depth, Color color);
 
         void clearState();
