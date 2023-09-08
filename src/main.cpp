@@ -9,6 +9,7 @@
 #include "../include/functions.hpp"
 #include "../include/search.hpp"
 #include "../include/gameInterface.hpp"
+#include "../include/moveOrder.hpp"
 
 void runMoveGeneration(std::string fen, int depth) {
     Board board(fen);
@@ -51,6 +52,31 @@ void playAgainstEngine() {
     gameInterface.play(WHITE);
 }
 
+void testQuickSort() {
+    std::vector<Move> moves = {
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+    };
+
+    std::vector<int> moveScores = {20, 23, 6, 17, 45, 33, 2, 72, 28, 10};
+
+    MoveOrder mo = MoveOrder();
+    mo.quickSort(moveScores, moves, 0, moves.size()-1);
+
+    for(int i = 0; i < moveScores.size(); i++) {
+        std::cout << moveScores.at(i) << ", ";
+    }
+    std::cout << std::endl;
+}
+
 int main(int argc, char *argv[]){
     std::string fen; 
     int depth; 
@@ -74,7 +100,9 @@ int main(int argc, char *argv[]){
 
     //runMoveGeneration(fen, depth);
     //runSearch(fen, depth);
-    playAgainstEngine();
+    //playAgainstEngine();
+
+    testQuickSort();
 
     //Board board("r3k2r/pppq1pp1/2np1n1p/2b1p1B1/2B1P1b1/2NP1N1P/PPPQ1PP1/R3K2R w KQkq - 0 1");
     //MoveGeneration mg(board);
