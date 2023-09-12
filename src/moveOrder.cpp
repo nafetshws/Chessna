@@ -22,7 +22,7 @@ void MoveOrder::orderMoves(Board board, std::vector<Move>& moves) {
         moveScores.at(i) = score; 
     }
 
-    quickSort(moveScores, moves, 0, moves.size()-1);
+    this->quickSort(moveScores, moves, 0, moves.size()-1);
 }
 
 void MoveOrder::quickSort(std::vector<int>& moveScores, std::vector<Move>& moves, int low, int high) {
