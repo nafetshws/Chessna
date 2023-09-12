@@ -4,6 +4,7 @@
 #include "../include/moveGeneration.hpp"
 #include "../include/board.hpp"
 #include "../include/evaluation.hpp"
+#include "../include/functions.hpp"
 
 Search::Search(Board board) {
     this->board = board;
@@ -44,14 +45,26 @@ int Search::negaMax(int depth, int depthFromRoot) {
 }
 
 int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
+    //draw by 50 move rule
+    if(this->board.halfMoveClock >= 100) return 0;
+
     if(depth == 0) {
         this->visitedNodes++;
-        //return this->evaluation.evaluatePosition(this->board);
-        return this->quiescenceSearch(alpha, beta);//this->evaluation.evaluatePosition(this->board); //return evaluation of the position
+        return this->quiescenceSearch(alpha, beta);
     }
 
     std::vector<Move> moves = moveGeneration.generateMoves(this->board, this->board.sideToMove, false);
     moveOrder.orderMoves(this->board, moves);
+
+    if(moves.size() == 0) {
+        if(moveGeneration.check_info.numberOfChecks != 0) {
+            //checkmate
+            return -(INSTANT_MATE - depthFromRoot);
+        } else {
+            //stalemate
+            return 0;
+        }
+    }
 
     for(int i = 0; i < moves.size(); i++) {
         //copy board to undo move
