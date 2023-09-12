@@ -10,6 +10,8 @@ const int BISHOP_VAUE = 330; //B > N to encourage keeping bishop paires
 const int KNIGHT_VALUE = 320; // N, B > 3P to not trade a knight/bishop for 3 pawns
 const int PAWN_VALUE = 100;
 
+const int INSTANT_MATE = 100000;
+
 const std::vector<int> pawnPositionEvaluationWhite = {
     0,  0,  0,  0,  0,  0,  0,  0,
     50, 50, 50, 50, 50, 50, 50, 50,
@@ -167,6 +169,7 @@ const std::vector<int> kingEndGamePositionEvaluationBlack = {
 class Evaluation {
     public:
         int perspective;
+        bool isEndgame;
 
         Evaluation();
 

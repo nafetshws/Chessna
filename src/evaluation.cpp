@@ -4,6 +4,7 @@
 
 Evaluation::Evaluation() {
     this->perspective = 0;
+    this->isEndgame = false;
 }
 
 int Evaluation::evaluatePosition(Board board) {
@@ -23,16 +24,32 @@ int Evaluation::evaluatePosition(Board board) {
     Bitboard blackKnights = board.getKnights(BLACK);
     Bitboard blackPawns = board.getPawns(BLACK);
 
-    int materialScore = 
-        KING_VALUE*(this->popcount(whiteKing) - this->popcount(blackKing)) + 
-        QUEEN_VALUE*(this->popcount(whiteQueens) - this->popcount(blackQueens)) + 
-        ROOK_VALUE*(this->popcount(whiteRooks) - this->popcount(blackRooks)) + 
-        BISHOP_VAUE*(this->popcount(whiteBishops) - this->popcount(blackBishops)) + 
-        KNIGHT_VALUE*(this->popcount(whiteKnights) - this->popcount(blackKnights)) + 
-        PAWN_VALUE*(this->popcount(whitePawns) - this->popcount(blackPawns));
+    int materialScoreWhite = 
+        KING_VALUE * this->popcount(whiteKing) + 
+        QUEEN_VALUE * this->popcount(whiteQueens) +  
+        ROOK_VALUE * this->popcount(whiteRooks) +
+        BISHOP_VAUE * this->popcount(whiteBishops) + 
+        KNIGHT_VALUE * this->popcount(whiteKnights); 
+        PAWN_VALUE * this->popcount(whitePawns);
+
+    int materialScoreBlack = 
+        KING_VALUE * this->popcount(blackKing) + 
+        QUEEN_VALUE * this->popcount(blackQueens) +  
+        ROOK_VALUE * this->popcount(blackRooks) +
+        BISHOP_VAUE * this->popcount(blackBishops) + 
+        KNIGHT_VALUE * this->popcount(blackKnights) + 
+        PAWN_VALUE * this->popcount(blackPawns);
+
+    int materialScore = materialScoreWhite - materialScoreBlack;
+
+    //check if endgame
+    if(!this->isEndgame && (materialScoreWhite - KING_VALUE*this->popcount(whiteKing) - PAWN_VALUE*this->popcount(whitePawns)) <= 1000) {
+        this->isEndgame = true;
+    }
+
 
     int positionScore = //0; 
-        calculatePositionScore(whiteKing, kingMiddlGamePositionEvaluationWhite) - calculatePositionScore(blackKing, kingMiddlGamePositionEvaluationBlack) +
+        calculatePositionScore(whiteKing, (isEndgame) ? kingEndGamePositionEvaluationWhite: kingMiddlGamePositionEvaluationWhite) - calculatePositionScore(blackKing, (this->isEndgame) ? kingEndGamePositionEvaluationBlack : kingMiddlGamePositionEvaluationBlack) +
         calculatePositionScore(whiteQueens, queenPositionEvaluationWhite) - calculatePositionScore(blackQueens, queenPositionEvaluationBlack) + 
         calculatePositionScore(whiteRooks, rookPositionEvaluationWhite) - calculatePositionScore(blackRooks, rookPositionEvaluationBlack) + 
         calculatePositionScore(whiteBishops, bishopPositionEvaluationWhite) - calculatePositionScore(blackBishops, bishopPositionEvaluationBlack) + 
