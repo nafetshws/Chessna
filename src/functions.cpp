@@ -3,6 +3,7 @@
 #include <chrono>
 #include "../include/functions.hpp"
 #include "../include/types.hpp"
+#include "../include/evaluation.hpp"
 
 
 std::string convertSquareToCoordinate(Square square) {
@@ -155,6 +156,25 @@ void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType 
                 attack_info.moves.push_back(move);
             }
         }
+    }
+}
+
+int getPieceTypeValue(PieceType pieceType) {
+    switch(pieceType) {
+        case KING:
+            return KING_VALUE;
+        case QUEEN:
+            return QUEEN_VALUE;
+        case ROOK:
+            return ROOK_VALUE;
+        case BISHOP:
+            return BISHOP_VAUE;
+        case KNIGHT:
+            return KNIGHT_VALUE;
+        case PAWN:
+            return PAWN_VALUE;
+        default:
+            return 0;
     }
 }
 

@@ -4,6 +4,7 @@
 #include "../include/board.hpp"
 #include "../include/moveGeneration.hpp"
 #include "../include/types.hpp"
+#include "../include/moveOrder.hpp"
 
 #define GREEN "\033[32m"
 #define RED   "\033[31m"
@@ -184,6 +185,35 @@ void test_enPassent_discoveredCheck3() {
     IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, WHITE).size(), 6);
 }
 
+void testQuickSort() {
+    std::vector<Move> moves = {
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+    };
+
+    std::vector<int> moveScores = {20, 23, 6, 17, 45, 33, 2, 72, 28, 10};
+
+    MoveOrder mo = MoveOrder();
+    mo.quickSort(moveScores, moves, 0, moves.size()-1);
+
+    std::string order = "";
+
+    for(int i = 0; i < moveScores.size(); i++) {
+        order.append(std::to_string(moveScores.at(i)));
+        order.append(", ");
+    }
+
+    IS_EQUAL(order, "72, 45, 33, 28, 23, 20, 17, 10, 6, 2, ");
+}
+
 //function to execute all move generation tests
 void test_moveGeneration() {
     test_generateRookMoves(); 
@@ -221,6 +251,8 @@ void test_moveGeneration() {
     test_enPassent_discoveredCheck();
     test_enPassent_discoveredCheck2();
     test_enPassent_discoveredCheck3();
+
+    testQuickSort();
 }
 
 void perft_test(std::string fen, u64 expectedRes, int depth) {

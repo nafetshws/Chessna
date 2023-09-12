@@ -1,7 +1,7 @@
 CC = g++
 
-TEST_FILES = test/test.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/search.cpp src/evaluation.cpp src/gameInterface.cpp
-FILES = src/main.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/search.cpp src/evaluation.cpp src/gameInterface.cpp 
+TEST_FILES = test/test.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/search.cpp src/evaluation.cpp src/gameInterface.cpp src/moveOrder.cpp
+FILES = src/main.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/search.cpp src/evaluation.cpp src/gameInterface.cpp src/moveOrder.cpp 
 
 TEST_OUT = build/test.obj
 OUT = build/main.obj

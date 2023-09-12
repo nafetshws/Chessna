@@ -15,6 +15,8 @@ Square bitboardToSquare(Bitboard b);
 std::vector<Square> convertBitboardToSquares(Bitboard bitboard);
 void convertBitbaordToMoves(Bitboard intersect, Bitboard destination, PieceType pieceType, Color color, Bitboard occupied, int &numberOfAttacks, Attack_Info &attack_info);
 
+int getPieceTypeValue(PieceType pieceType);
+
 u64 getCurrentTime();
 float getTimeDifference(u64 before, u64 after);
 
