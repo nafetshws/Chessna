@@ -29,7 +29,7 @@ int Evaluation::evaluatePosition(Board board) {
         QUEEN_VALUE * this->popcount(whiteQueens) +  
         ROOK_VALUE * this->popcount(whiteRooks) +
         BISHOP_VAUE * this->popcount(whiteBishops) + 
-        KNIGHT_VALUE * this->popcount(whiteKnights); 
+        KNIGHT_VALUE * this->popcount(whiteKnights) + 
         PAWN_VALUE * this->popcount(whitePawns);
 
     int materialScoreBlack = 
