@@ -5,12 +5,12 @@
 #include "../include/functions.hpp"
 
 void MoveOrder::orderMoves(Board board, std::vector<Move>& moves) {
-    //MVV-LVA (Most valuable victim - Least valuable aggressor)
     std::vector<int> moveScores;
     for(int i = 0; i < moves.size(); i++) {
         Move move = moves.at(i);
         int score = 0;
 
+        //MVV-LVA (Most valuable victim - Least valuable aggressor) - Captures
         if(move.moveType == CAPTURE) {
             PieceType attackedPieceType = board.findPiece(move.destination).type;
             PieceType attackerPieceType = move.pieceType;
@@ -18,6 +18,8 @@ void MoveOrder::orderMoves(Board board, std::vector<Move>& moves) {
 
             score += materialDifference;
         }
+
+        //Non-Captures
 
         moveScores.at(i) = score; 
     }
