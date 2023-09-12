@@ -11,6 +11,7 @@ Search::Search(Board board) {
     this->bestScore = 0;
     this->moveGeneration = MoveGeneration(this->board);
     this->evaluation = Evaluation();
+    this->moveOrder = MoveOrder();
     this->sideToMove = WHITE;
     this->visitedNodes = 0;
 }
@@ -50,6 +51,8 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     }
 
     std::vector<Move> moves = moveGeneration.generateMoves(this->board, this->board.sideToMove, false);
+    moveOrder.orderMoves(this->board, moves);
+
     for(int i = 0; i < moves.size(); i++) {
         //copy board to undo move
         Board copyBoard = this->board;
@@ -91,6 +94,7 @@ int Search::quiescenceSearch(int alpha, int beta) {
     }
 
     std::vector<Move> captures = this->moveGeneration.generateMoves(this->board, this->board.sideToMove, true);
+    moveOrder.orderMoves(this->board, captures); 
 
     for(int i = 0; i < captures.size(); i++) {
         Board copyBoard = this->board;

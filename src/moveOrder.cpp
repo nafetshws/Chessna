@@ -21,7 +21,7 @@ void MoveOrder::orderMoves(Board board, std::vector<Move>& moves) {
 
         //Non-Captures
 
-        moveScores.at(i) = score; 
+        moveScores.push_back(score); 
     }
 
     this->quickSort(moveScores, moves, 0, moves.size()-1);

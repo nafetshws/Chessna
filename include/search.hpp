@@ -5,6 +5,7 @@
 #include "../include/board.hpp"
 #include "../include/moveGeneration.hpp"
 #include "../include/evaluation.hpp"
+#include "../include/moveOrder.hpp"
 
 const int positiveInfinity = 999999;
 const int negativeInfinity = -positiveInfinity;
@@ -16,6 +17,7 @@ class Search {
         int bestScore;
         MoveGeneration moveGeneration;
         Evaluation evaluation;
+        MoveOrder moveOrder;
         Color sideToMove;
 
         u64 visitedNodes;
