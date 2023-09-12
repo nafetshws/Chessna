@@ -75,12 +75,7 @@ int main(int argc, char *argv[]){
     //runMoveGeneration(DEFAULT_FEN, 6);
 
     //runMoveGeneration(fen, depth);
-<<<<<<< HEAD
     runSearch(fen, depth);
-=======
-    //runSearch(fen, depth);
-    //playAgainstEngine();
->>>>>>> master
 
     //Board board("r3k2r/pppq1pp1/2np1n1p/2b1p1B1/2B1P1b1/2NP1N1P/PPPQ1PP1/R3K2R w KQkq - 0 1");
     //MoveGeneration mg(board);
