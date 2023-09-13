@@ -538,6 +538,8 @@ void Board::prettyPrintBoard() {
         }
     }
 
+    std::cout << std::endl;
+
     //print board
     for(int row = 7; row >= 0; row--) {
         std::cout << row+1 << "  ";
@@ -547,6 +549,7 @@ void Board::prettyPrintBoard() {
         std::cout << std::endl;
     }
     std::cout << std::endl << "   " << "a b c d e f g h" << std::endl;
+    std::cout << std::endl;
 }
 
 Bitboard Board::getPawns(Color color) {

@@ -43,6 +43,15 @@ enum MoveType {
     QUEEN_CASTLE,
 };
 
+enum GameStatus {
+    CHECKMATE,
+    STALEMATE,
+    DRAW_BY_REPETITION,
+    DRAW_BY_INSUFFICIENT_MATERIAL,
+    DRAW_BY_FIFTY_MOVE_RULE,
+    ACTIVE
+};
+
 struct Piece {
     Square pos;
     PieceType type;

@@ -5,6 +5,7 @@
 #include "../include/types.hpp"
 #include "../include/search.hpp"
 #include "../include/functions.hpp"
+#include "../include/evaluation.hpp"
 
 GameInterface::GameInterface() {
     this->board = Board(DEFAULT_FEN);
@@ -19,17 +20,39 @@ GameInterface::GameInterface(std::string fen) {
 void GameInterface::play(Color playerColor) {
     this->isPlaying = true;
     std::string moveNotation;
+    MoveGeneration mg;
 
     while(this->isPlaying) {
-        this->board.prettyPrintBoard();
-        std::cout << "\nYour move: ";
-        std::cin >> moveNotation;
-        //make player move
-        this->playMove(moveNotation);
-        //make engine move
-        Move engineMove = this->getBestEngineMove();
-        std::cout << "Engine played: " << printableMove(engineMove) << std::endl << std::endl;
-        this->board.makeMove(engineMove);
+        if(this->getGameStatus() != ACTIVE) {
+            this->isPlaying = false;
+            break;
+        }
+
+        //this->board.prettyPrintBoard();
+
+        if(this->board.sideToMove == playerColor) {
+            std::cout << "Your move: ";
+            std::cin >> moveNotation;
+            //make player move
+            if(this->moveIsLegal(moveNotation, playerColor)) {
+                this->playMove(moveNotation);
+            } else {
+                std::cout << "\nError: Invalid move. Try again!\n" << std::endl;
+                continue;
+            }
+        } else {
+            //make engine move
+            Move engineMove = this->getBestEngineMove();
+            std::cout << "Engine played: " << printableMove(engineMove) << std::endl;
+            this->board.makeMove(engineMove);
+        }
+    }
+
+    GameStatus g = this->getGameStatus();
+    if(g == CHECKMATE) {
+        std::cout << "\nCheckmate!" << std::endl;
+    } else {
+        std::cout << "\nDraw!" << std::endl;
     }
 }
 
@@ -40,6 +63,50 @@ Move GameInterface::getBestEngineMove() {
     Move engineMove = search.bestMove;
     return engineMove;
 }
+
+GameStatus GameInterface::getGameStatus() {
+    MoveGeneration mg;
+    std::vector<Move> moves = mg.generateMoves(this->board, this->board.sideToMove);
+
+    //check for draw / stalemate
+    if(moves.size() == 0) {
+        if(mg.check_info.numberOfChecks != 0) {
+            //checkmate
+            return CHECKMATE;
+        } else {
+            //stalemate
+            return STALEMATE;
+        }
+    } else if(this->board.halfMoveClock >= 100) {
+        return DRAW_BY_FIFTY_MOVE_RULE;
+    } 
+
+    Bitboard minorPiecesWhite = this->board.getBishops(WHITE) | this->board.getKnights(WHITE);
+    Bitboard minorPiecesBlack = this->board.getBishops(BLACK) | this->board.getKnights(BLACK);
+
+    if(popcount(minorPiecesWhite) <= 1 && popcount(minorPiecesBlack) <= 1 &&
+        (this->board.getKing(WHITE) | minorPiecesWhite) == this->board.getOccupiedBy(WHITE) &&
+        (this->board.getKing(BLACK) | minorPiecesBlack) == this->board.getOccupiedBy(BLACK)) {
+            return DRAW_BY_INSUFFICIENT_MATERIAL;
+    }
+
+   return ACTIVE; 
+
+}
+
+bool GameInterface::moveIsLegal(std::string moveNotation, Color playerColor) {
+    MoveGeneration mg;
+    std::vector<Move> moves = mg.generateMoves(this->board, playerColor);
+    bool moveIsLegal = false;
+
+    for(Move move : moves) {
+        if((convertSquareToCoordinate(move.origin) + convertSquareToCoordinate(move.destination)).compare(moveNotation) == 0) moveIsLegal = true;
+    }
+
+    return moveIsLegal;
+}
+
+
 
 void GameInterface::playMove(std::string moveNotation) {
     Square origin = convertCoordinateToSquare(moveNotation.substr(0, 2));
@@ -75,6 +142,10 @@ void GameInterface::playMove(std::string moveNotation) {
         else if(piece.type == PAWN && std::abs(destination - origin) != 8) moveType = EN_PASSENT_CAPTURE;
         else moveType = QUIET;
     }
+    
+    //check if move is legal
+
+
 
     Move move(origin, destination, piece.type, this->board.sideToMove, moveType);
 

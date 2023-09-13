@@ -59,7 +59,8 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     if(moves.size() == 0) {
         if(moveGeneration.check_info.numberOfChecks != 0) {
             //checkmate
-            return -(INSTANT_MATE - depthFromRoot);
+            int mateScore = INSTANT_MATE - depthFromRoot;
+            return -mateScore; 
         } else {
             //stalemate
             return 0;

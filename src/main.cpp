@@ -26,7 +26,7 @@ void runMoveGeneration(std::string fen, int depth) {
     std::cout << "Nodes: " << nodes << std::endl;
     std::cout << "attack: " << moveGeneration.underAttackCounter << std::endl;
     std::cout << "time: " << getTimeDifference(before, after) << std::endl;
-    std::cout << "nodes/s: " << nodesPerS<< std::endl;
+    std::cout << "nodes/s: " << nodesPerS << std::endl;
 }
 
 void runSearch(std::string fen, int depth) {
@@ -47,7 +47,8 @@ void runSearch(std::string fen, int depth) {
 }
 
 void playAgainstEngine() {
-    GameInterface gameInterface; 
+    //GameInterface gameInterface(DEFAULT_FEN); 
+    GameInterface gameInterface("r1b2rk1/ppp2p2/5Pp1/4p1P1/2p1P3/2P5/P1n2K1R/7R b - - 1 32"); 
 
     gameInterface.play(WHITE);
 }
@@ -72,16 +73,10 @@ int main(int argc, char *argv[]){
         fen = "rnb1kbnr/p1qppppp/1pp5/8/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 0 1"; 
     }
 
-    //runMoveGeneration(DEFAULT_FEN, 6);
-
     //runMoveGeneration(fen, depth);
-    runSearch(fen, depth);
+    //runSearch(fen, depth);
 
-    //Board board("r3k2r/pppq1pp1/2np1n1p/2b1p1B1/2B1P1b1/2NP1N1P/PPPQ1PP1/R3K2R w KQkq - 0 1");
-    //MoveGeneration mg(board);
-
-    //std::vector<Move> moves = mg.generateMoves(board, WHITE);
-    //printMoves(moves);
+    playAgainstEngine();
 
     return 0;
 }

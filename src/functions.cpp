@@ -185,3 +185,7 @@ u64 getCurrentTime() {
 float getTimeDifference(u64 before, u64 after) {
     return ((after - before)/(float)1000000000);
 }
+
+int popcount(Bitboard bitboard) {
+    return std::__libcpp_popcount(bitboard);
+}
