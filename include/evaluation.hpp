@@ -156,7 +156,7 @@ const std::vector<int> kingEndGamePositionEvaluationWhite = {
 };
 
 const std::vector<int> kingEndGamePositionEvaluationBlack = {
-    -50,-30,-30,-30,-30,-30,-30,-50
+    -50,-30,-30,-30,-30,-30,-30,-50,
     -30,-30,  0,  0,  0,  0,-30,-30,
     -30,-10, 20, 30, 30, 20,-10,-30,
     -30,-10, 30, 40, 40, 30,-10,-30,
