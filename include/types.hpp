@@ -15,9 +15,9 @@ enum Color {
 
 enum PieceType {
     PAWN,
-    ROOK,
     KNIGHT,
     BISHOP,
+    ROOK,
     QUEEN,
     KING,
     UNOCCUPIED

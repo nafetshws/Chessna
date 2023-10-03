@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <climits>
 
 #include "../include/board.hpp"
 #include "../include/moveGeneration.hpp"
@@ -10,6 +11,8 @@
 #include "../include/search.hpp"
 #include "../include/gameInterface.hpp"
 #include "../include/moveOrder.hpp"
+#include "../include/transpositionTable.hpp"
+#include "../include/zobrist.hpp"
 
 void runMoveGeneration(std::string fen, int depth) {
     Board board(fen);
@@ -54,7 +57,10 @@ void playAgainstEngine() {
 }
 
 
+
 int main(int argc, char *argv[]){
+    Zobrist::init();
+
     std::string fen; 
     int depth; 
 
@@ -73,10 +79,16 @@ int main(int argc, char *argv[]){
         fen = "rnb1kbnr/p1qppppp/1pp5/8/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 0 1"; 
     }
 
-    //runMoveGeneration(fen, depth);
+    runMoveGeneration(fen, depth);
     //runSearch(fen, depth);
 
-    playAgainstEngine();
+    //playAgainstEngine();
+
+
+    //Board board("rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1");
+    //MoveGeneration mg(board);
+
+    //printMoves(mg.generateMoves(board, BLACK));
 
     return 0;
 }

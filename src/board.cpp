@@ -4,6 +4,7 @@
 #include "../include/board.hpp"
 #include "../include/types.hpp"
 #include "../include/functions.hpp"
+#include "../include/zobrist.hpp"
 
 Board::Board(const std::string &fen) {
     initBoard(fen);
@@ -14,7 +15,6 @@ Board::Board() {
 }
 
 void Board::initBoard(const std::string &fen){
-
     std::string delimiter = " ";
     int pos = 0;
 
@@ -176,6 +176,9 @@ void Board::initBoard(const std::string &fen){
     this->castlingAbillity = castlingAbillity;
     this->halfMoveClock = stoi(halfMoveClock);
     this->fullMoveCounter = stoi(fullMoveCounter);
+
+    //generate zobrist key
+    this->zobristKey = Zobrist::createZobristKey(*this);
 }
 
 void Board::makeMove(Move move) {
@@ -184,6 +187,8 @@ void Board::makeMove(Move move) {
 
     Bitboard originAsBitboard = squareToBitboard(move.origin);
     Bitboard destinationAsBitboard = squareToBitboard(move.destination);
+
+    Square prevEnPassentSquare = this->enPassentTargetSquare;
 
     switch(move.pieceType) {
         case PAWN:
@@ -218,6 +223,9 @@ void Board::makeMove(Move move) {
         case QUIET: {
             *pieces = (*pieces & (~originAsBitboard)) | destinationAsBitboard;
             this->enPassentTargetSquare = -1;
+
+            //update zobrist
+            this->updateZobristKey(move, prevEnPassentSquare);
             break;
         }
         case CAPTURE: {
@@ -249,6 +257,41 @@ void Board::makeMove(Move move) {
 
             *pieces = *pieces & (~originAsBitboard) | destinationAsBitboard;
             this->enPassentTargetSquare = -1;
+
+            //remove castling rights because of captured piece
+            if(target.type == ROOK) {
+                if(this->getKingSideCastleAbility(target.color)) {
+                    if(target.color == WHITE) {
+                        if(target.pos == 7) {
+                            this->removeKingSideCastleAbillity(target.color);
+                            this->zobristKey ^= Zobrist::castlingRights[0];
+                        }
+                    } else {
+                        if(target.pos == 63) {
+                            this->removeKingSideCastleAbillity(target.color);
+                            this->zobristKey ^= Zobrist::castlingRights[2];
+                        }
+                    }
+                } else if(this->getQueenSideCastleAbility(target.color)) {
+                    if(target.color == WHITE) {
+                        if(target.pos == 0) {
+                            this->removeQueenSideCastleAbillity(target.color);
+                            this->zobristKey ^= Zobrist::castlingRights[1];
+                        }
+                    } else {
+                        if(target.pos == 56) {
+                            this->removeQueenSideCastleAbillity(target.color);
+                            this->zobristKey ^= Zobrist::castlingRights[3];
+                        }
+                    }
+                }
+            }
+
+            //update zobrist
+            //remove captured piece
+            this->zobristKey ^= Zobrist::pieces[target.pos][target.type][target.color];
+            this->updateZobristKey(move, prevEnPassentSquare);
+
             break;
         }
         case DOUBLE_PAWN_PUSH: {
@@ -262,23 +305,34 @@ void Board::makeMove(Move move) {
             }
             *pieces = *pieces & (~originAsBitboard) | destinationAsBitboard;
 
+            //update zobrist
+            this->updateZobristKey(move, prevEnPassentSquare);
             break;
         }
         case KING_CASTLE: {
             this->castleKingSide(move.color);
-            this->removeKingSideCastleAbillity(move.color);
             this->enPassentTargetSquare = -1;
+
+            //update zobrist key
+            this->updateZobristKey(move, prevEnPassentSquare);
+
             break;
         }
         case QUEEN_CASTLE: {
             this->castleQueenSide(move.color);
-            this->removeQueenSideCastleAbillity(move.color);
             this->enPassentTargetSquare = -1;
+
+            //update zobrist key
+            this->updateZobristKey(move, prevEnPassentSquare);
+
             break;
         }
         case QUEEN_PROMOTION: {
+            //position of pieces in zobrist key is updated in promotion method
             this->makeQueenPromotion(move);
             this->enPassentTargetSquare = -1;
+            this->updateZobristEnPassent(prevEnPassentSquare);
+            this->updateZobristSideToMove();
             break;
         }
         case EN_PASSENT_CAPTURE: {
@@ -287,28 +341,46 @@ void Board::makeMove(Move move) {
                 Bitboard enPassentSquare = squareToBitboard(this->enPassentTargetSquare);
                 Bitboard target = enPassentSquare >> SOUTH;
                 this->blackPawns &= ~target;
+
+                //remove captured piece from zobrist
+                Square targetSquare = bitboardToSquare(target);
+                this->zobristKey ^= Zobrist::pieces[targetSquare][PAWN][BLACK];
+
             } else {
                 Bitboard enPassentSquare = squareToBitboard(this->enPassentTargetSquare);
                 Bitboard target = enPassentSquare << NORTH;
                 this->whitePawns &= ~target;
+
+                //remove captured piece from zobrist
+                Square targetSquare = bitboardToSquare(target);
+                this->zobristKey ^= Zobrist::pieces[targetSquare][PAWN][WHITE];
             }
 
             this->enPassentTargetSquare = -1;
+
+            //update zobrist
+            this->updateZobristKey(move, prevEnPassentSquare);
             break;
         }
         case KNIGHT_PROMOTION: {
             this->makeKnightPromotion(move);
             this->enPassentTargetSquare = -1;
+            this->updateZobristEnPassent(prevEnPassentSquare);
+            this->updateZobristSideToMove();
             break;
         }
         case ROOK_PROMOTION: {
             this->makeRookPromotion(move);
             this->enPassentTargetSquare = -1;
+            this->updateZobristEnPassent(prevEnPassentSquare);
+            this->updateZobristSideToMove();
             break;
         }
         case BISHOP_PROMOTION: {
             this->makeBishopPromotion(move);
             this->enPassentTargetSquare = -1;
+            this->updateZobristEnPassent(prevEnPassentSquare);
+            this->updateZobristSideToMove();
             break;
         }
         case CAPTURE_QUEEN_PROMOTION: case CAPTURE_ROOK_PROMOTION: case CAPTURE_KNIGHT_PROMOTION: case CAPTURE_BISHOP_PROMOTION: {
@@ -338,6 +410,40 @@ void Board::makeMove(Move move) {
                     break;
             }
             this->enPassentTargetSquare = -1;
+            
+            //remove castling rights because of captured piece
+            if(target.type == ROOK) {
+                if(this->getKingSideCastleAbility(target.color)) {
+                    if(target.color == WHITE) {
+                        if(target.pos == 7) {
+                            this->removeKingSideCastleAbillity(target.color);
+                            this->zobristKey ^= Zobrist::castlingRights[0];
+                        }
+                    } else {
+                        if(target.pos == 63) {
+                            this->removeKingSideCastleAbillity(target.color);
+                            this->zobristKey ^= Zobrist::castlingRights[2];
+                        }
+                    }
+                } else if(this->getQueenSideCastleAbility(target.color)) {
+                    if(target.color == WHITE) {
+                        if(target.pos == 0) {
+                            this->removeQueenSideCastleAbillity(target.color);
+                            this->zobristKey ^= Zobrist::castlingRights[1];
+                        }
+                    } else {
+                        if(target.pos == 56) {
+                            this->removeQueenSideCastleAbillity(target.color);
+                            this->zobristKey ^= Zobrist::castlingRights[3];
+                        }
+                    }
+                }
+            }
+
+            //remove captured piece
+            this->zobristKey ^= Zobrist::pieces[target.pos][target.type][target.color];
+            this->updateZobristEnPassent(prevEnPassentSquare);
+            this->updateZobristSideToMove();
 
             switch(move.moveType) {
                 case CAPTURE_BISHOP_PROMOTION:
@@ -361,15 +467,33 @@ void Board::makeMove(Move move) {
             break;
     }
 
+    //remove castling rights in case rook or king moves
     if(move.pieceType == ROOK) {
         if(move.color == WHITE) {
-            if(originAsBitboard == A1) this->removeQueenSideCastleAbillity(move.color);
-            else if(originAsBitboard == H1) this->removeKingSideCastleAbillity(move.color);
+            if((originAsBitboard == A1) && this->getQueenSideCastleAbility(move.color)) {
+                this->zobristKey ^= Zobrist::castlingRights[1];
+                this->removeQueenSideCastleAbillity(move.color);
+            }else if((originAsBitboard == H1) && this->getKingSideCastleAbility(move.color)) { 
+                this->zobristKey ^= Zobrist::castlingRights[0];
+                this->removeKingSideCastleAbillity(move.color);
+            }
         } else {
-            if(originAsBitboard == A8) this->removeQueenSideCastleAbillity(move.color);
-            else if(originAsBitboard == H8) this->removeKingSideCastleAbillity(move.color);
+            if((originAsBitboard == A8) && this->getQueenSideCastleAbility(move.color)) {
+                this->zobristKey ^= Zobrist::castlingRights[3];
+                this->removeQueenSideCastleAbillity(move.color);
+            } else if((originAsBitboard == H8) && this->getKingSideCastleAbility(move.color)) {
+                this->zobristKey ^= Zobrist::castlingRights[2];
+                this->removeKingSideCastleAbillity(move.color);
+            } 
         }
     } else if(move.pieceType == KING) {
+        if(move.color == WHITE) {
+            if(this->getKingSideCastleAbility(move.color)) this->zobristKey ^= Zobrist::castlingRights[0];
+            if(this->getQueenSideCastleAbility(move.color)) this->zobristKey ^= Zobrist::castlingRights[1];
+        } else {
+            if(this->getKingSideCastleAbility(move.color)) this->zobristKey ^= Zobrist::castlingRights[2];
+            if(this->getQueenSideCastleAbility(move.color)) this->zobristKey ^= Zobrist::castlingRights[3];
+        }
         //remove casting ability
         this->removeKingSideCastleAbillity(move.color);
         this->removeQueenSideCastleAbillity(move.color);
@@ -405,31 +529,27 @@ Piece Board::findPiece(Square s) {
 
 bool Board::getKingSideCastleAbility(Color color) {
     if(color == WHITE) {
-        return (this->castlingAbillity.find('K') != std::string::npos) && (this->whiteRooks & H1) != 0;
+        return (this->castlingAbillity.find('K') != std::string::npos); 
     } else {
-        return (this->castlingAbillity.find('k') != std::string::npos) && (this->blackRooks & H8) != 0;
+        return (this->castlingAbillity.find('k') != std::string::npos);
     }
 }
+
 bool Board::getQueenSideCastleAbility(Color color) {
     if(color == WHITE) {
-        return (this->castlingAbillity.find('Q') != std::string::npos) && (this->whiteRooks & A1) != 0;
+        return (this->castlingAbillity.find('Q') != std::string::npos); 
     } else {
-        return (this->castlingAbillity.find('q') != std::string::npos) && (this->blackRooks & A8) != 0;
+        return (this->castlingAbillity.find('q') != std::string::npos); 
     }
 }
 
 void Board::castleKingSide(Color color) {
     if(color == WHITE) {
-        //check if castling is still available
-        //if(this->castlingAbillity.find('K') != std::string::npos) return;
         //move king
         this->whiteKing = (this->whiteKing << 2);
         //move rook
         this->whiteRooks -= (squareToBitboard(7)) - (squareToBitboard(5));
-        //this->whiteRooks = (this->whiteRooks - squareToBitboard(7)) + squareToBitboard(5);
     } else {
-        //check if castling is still available
-        //if(this->castlingAbillity.find('k') != std::string::npos) return;
         //move king
         this->blackKing = (this->blackKing << 2);
         //move rook
@@ -439,15 +559,11 @@ void Board::castleKingSide(Color color) {
 
 void Board::castleQueenSide(Color color) {
     if(color == WHITE) {
-        //check if castling is still available
-        //if(this->castlingAbillity.find('Q') != std::string::npos) return;
         //move king
         this->whiteKing = (this->whiteKing >> 2);
         //move rook
         this->whiteRooks += (1ULL << 3)-1;
     } else {
-        //check if castling is still available
-        //if(this->castlingAbillity.find('q') != std::string::npos) return;
         //move king
         this->blackKing = (this->blackKing >> 2);
         //move rook
@@ -474,6 +590,11 @@ void Board::makeRookPromotion(Move move) {
         this->blackPawns &= ~(squareToBitboard(move.origin));
         this->blackRooks |= squareToBitboard(move.destination);
     }
+
+    //remove pawn from board
+    this->zobristKey ^= Zobrist::pieces[move.origin][PAWN][move.color];
+    //add queen to board
+    this->zobristKey ^= Zobrist::pieces[move.destination][ROOK][move.color];
 }
 
 void Board::makeBishopPromotion(Move move) {
@@ -484,6 +605,11 @@ void Board::makeBishopPromotion(Move move) {
         this->blackPawns &= ~(squareToBitboard(move.origin));
         this->blackBishops |= squareToBitboard(move.destination);
     }
+
+    //remove pawn from board
+    this->zobristKey ^= Zobrist::pieces[move.origin][PAWN][move.color];
+    //add queen to board
+    this->zobristKey ^= Zobrist::pieces[move.destination][BISHOP][move.color];
 }
 
 void Board::makeKnightPromotion(Move move) {
@@ -494,6 +620,11 @@ void Board::makeKnightPromotion(Move move) {
         this->blackPawns &= ~(squareToBitboard(move.origin));
         this->blackKnights |= squareToBitboard(move.destination);
     }
+
+    //remove pawn from board
+    this->zobristKey ^= Zobrist::pieces[move.origin][PAWN][move.color];
+    //add queen to board
+    this->zobristKey ^= Zobrist::pieces[move.destination][KNIGHT][move.color];
 }
 
 void Board::makeQueenPromotion(Move move) {
@@ -504,6 +635,11 @@ void Board::makeQueenPromotion(Move move) {
         this->blackPawns &= ~(squareToBitboard(move.origin));
         this->blackQueen |= squareToBitboard(move.destination);
     }
+
+    //remove pawn from board
+    this->zobristKey ^= Zobrist::pieces[move.origin][PAWN][move.color];
+    //add queen to board
+    this->zobristKey ^= Zobrist::pieces[move.destination][QUEEN][move.color];
 }
 
 void Board::printBoard(Bitboard board) {
@@ -613,4 +749,59 @@ PieceType Board::getPieceTypeOfSquare(Bitboard b, Color color) {
     if((this->getQueens(color) & b) != 0) return QUEEN;
     if((this->getKing(color) & b) != 0) return KING;
     return UNOCCUPIED; 
+}
+
+void Board::updateZobristKey(Move move, Square prevEnPassentSquare) {
+    this->updateZobristPieces(move);
+    this->updateZobristCastling(move);
+    this->updateZobristEnPassent(prevEnPassentSquare);
+    this->updateZobristSideToMove();
+}
+
+void Board::updateZobristPieces(Move move) {
+    //remove piece from board
+    this->zobristKey ^= Zobrist::pieces[move.origin][move.pieceType][move.color];
+    //place it on destination square
+    this->zobristKey ^= Zobrist::pieces[move.destination][move.pieceType][move.color];
+}
+
+void Board::updateZobristCastling(Move move) {
+    if(move.moveType == KING_CASTLE) {
+        if(move.color == WHITE) {
+            //move white rook
+            this->zobristKey ^= Zobrist::pieces[7][ROOK][move.color];
+            this->zobristKey ^= Zobrist::pieces[5][ROOK][move.color];
+        } else {
+            //move black rook
+            this->zobristKey ^= Zobrist::pieces[63][ROOK][move.color];
+            this->zobristKey ^= Zobrist::pieces[61][ROOK][move.color];
+        }
+    } else if(move.moveType == QUEEN_CASTLE) {
+        if(move.color == WHITE) {
+            //move white rook
+            this->zobristKey ^= Zobrist::pieces[0][ROOK][move.color];
+            this->zobristKey ^= Zobrist::pieces[3][ROOK][move.color];
+        } else {
+            //move black rook
+            this->zobristKey ^= Zobrist::pieces[56][ROOK][move.color];
+            this->zobristKey ^= Zobrist::pieces[59][ROOK][move.color];
+        }
+    } 
+}
+
+
+void Board::updateZobristEnPassent(Square prevEnPassentSquare) {
+    //update en passent
+    if(prevEnPassentSquare != -1) {
+        this->zobristKey ^= Zobrist::enPassentFile[prevEnPassentSquare % 8];
+    }
+
+    if(this->enPassentTargetSquare != -1) {
+        this->zobristKey ^= Zobrist::enPassentFile[this->enPassentTargetSquare % 8];
+    } 
+}
+
+void Board::updateZobristSideToMove() {
+    //update side to move
+    this->zobristKey ^= Zobrist::sideToMove;
 }

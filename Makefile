@@ -1,10 +1,12 @@
 CC = g++
 
-TEST_FILES = test/test.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/search.cpp src/evaluation.cpp src/gameInterface.cpp src/moveOrder.cpp
-FILES = src/main.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/search.cpp src/evaluation.cpp src/gameInterface.cpp src/moveOrder.cpp 
+TEST_FILES = test/test.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/search.cpp src/evaluation.cpp src/gameInterface.cpp src/moveOrder.cpp src/transpositionTable.cpp src/hashEntry.cpp src/zobrist.cpp
+FILES = src/main.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/search.cpp src/evaluation.cpp src/gameInterface.cpp src/moveOrder.cpp src/transpositionTable.cpp src/hashEntry.cpp src/zobrist.cpp
 
 TEST_OUT = build/test.obj
 OUT = build/main.obj
+DEBUG_OUT = build/debug.obj
+
 CC_FLAGS = -std=c++11 -O3
 
 BUILD_DIR = ./build
@@ -14,6 +16,9 @@ main:
 	g++ -o $(OUT) $(FILES) $(CC_FLAGS) 
 tests:
 	g++ -o $(TEST_OUT) $(TEST_FILES) $(CC_FLAGS)
+debug:
+	g++ -g -o $(DEBUG_OUT) $(FILES) $(CC_FLAGS) 
+
 
 .PHONY: clean
 clean:

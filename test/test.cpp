@@ -5,12 +5,15 @@
 #include "../include/moveGeneration.hpp"
 #include "../include/types.hpp"
 #include "../include/moveOrder.hpp"
+#include "../include/zobrist.hpp"
+#include "../include/functions.hpp"
 
 #define GREEN "\033[32m"
 #define RED   "\033[31m"
 #define RESET "\033[0m"
 
 int counter = 1;
+bool failed = false;
 
 #define IS_TRUE(value) { \
     if(!(value)) { \
@@ -24,6 +27,7 @@ int counter = 1;
 #define IS_EQUAL(test_value, correct_value) { \
     if (test_value != correct_value) { \
         std::cout << "Test " << counter << ": " << __FUNCTION__ << RED << " FAILED on line " << __LINE__ << RESET << ". Expected " <<  correct_value << " but recieved " << test_value << "." << std::endl; \
+        failed = true; \
     } else { \
         std::cout << "Test " << counter << ": " << __FUNCTION__ << GREEN << " PASSED" << RESET << "." << std::endl; \
     } \
@@ -185,74 +189,62 @@ void test_enPassent_discoveredCheck3() {
     IS_EQUAL(moveGeneration.generateMoves(moveGeneration.board, WHITE).size(), 6);
 }
 
-void testQuickSort() {
-    std::vector<Move> moves = {
-        Move(),
-        Move(),
-        Move(),
-        Move(),
-        Move(),
-        Move(),
-        Move(),
-        Move(),
-        Move(),
-        Move(),
-    };
+void testZobrist(std::string fen) {
+    //Board board("r3k2r/pppq1pp1/2np1n1p/2b1p1B1/2B1P1b1/2NP1N1P/PPPQ1PP1/R3K2R w KQkq - 0 1");
+    //Board board("4r3/3P4/k7/8/8/8/K3p3/5R2 w - - 0 1");
+    Board board(fen);
+    MoveGeneration mg(board);
 
-    std::vector<int> moveScores = {20, 23, 6, 17, 45, 33, 2, 72, 28, 10};
+    std::vector<Move> moves = mg.generateMoves(board, WHITE, false);
 
-    MoveOrder mo = MoveOrder();
-    mo.quickSort(moveScores, moves, 0, moves.size()-1);
+    for(Move move : moves) {
+        Board copyBoard = board;
+        std::cout << "Making move: " << printableMove(move) << std::endl; 
+        board.makeMove(move);
+        u64 zobristKeyAfterMove = board.zobristKey; 
 
-    std::string order = "";
+        Zobrist z;
+        u64 zobristKeyAfterCreation = z.createZobristKey(board);
 
-    for(int i = 0; i < moveScores.size(); i++) {
-        order.append(std::to_string(moveScores.at(i)));
-        order.append(", ");
+        IS_EQUAL(zobristKeyAfterMove, zobristKeyAfterCreation);
+        board = copyBoard;
     }
-
-    IS_EQUAL(order, "72, 45, 33, 28, 23, 20, 17, 10, 6, 2, ");
 }
 
-//function to execute all move generation tests
-void test_moveGeneration() {
-    test_generateRookMoves(); 
-    test_generateBishopMoves();
-    test_generateQueenMoves();
+void runExtensiveZobristTest(int depth, Board board, MoveGeneration mg) {
+    if(depth == 0 || failed == true) return;
 
-    test_generatePawnMoves();
+    std::vector<Move> moves = mg.generateMoves(board, board.sideToMove, false); 
 
-    test_generateKnightMoves();
-    test_generateKingMoves();
-    test_legalKingMoves();
-    test_legalKingMoves2();
-    //test_generateAttackedSquares();
+    for(int i = 0; i < moves.size(); i++) {
+        Board copyBoard = board;
+        board.makeMove(moves.at(i));
+        u64 zobristKeyAfterMove = board.zobristKey; 
 
-    test_isInCheck();
-    test_isInCheck2();
-    test_isInCheck3();
+        Zobrist z;
+        u64 zobristKeyAfterCreation = z.createZobristKey(board);
 
-    test_moveGenerationInDoubleCheck();
-    test_moveGenerationInDoubleCheck2();
+        IS_EQUAL(zobristKeyAfterMove, zobristKeyAfterCreation);
 
-    test_moveGenerationInSinlgeCheck();
-    test_moveGenerationInSinlgeCheck2();
-    test_moveGenerationInSinlgeCheck3();
+        if(failed) {
+            std::cout << "**********************" << std::endl;
+            std::cout << "Move: " << printableMove(moves.at(i)) << std::endl << std::endl;
+            copyBoard.prettyPrintBoard();
+            std::cout << "**********************" << std::endl;
+            return;
+        }
 
-    test_enPassentCheckEvasion();
-    test_enPassentCheckEvasion2();
-    test_enPassentCheckEvasion3();
+        runExtensiveZobristTest(depth-1, board, mg);
+        //unmake move
+        board = copyBoard;
+    }
+}
 
-    test_getPinnedPieces();
-    test_pinnedPiecesMoveGeneration();
-    test_pinnedPiecesMoveGeneration2();
-    test_pinnedPiecesMoveGeneration3();
+void extensiveZobristTest(std::string fen) {
+    Board board(fen);
+    MoveGeneration mg(board);
 
-    test_enPassent_discoveredCheck();
-    test_enPassent_discoveredCheck2();
-    test_enPassent_discoveredCheck3();
-
-    testQuickSort();
+    runExtensiveZobristTest(5, board, mg);
 }
 
 void perft_test(std::string fen, u64 expectedRes, int depth) {
@@ -335,10 +327,84 @@ void quick_perft(bool quick) {
     };
 
     for(int i = 0; i < test_fens.size(); i++) {
-        if(quick) perft_test(test_fens.at(i), totalNodesD5.at(i), depths.at(i)-1);
+        if(quick) {
+            //extensiveZobristTest(test_fens.at(i));
+            perft_test(test_fens.at(i), totalNodesD5.at(i), depths.at(i)-1);
+        }
         else perft_test(test_fens.at(i), totalNodesD6.at(i), depths.at(i));
     }
 }
+
+void testQuickSort() {
+    std::vector<Move> moves = {
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+        Move(),
+    };
+
+    std::vector<int> moveScores = {20, 23, 6, 17, 45, 33, 2, 72, 28, 10};
+
+    MoveOrder mo = MoveOrder();
+    mo.quickSort(moveScores, moves, 0, moves.size()-1);
+
+    std::string order = "";
+
+    for(int i = 0; i < moveScores.size(); i++) {
+        order.append(std::to_string(moveScores.at(i)));
+        order.append(", ");
+    }
+
+    IS_EQUAL(order, "72, 45, 33, 28, 23, 20, 17, 10, 6, 2, ");
+}
+
+//function to execute all move generation tests
+void test_moveGeneration() {
+    test_generateRookMoves(); 
+    test_generateBishopMoves();
+    test_generateQueenMoves();
+
+    test_generatePawnMoves();
+
+    test_generateKnightMoves();
+    test_generateKingMoves();
+    test_legalKingMoves();
+    test_legalKingMoves2();
+    //test_generateAttackedSquares();
+
+    test_isInCheck();
+    test_isInCheck2();
+    test_isInCheck3();
+
+    test_moveGenerationInDoubleCheck();
+    test_moveGenerationInDoubleCheck2();
+
+    test_moveGenerationInSinlgeCheck();
+    test_moveGenerationInSinlgeCheck2();
+    test_moveGenerationInSinlgeCheck3();
+
+    test_enPassentCheckEvasion();
+    test_enPassentCheckEvasion2();
+    test_enPassentCheckEvasion3();
+
+    test_getPinnedPieces();
+    test_pinnedPiecesMoveGeneration();
+    test_pinnedPiecesMoveGeneration2();
+    test_pinnedPiecesMoveGeneration3();
+
+    test_enPassent_discoveredCheck();
+    test_enPassent_discoveredCheck2();
+    test_enPassent_discoveredCheck3();
+
+    testQuickSort();
+}
+
 
 //function to execute all tests
 void test_all() {
@@ -347,6 +413,8 @@ void test_all() {
 }
 
 int main(int argc, char* argv[]) {
+    Zobrist::init();
+
     if(argc == 1) {
         test_all();
     } else {
@@ -354,6 +422,8 @@ int main(int argc, char* argv[]) {
         if(input.compare("quick") == 0) quick_perft(true);
         else if(input.compare("middle") == 0) quick_perft(false); 
         else if(input.compare("full") == 0) test_perftsuite(6);
+        else if(input.compare("zobrist") == 0) testZobrist("rnbqkbnr/1ppppppp/8/8/p7/P2P4/1PP1PPPP/RNBQKBNR w KQkq - 0 1"); 
+        else if(input.compare("extensive_zobrist") == 0) extensiveZobristTest(DEFAULT_FEN); 
     }
     return 0;
 }

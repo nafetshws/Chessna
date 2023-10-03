@@ -4,6 +4,9 @@
 #include "../include/types.hpp"
 #include <string>
 
+//necessary to avoid circular dependency
+//class Zobrist;
+
 struct Board {
     Bitboard whitePawns, whiteRooks, whiteKnights, whiteBishops, whiteQueen, whiteKing;
     Bitboard blackPawns, blackRooks, blackKnights, blackBishops, blackQueen, blackKing;
@@ -13,6 +16,8 @@ struct Board {
     Square enPassentTargetSquare;
     int halfMoveClock;
     int fullMoveCounter;
+
+    u64 zobristKey;
 
     Board(const std::string &fen);
     Board();
@@ -53,6 +58,14 @@ struct Board {
 
     PieceType getPieceTypeOfSquare(Square square, Color color);
     PieceType getPieceTypeOfSquare(Bitboard b, Color color); 
+
+    void updateZobristKey(Move move, Square prevEnPassentSquare);
+    void updateZobristPieces(Move move);
+    void updateZobristCastling(Move move);
+    void updateZobristEnPassent(Square prevEnPassentSquare); 
+    void updateZobristSideToMove();
+    void updateZobristPromotion(Move move);
+
 };
 
 
