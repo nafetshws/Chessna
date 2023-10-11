@@ -21,7 +21,4 @@ int popcount(Bitboard bitboard);
 u64 getCurrentTime();
 float getTimeDifference(u64 before, u64 after);
 
-
-
-
 #endif

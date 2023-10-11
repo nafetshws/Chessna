@@ -62,7 +62,7 @@ struct Piece {
 
 struct Move {
     Move(Square _origin, Square _destination, PieceType _pieceType, Color _color, MoveType _moveType) : origin(_origin), destination(_destination), pieceType(_pieceType), color(_color), moveType(_moveType) {}
-    Move(): origin(-1), destination(-1), pieceType(UNOCCUPIED), color(WHITE), moveType(QUIET) {}
+    Move(): origin(-1), destination(-1), pieceType(UNOCCUPIED), color(WHITE), moveType(NULL_MOVE) {}
 
     Square origin;
     Square destination;
@@ -133,6 +133,12 @@ struct Pin {
 struct Pins {
     std::vector<Pin> pins;
     Bitboard absolutePins;
+};
+
+enum EvalFlag {
+    HASH_EXACT,
+    HASH_ALPHA,
+    HASH_BETA
 };
 
 const Bitboard H1 = 0x80;
