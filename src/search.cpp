@@ -145,6 +145,10 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
         int score = -this->alphaBeta(-beta, -alpha, depth-1, depthFromRoot + 1);
         this->board = copyBoard;
 
+        if(this->getSearchIsCancelled()) {
+            return 0;
+        }
+
         // Beta-cutoff: opponent will have chosen a different path down the tree as the move is too good
         if(score >= beta) {
             TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, beta, HASH_BETA, moves.at(i));
@@ -164,6 +168,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
             }
         }
     }
+
     TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, alpha, eFlag, bestMoveInPos);
     return alpha;
 }
