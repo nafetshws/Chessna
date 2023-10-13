@@ -11,12 +11,50 @@
 Search::Search(Board board) {
     this->board = board;
     this->bestMove = Move(); 
+    this->bestMoveThisIteration = Move(); 
+    this->prevBestMove = Move(); 
     this->bestScore = 0;
+    this->bestScoreThisIteration = 0;
+    this->prevBestScore = 0;
     this->moveGeneration = MoveGeneration(this->board);
     this->evaluation = Evaluation();
     this->moveOrder = MoveOrder();
     this->sideToMove = WHITE;
     this->visitedNodes = 0;
+    this->searchIsCancelled = false;
+    this->startTime = 0;
+    this->maxSearchTime = 0;
+    this->minDepth = 0;
+}
+
+void Search::iterativeDeepening(float timeInS) {
+    this->searchIsCancelled = false;
+    this->startTime = getCurrentTime();
+    this->maxSearchTime = timeInS;
+    this->minDepth = 0;
+
+    for(int currentSearchDepth = 1; currentSearchDepth < 100; currentSearchDepth++) {
+        //if(getTimeDifference(this-> startTime, getCurrentTime()) >= timeInS) this->cancelSearch(); 
+        checkTimeLimit();
+
+        if(this->getSearchIsCancelled()) break;
+
+        int eval = alphaBeta(negativeInfinity, positiveInfinity, currentSearchDepth, 0);
+
+        if(this->getSearchIsCancelled()) {
+            this->bestMove = prevBestMove;
+            this->bestScore = prevBestScore;
+        } else {
+            //save results of this iteration
+            this->bestMove = this->bestMoveThisIteration;
+            this->prevBestMove = this->bestMoveThisIteration;
+
+            this->bestScore = this->bestScoreThisIteration;
+            this->prevBestScore = this->bestScoreThisIteration;
+            this->minDepth++;
+        }
+
+    }
 }
 
 int Search::negaMax(int depth, int depthFromRoot) {
@@ -47,16 +85,23 @@ int Search::negaMax(int depth, int depthFromRoot) {
 }
 
 int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
+    //NOTE: should be implemented in another thread
+    checkTimeLimit();
+
+    if(this->getSearchIsCancelled()) {
+        return 0;
+    }
+
     EvalFlag eFlag = HASH_ALPHA;
     //draw by 50 move rule
     if(this->board.halfMoveClock >= 100) return 0;
 
     //check if position was already evaluated and return according evaluation
     int ttEval = TranspositionTable::getTtEvaluation(this->board.zobristKey, depth, alpha, beta);
-    if(ttEval != POS_NOT_FOUND) {
+    if(ttEval != POS_NOT_FOUND && ttEval != POS_NOT_DEEP_ENOUGH) {
         if(depthFromRoot == 0) {
-            this->bestMove = TranspositionTable::fetchEntry(this->board.zobristKey)->move;
-            this->bestScore = ttEval;
+            this->bestMoveThisIteration = TranspositionTable::fetchEntry(this->board.zobristKey)->move;
+            this->bestScoreThisIteration = ttEval;
         }
 
         return ttEval;
@@ -65,12 +110,19 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
 
     if(depth == 0) {
         this->visitedNodes++;
-        int quiescenceEval = this->quiescenceSearch(alpha, beta);
-        return quiescenceEval;
+        return this->quiescenceSearch(alpha, beta);
+    }
+
+    //prev best move is always from
+    Move possibleBestMove = EMPTY_MOVE; 
+    if(depthFromRoot == 0) {
+        possibleBestMove = this->prevBestMove;
+    } else if(ttEval == POS_NOT_DEEP_ENOUGH) {
+        possibleBestMove = TranspositionTable::fetchEntry(this->board.zobristKey)->move; 
     }
 
     std::vector<Move> moves = moveGeneration.generateMoves(this->board, this->board.sideToMove, false);
-    moveOrder.orderMoves(this->board, moves);
+    moveOrder.orderMoves(this->board, moves, possibleBestMove);
 
     if(moves.size() == 0) {
         if(moveGeneration.check_info.numberOfChecks != 0) {
@@ -107,8 +159,8 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
             eFlag = HASH_EXACT;
 
             if(depthFromRoot == 0) {
-                this->bestMove = moves.at(i);
-                this->bestScore = alpha;
+                this->bestMoveThisIteration = moves.at(i);
+                this->bestScoreThisIteration = alpha;
             }
         }
     }
@@ -117,6 +169,10 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
 }
 
 int Search::quiescenceSearch(int alpha, int beta) {
+    if(this->getSearchIsCancelled()) {
+        return 0;
+    }    
+
     int eval = this->evaluation.evaluatePosition(this->board);
     this->visitedNodes++;
     //non-capture moves can be better than bad captures. It might not be necessary to continue search
@@ -130,7 +186,7 @@ int Search::quiescenceSearch(int alpha, int beta) {
     }
 
     std::vector<Move> captures = this->moveGeneration.generateMoves(this->board, this->board.sideToMove, true);
-    moveOrder.orderMoves(this->board, captures); 
+    moveOrder.orderMoves(this->board, captures, EMPTY_MOVE); 
 
     for(int i = 0; i < captures.size(); i++) {
         Board copyBoard = this->board;
@@ -148,4 +204,16 @@ int Search::quiescenceSearch(int alpha, int beta) {
     }
 
     return alpha;
+}
+
+void Search::cancelSearch() {
+    this->searchIsCancelled = true;
+}
+
+bool Search::getSearchIsCancelled() {
+    return this->searchIsCancelled;
+}
+
+void Search::checkTimeLimit() {
+    if(getTimeDifference(this-> startTime, getCurrentTime()) >= this->maxSearchTime) this->cancelSearch(); 
 }

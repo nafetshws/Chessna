@@ -8,6 +8,7 @@
 class GameInterface {
     public:
         Board board;
+        int lastMinDepth;
 
         GameInterface();
         GameInterface(std::string fen);

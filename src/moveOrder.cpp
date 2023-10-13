@@ -4,11 +4,17 @@
 #include "../include/board.hpp"
 #include "../include/functions.hpp"
 
-void MoveOrder::orderMoves(Board board, std::vector<Move>& moves) {
+void MoveOrder::orderMoves(Board board, std::vector<Move>& moves, Move prevBestMove) {
     std::vector<int> moveScores;
     for(int i = 0; i < moves.size(); i++) {
         Move move = moves.at(i);
         int score = 0;
+
+        if(move.checkIfEqual(prevBestMove)) {
+            score = BEST_MOVE_SCORE;
+            moveScores.push_back(score); 
+            continue;
+        }
 
         //MVV-LVA (Most valuable victim - Least valuable aggressor) - Captures
         if(move.moveType == CAPTURE) {

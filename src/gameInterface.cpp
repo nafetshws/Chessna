@@ -10,11 +10,13 @@
 GameInterface::GameInterface() {
     this->board = Board(DEFAULT_FEN);
     this->isPlaying = false;
+    this->lastMinDepth = 0;
 }
 
 GameInterface::GameInterface(std::string fen) {
     this->board = Board(fen);
     this->isPlaying = false;
+    this->lastMinDepth = 0;
 }
 
 void GameInterface::play(Color playerColor) {
@@ -43,7 +45,7 @@ void GameInterface::play(Color playerColor) {
         } else {
             //make engine move
             Move engineMove = this->getBestEngineMove();
-            std::cout << "Engine played: " << printableMove(engineMove) << std::endl;
+            std::cout << "Engine played (" << this->lastMinDepth << "): " << printableMove(engineMove) << std::endl;
             this->board.makeMove(engineMove);
         }
     }
@@ -58,8 +60,9 @@ void GameInterface::play(Color playerColor) {
 
 Move GameInterface::getBestEngineMove() {
     Search search(this->board);
-    int depth = 6;
-    int eval = search.alphaBeta(negativeInfinity, positiveInfinity, 6, 0);
+    float time = 30;
+    search.iterativeDeepening(time);
+    this->lastMinDepth = search.minDepth;
     Move engineMove = search.bestMove;
     return engineMove;
 }
@@ -91,7 +94,6 @@ GameStatus GameInterface::getGameStatus() {
     }
 
    return ACTIVE; 
-
 }
 
 bool GameInterface::moveIsLegal(std::string moveNotation, Color playerColor) {
@@ -100,7 +102,17 @@ bool GameInterface::moveIsLegal(std::string moveNotation, Color playerColor) {
     bool moveIsLegal = false;
 
     for(Move move : moves) {
-        if((convertSquareToCoordinate(move.origin) + convertSquareToCoordinate(move.destination)).compare(moveNotation) == 0) moveIsLegal = true;
+        std::string coords = (convertSquareToCoordinate(move.origin) + convertSquareToCoordinate(move.destination));
+        if(moveNotation.size() == 4 && moveNotation.compare(coords) == 0) {
+            moveIsLegal = true;
+        } else if(moveNotation.size() == 5) {
+            char promPiece = moveNotation.at(4);        
+            if(moveNotation.substr(0, 4).compare(coords) == 0
+                && promPiece == 'q' || promPiece == 'r'
+                || promPiece == 'n' || promPiece == 'b') {
+                    moveIsLegal = true;
+                }
+        }
     }
 
     return moveIsLegal;

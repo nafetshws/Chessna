@@ -39,19 +39,38 @@ void runSearch(std::string fen, int depth) {
 
     u64 before = getCurrentTime(); 
     int eval = search.alphaBeta(negativeInfinity, positiveInfinity, depth, 0);
-    //int eval = search.negaMax(depth, 0);
     u64 after = getCurrentTime(); 
+
     float dt = getTimeDifference(before, after);
-    std::cout << "eval: " << search.bestScore << std::endl;
-    std::cout << "best move: " << printableMove(search.bestMove) << std::endl;
+
+    std::cout << "eval: " << search.bestScoreThisIteration << std::endl;
+    std::cout << "best move: " << printableMove(search.bestMoveThisIteration) << std::endl;
     std::cout << "visited nodes: " << search.visitedNodes << std::endl;
     std::cout << "time (in s): " << dt << std::endl;
     std::cout << "nodes/s: " << (search.visitedNodes / dt) << std::endl;
 }
 
+void runIterativeDeepening(std::string fen, float timeInS) {
+    Board board(fen);
+
+    Search search(board);
+
+    u64 before = getCurrentTime();
+    search.iterativeDeepening(timeInS);
+    u64 after = getCurrentTime();
+
+    float dt = getTimeDifference(before, after);
+
+    std::cout << "eval: " << search.bestScore << std::endl;
+    std::cout << "best move: " << printableMove(search.bestMove) << std::endl;
+    std::cout << "visited nodes: " << search.visitedNodes << std::endl;
+    std::cout << "time (in s): " << dt << std::endl;
+    std::cout << "min depth: " << search.minDepth << std::endl;
+    std::cout << "nodes/s: " << (search.visitedNodes / dt) << std::endl;
+}
+
 void playAgainstEngine() {
-    //GameInterface gameInterface(DEFAULT_FEN); 
-    GameInterface gameInterface("r1b2rk1/ppp2p2/5Pp1/4p1P1/2p1P3/2P5/P1n2K1R/7R b - - 1 32"); 
+    GameInterface gameInterface(DEFAULT_FEN); 
 
     gameInterface.play(WHITE);
 }
@@ -76,14 +95,18 @@ int main(int argc, char *argv[]){
         }
         depth = std::stoi(argv[2]);
     } else {
-        depth = 5;
-        fen = "rnb1kbnr/p1qppppp/1pp5/8/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 0 1"; 
+        depth = 10;
+        //fen = "rnb1kbnr/p1qppppp/1pp5/8/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 0 1"; 
+        fen = "6k1/5p2/6p1/8/7p/8/6PP/6K1 b - - 0 1";
     }
 
     //runMoveGeneration(fen, depth);
-    runSearch(fen, depth);
+    //runSearch(fen, depth);
 
-    //playAgainstEngine();
+    playAgainstEngine();
+
+    //depth = time in seconds
+    //runIterativeDeepening(fen, depth);
 
     //Board board("rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1");
     //MoveGeneration mg(board);

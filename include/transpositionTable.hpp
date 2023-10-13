@@ -18,6 +18,7 @@ struct HashEntry {
 };
 
 const int POS_NOT_FOUND = -100000;
+const int POS_NOT_DEEP_ENOUGH = -200000;
 
 class TranspositionTable {
     public:

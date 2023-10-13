@@ -44,7 +44,7 @@ int TranspositionTable::getTtEvaluation(u64 zobristKey, int depth, int alpha, in
             break;
         }
     }
-    return POS_NOT_FOUND;
+    return POS_NOT_DEEP_ENOUGH;
 }
 
 

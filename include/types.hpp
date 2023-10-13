@@ -69,6 +69,11 @@ struct Move {
     PieceType pieceType;
     Color color;
     MoveType moveType;
+
+    bool checkIfEqual(Move move) {
+        if(move.origin == origin && move.destination == destination && move.pieceType == pieceType && move.color == color) return true;
+        return false;
+    }
 };
 
 struct Attack_Info {
@@ -142,6 +147,7 @@ enum EvalFlag {
 };
 
 const unsigned int TT_SIZE = 26214400;
+const unsigned int BEST_MOVE_SCORE = 5000000;
 
 const Bitboard H1 = 0x80;
 const Bitboard H8 = 0x8000000000000000; 

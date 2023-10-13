@@ -8,7 +8,7 @@
 
 class MoveOrder {
     public:
-        void orderMoves(Board board, std::vector<Move>& moves); 
+        void orderMoves(Board board, std::vector<Move>& moves, Move prevBestMove); 
         void quickSort(std::vector<int>& moveScores, std::vector<Move>& moves, int low, int high); 
 
     private:
