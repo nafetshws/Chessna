@@ -141,6 +141,8 @@ enum EvalFlag {
     HASH_BETA
 };
 
+const unsigned int TT_SIZE = 26214400;
+
 const Bitboard H1 = 0x80;
 const Bitboard H8 = 0x8000000000000000; 
 const Bitboard A1 = 0x1;

@@ -66,8 +66,6 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     if(depth == 0) {
         this->visitedNodes++;
         int quiescenceEval = this->quiescenceSearch(alpha, beta);
-        //NOTE: might need to update depth according to quiescene - fine for now
-        //TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, quiescenceEval, HASH_EXACT, this->bestMove);
         return quiescenceEval;
     }
 

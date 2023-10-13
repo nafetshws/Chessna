@@ -22,7 +22,10 @@ const int POS_NOT_FOUND = -100000;
 class TranspositionTable {
     public:
 
-        static std::vector<HashEntry> entries;
+        //static std::vector<HashEntry> entries;
+        static HashEntry testEntry;
+
+        static HashEntry entries[];
 
         static long numberOfCurrentEntries;
         static long numberOfMaxEntries; 
