@@ -1,10 +1,10 @@
 #include "../include/evaluation.hpp"
 #include "../include/board.hpp"
 #include "../include/functions.hpp"
+#include <iostream>
 
 Evaluation::Evaluation() {
     this->perspective = 0;
-    this->isEndgame = false;
 }
 
 int Evaluation::evaluatePosition(Board board) {
@@ -42,14 +42,18 @@ int Evaluation::evaluatePosition(Board board) {
 
     int materialScore = materialScoreWhite - materialScoreBlack;
 
+
     //check if endgame
-    if(!this->isEndgame && (materialScoreWhite - KING_VALUE*this->popcount(whiteKing) - PAWN_VALUE*this->popcount(whitePawns)) <= 1000) {
-        this->isEndgame = true;
+    bool isEndgame = false;
+    int endgameSum =  materialScoreWhite - KING_VALUE*this->popcount(whiteKing) - PAWN_VALUE*this->popcount(whitePawns); 
+    if(endgameSum <= 1000) {
+        isEndgame = true;
+
     }
 
 
-    int positionScore = //0; 
-        calculatePositionScore(whiteKing, (isEndgame) ? kingEndGamePositionEvaluationWhite: kingMiddlGamePositionEvaluationWhite) - calculatePositionScore(blackKing, (this->isEndgame) ? kingEndGamePositionEvaluationBlack : kingMiddlGamePositionEvaluationBlack) +
+    int positionScore = 
+        calculatePositionScore(whiteKing, (isEndgame) ? kingEndGamePositionEvaluationWhite: kingMiddlGamePositionEvaluationWhite) - calculatePositionScore(blackKing, (isEndgame) ? kingEndGamePositionEvaluationBlack : kingMiddlGamePositionEvaluationBlack) +
         calculatePositionScore(whiteQueens, queenPositionEvaluationWhite) - calculatePositionScore(blackQueens, queenPositionEvaluationBlack) + 
         calculatePositionScore(whiteRooks, rookPositionEvaluationWhite) - calculatePositionScore(blackRooks, rookPositionEvaluationBlack) + 
         calculatePositionScore(whiteBishops, bishopPositionEvaluationWhite) - calculatePositionScore(blackBishops, bishopPositionEvaluationBlack) + 

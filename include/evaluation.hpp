@@ -169,7 +169,6 @@ const std::vector<int> kingEndGamePositionEvaluationBlack = {
 class Evaluation {
     public:
         int perspective;
-        bool isEndgame;
 
         Evaluation();
 
