@@ -16,6 +16,11 @@ void MoveOrder::orderMoves(Board board, std::vector<Move>& moves, Move prevBestM
             continue;
         }
 
+        if(move.moveType == QUIET) {
+            moveScores.push_back(score);
+            continue;
+        };
+
         //MVV-LVA (Most valuable victim - Least valuable aggressor) - Captures
         if(move.moveType == CAPTURE) {
             PieceType attackedPieceType = board.findPiece(move.destination).type;
@@ -25,7 +30,20 @@ void MoveOrder::orderMoves(Board board, std::vector<Move>& moves, Move prevBestM
             score += materialDifference;
         }
 
-        //Non-Captures
+        //Other adventagous moves
+        if(move.moveType == QUEEN_PROMOTION) {
+            score += 800; 
+        } else if(move.moveType == KNIGHT_PROMOTION) {
+            score += 220; 
+        } else if(move.moveType == KING_CASTLE) {
+            score += 30;
+        } else if(move.moveType == QUEEN_CASTLE) {
+            score += 25;
+        } else if(move.moveType == CAPTURE_QUEEN_PROMOTION) {
+            score += 1000;
+        } else if(move.moveType == CAPTURE_KNIGHT_PROMOTION) {
+            score += 300;
+        } 
 
         moveScores.push_back(score); 
     }

@@ -42,8 +42,8 @@ void Search::iterativeDeepening(float timeInS) {
         int eval = alphaBeta(negativeInfinity, positiveInfinity, currentSearchDepth, 0);
 
         if(this->getSearchIsCancelled()) {
-            this->bestMove = prevBestMove;
-            this->bestScore = prevBestScore;
+            this->bestMove = bestMoveThisIteration;
+            this->bestScore = bestScoreThisIteration;
         } else {
             //save results of this iteration
             this->bestMove = this->bestMoveThisIteration;
