@@ -86,13 +86,17 @@ std::vector<Move> MoveGeneration::generateMoves(const Board &board, Color color,
         if(abs(destination - kingOrigin) == 2) {
             moveType = (squareToBitboard(kingOrigin) << 2*EAST) == squareToBitboard(destination) ? MoveType::KING_CASTLE : MoveType::QUEEN_CASTLE;
         } else {
+            //NOTE: Unnecessary?? Review later
             moveType = (squareToBitboard(destination) & this->board.getOccupiedBy(getOppositeColor(color))) != 0 ? MoveType::CAPTURE : MoveType::QUIET;
         }
-        if(generateOnlyCaptures) {
-            if(moveType == CAPTURE) moves.push_back(Move(kingOrigin, destination, KING, color, moveType)); 
-        } else {
+
+        //if the player is in check add the moves even if only captures is enabled
+        if(!generateOnlyCaptures || check_info.numberOfChecks != 0) {
             moves.push_back(Move(kingOrigin, destination, PieceType::KING, color, moveType));
+        } else {
+            if(moveType == CAPTURE) moves.push_back(Move(kingOrigin, destination, KING, color, moveType)); 
         } 
+
         //delete move from bitboard
         kingMoves = ~(1ULL << destination) & kingMoves;
     }
@@ -116,7 +120,7 @@ std::vector<Move> MoveGeneration::generateMoves(const Board &board, Color color,
         moves.insert(moves.end(), a.moves.begin(), a.moves.end());
 
         //3
-        if(!generateOnlyCaptures) {
+        //if(!generateOnlyCaptures) {
             PieceType checkingPieceType = check_info.moves.at(0).pieceType;
             //only rooks, bishops and queens can be blocked
             if(checkingPieceType == QUEEN || checkingPieceType == ROOK || checkingPieceType == BISHOP) { 
@@ -200,7 +204,7 @@ std::vector<Move> MoveGeneration::generateMoves(const Board &board, Color color,
                     intersection = ~(1ULL << destination) & intersection;
                 }
             }
-        }
+        //}
         return moves;
     }
 

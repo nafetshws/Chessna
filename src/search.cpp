@@ -33,7 +33,7 @@ void Search::iterativeDeepening(float timeInS) {
     this->maxSearchTime = timeInS;
     this->minDepth = 0;
 
-    for(int currentSearchDepth = 1; currentSearchDepth < 100; currentSearchDepth++) {
+    for(int currentSearchDepth = 1; currentSearchDepth < 200; currentSearchDepth++) {
         //if(getTimeDifference(this-> startTime, getCurrentTime()) >= timeInS) this->cancelSearch(); 
         checkTimeLimit();
 
@@ -86,7 +86,7 @@ int Search::negaMax(int depth, int depthFromRoot) {
 
 int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     //NOTE: should be implemented in another thread
-    checkTimeLimit();
+    //checkTimeLimit();
 
     if(this->getSearchIsCancelled()) {
         return 0;

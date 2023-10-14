@@ -7,16 +7,20 @@
 #include "../include/functions.hpp"
 #include "../include/evaluation.hpp"
 
+int GameInterface::maxTime;
+
 GameInterface::GameInterface() {
     this->board = Board(DEFAULT_FEN);
     this->isPlaying = false;
     this->lastMinDepth = 0;
+    maxTime = 30;
 }
 
 GameInterface::GameInterface(std::string fen) {
     this->board = Board(fen);
     this->isPlaying = false;
     this->lastMinDepth = 0;
+    maxTime = 30;
 }
 
 void GameInterface::play(Color playerColor) {
@@ -60,8 +64,8 @@ void GameInterface::play(Color playerColor) {
 
 Move GameInterface::getBestEngineMove() {
     Search search(this->board);
-    float time = 30;
-    search.iterativeDeepening(time);
+    //float time = 30;
+    search.iterativeDeepening(maxTime);
     this->lastMinDepth = search.minDepth;
     Move engineMove = search.bestMove;
     return engineMove;

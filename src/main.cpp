@@ -71,8 +71,8 @@ void runIterativeDeepening(std::string fen, float timeInS) {
 
 void playAgainstEngine(std::string fen = DEFAULT_FEN) {
     GameInterface gameInterface(fen); 
-
-    gameInterface.play(WHITE);
+    GameInterface::maxTime = 15;
+    gameInterface.play(BLACK);
 }
 
 
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]){
     }
 
     //runMoveGeneration(fen, depth);
-    //runSearch(fen, depth);
+    runSearch(fen, depth);
 
     //playAgainstEngine();
 
