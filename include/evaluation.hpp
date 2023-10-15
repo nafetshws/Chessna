@@ -166,6 +166,17 @@ const std::vector<int> kingEndGamePositionEvaluationBlack = {
     -50,-40,-30,-20,-20,-30,-40,-50,
 };
 
+const int arrCenterManhattanDistance[64] = { 
+  6, 5, 4, 3, 3, 4, 5, 6,
+  5, 4, 3, 2, 2, 3, 4, 5,
+  4, 3, 2, 1, 1, 2, 3, 4,
+  3, 2, 1, 0, 0, 1, 2, 3,
+  3, 2, 1, 0, 0, 1, 2, 3,
+  4, 3, 2, 1, 1, 2, 3, 4,
+  5, 4, 3, 2, 2, 3, 4, 5,
+  6, 5, 4, 3, 3, 4, 5, 6
+};
+
 class Evaluation {
     public:
         int perspective;
@@ -175,6 +186,9 @@ class Evaluation {
         int evaluatePosition(Board board);
         int popcount(Bitboard bitboard);
         int calculatePositionScore(Bitboard pieces, const std::vector<int>& values);
+
+        int calculateOrthogonalDistance(Square s1, Square s2);
+        int lookupCMD(int square);
 
 };
 

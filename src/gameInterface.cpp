@@ -7,7 +7,7 @@
 #include "../include/functions.hpp"
 #include "../include/evaluation.hpp"
 
-int GameInterface::maxTime;
+float GameInterface::maxTime;
 
 GameInterface::GameInterface() {
     this->board = Board(DEFAULT_FEN);
@@ -67,6 +67,7 @@ Move GameInterface::getBestEngineMove() {
     //float time = 30;
     search.iterativeDeepening(maxTime);
     this->lastMinDepth = search.minDepth;
+    std::cout << "score : " << search.bestScore << " ";
     Move engineMove = search.bestMove;
     return engineMove;
 }

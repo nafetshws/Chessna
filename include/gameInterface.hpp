@@ -9,7 +9,7 @@ class GameInterface {
     public:
         Board board;
         int lastMinDepth;
-        static int maxTime;
+        static float maxTime;
 
         GameInterface();
         GameInterface(std::string fen);

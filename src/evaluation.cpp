@@ -2,6 +2,7 @@
 #include "../include/board.hpp"
 #include "../include/functions.hpp"
 #include <iostream>
+#include <cmath>
 
 Evaluation::Evaluation() {
     this->perspective = 0;
@@ -51,7 +52,6 @@ int Evaluation::evaluatePosition(Board board) {
 
     }
 
-
     int positionScore = 
         calculatePositionScore(whiteKing, (isEndgame) ? kingEndGamePositionEvaluationWhite: kingMiddlGamePositionEvaluationWhite) - calculatePositionScore(blackKing, (isEndgame) ? kingEndGamePositionEvaluationBlack : kingMiddlGamePositionEvaluationBlack) +
         calculatePositionScore(whiteQueens, queenPositionEvaluationWhite) - calculatePositionScore(blackQueens, queenPositionEvaluationBlack) + 
@@ -59,6 +59,26 @@ int Evaluation::evaluatePosition(Board board) {
         calculatePositionScore(whiteBishops, bishopPositionEvaluationWhite) - calculatePositionScore(blackBishops, bishopPositionEvaluationBlack) + 
         calculatePositionScore(whiteKnights, knightPositionEvaluationWhite) - calculatePositionScore(blackKnights, knightPositionEvaluationBlack) + 
         calculatePositionScore(whitePawns, pawnPositionEvaluationWhite) - calculatePositionScore(blackPawns, pawnPositionEvaluationBlack); 
+
+    //mopup evaluation
+    int mopUpEval = 0;
+    if(isEndgame && popcount(whitePawns) == 0 && popcount(blackPawns) == 0 && (materialScore * this->perspective) > 0) {
+        //std::cout << "start mopup: " << board.sideToMove << std::endl;
+        //calculate Manhattan-Distance (orthogonal distance between kings)
+        Square whiteKingPos = bitboardToSquare(whiteKing);
+        Square blackKingPos = bitboardToSquare(blackKing);
+
+        int md = calculateOrthogonalDistance(whiteKingPos, blackKingPos);
+
+        //std::cout << "before cmd: " << std::endl;
+        int cmd = board.sideToMove == WHITE ? lookupCMD(blackKingPos) : lookupCMD(whiteKingPos); 
+        //std::cout << "after cmd" << std::endl;
+
+        mopUpEval = 20 * cmd + 8 * (14 - md);
+
+        //std::cout << "return mopup" << std::endl;
+        return ((materialScore * this->perspective) + mopUpEval);
+    } 
 
     return (materialScore + positionScore) * this->perspective;
 }
@@ -74,6 +94,23 @@ int Evaluation::calculatePositionScore(Bitboard pieces, const std::vector<int>& 
     }
 
     return sum;
+}
+
+
+int Evaluation::calculateOrthogonalDistance(Square s1, Square s2) {
+    int file1 = s1 % 8; 
+    int file2 = s2 % 8;
+
+    int row1 = s1 / 8;
+    int row2 = s2 / 8;
+
+    int d = abs(row2 - row1) + abs(file2 - file1); 
+    return d;
+}
+
+//CMD == Center-Manhattan-Distance
+int Evaluation::lookupCMD(int square) {
+    return arrCenterManhattanDistance[square];
 }
 
 int Evaluation::popcount(Bitboard bitboard) {

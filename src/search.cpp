@@ -34,7 +34,6 @@ void Search::iterativeDeepening(float timeInS) {
     this->minDepth = 0;
 
     for(int currentSearchDepth = 1; currentSearchDepth < 200; currentSearchDepth++) {
-        //if(getTimeDifference(this-> startTime, getCurrentTime()) >= timeInS) this->cancelSearch(); 
         checkTimeLimit();
 
         if(this->getSearchIsCancelled()) break;
@@ -53,6 +52,10 @@ void Search::iterativeDeepening(float timeInS) {
             this->prevBestScore = this->bestScoreThisIteration;
             this->minDepth++;
         }
+
+        //if(eval > 99000 || eval < -99000) {
+        //    break;
+        //}
 
     }
 }
@@ -86,7 +89,7 @@ int Search::negaMax(int depth, int depthFromRoot) {
 
 int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     //NOTE: should be implemented in another thread
-    //checkTimeLimit();
+    checkTimeLimit();
 
     if(this->getSearchIsCancelled()) {
         return 0;
@@ -103,7 +106,6 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
             this->bestMoveThisIteration = TranspositionTable::fetchEntry(this->board.zobristKey)->move;
             this->bestScoreThisIteration = ttEval;
         }
-
         return ttEval;
     }
 
