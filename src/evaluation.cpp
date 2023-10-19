@@ -87,8 +87,9 @@ int Evaluation::calculatePositionScore(Bitboard pieces, const std::vector<int>& 
     int sum = 0;
     while(pieces != 0) {
         int index = __builtin_ctzll(pieces);
+        int boardIndex = 63 - index;
 
-        sum += values.at(index);
+        sum += values.at(boardIndex);
 
         pieces &= ~squareToBitboard(index);
     }
