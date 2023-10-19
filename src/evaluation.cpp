@@ -62,7 +62,7 @@ int Evaluation::evaluatePosition(Board board) {
 
     //mopup evaluation
     int mopUpEval = 0;
-    if(isEndgame && popcount(whitePawns) == 0 && popcount(blackPawns) == 0 && (materialScore * this->perspective) > 0) {
+    if(isEndgame && popcount(whitePawns) <= 1 && popcount(blackPawns) <= 1 && (materialScore * this->perspective) > 0) {
         //std::cout << "start mopup: " << board.sideToMove << std::endl;
         //calculate Manhattan-Distance (orthogonal distance between kings)
         Square whiteKingPos = bitboardToSquare(whiteKing);

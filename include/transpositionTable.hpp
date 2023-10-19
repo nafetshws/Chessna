@@ -33,8 +33,11 @@ class TranspositionTable {
 
         static void init(int sizeMB);
 
-        static int getTtEvaluation(u64 zobristKey, int depth, int alpha, int beta);
-        static void storeTtEvaluation(u64 zobristKey, int depth, int eval, EvalFlag flag, Move move);
+        static int getTtEvaluation(u64 zobristKey, int depth, int alpha, int beta, int depthFromRoot);
+        static void storeTtEvaluation(u64 zobristKey, int depth, int eval, EvalFlag flag, Move move, int depthFromRoot);
+
+        static int convertEvalToTT(int eval, int depthFromRoot);
+        static int convertEvalFromTT(int eval, int depthFromRoot);
 
         static HashEntry* fetchEntry(u64 zobristKey);
 

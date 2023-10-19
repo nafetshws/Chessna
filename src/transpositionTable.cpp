@@ -1,6 +1,7 @@
 #include <iostream>
 #include "../include/transpositionTable.hpp"
 #include "../include/types.hpp"
+#include "../include/evaluation.hpp"
 #include <vector>
 
 long TranspositionTable::numberOfCurrentEntries;
@@ -15,21 +16,22 @@ void TranspositionTable::init(int sizeMB) {
     numberOfCurrentEntries = 0;
 }
 
-void TranspositionTable::storeTtEvaluation(u64 zobristKey, int depth, int eval, EvalFlag flag, Move move) {
+void TranspositionTable::storeTtEvaluation(u64 zobristKey, int depth, int eval, EvalFlag flag, Move move, int depthFromRoot) {
     //Always replace
-    HashEntry entry(zobristKey, depth, eval, flag, move);
+    HashEntry entry(zobristKey, depth, convertEvalToTT(eval, depthFromRoot), flag, move);
     entries[zobristKey % numberOfMaxEntries] = entry;
 }
 
-int TranspositionTable::getTtEvaluation(u64 zobristKey, int depth, int alpha, int beta) {
+int TranspositionTable::getTtEvaluation(u64 zobristKey, int depth, int alpha, int beta, int depthFromRoot) {
     HashEntry entry = entries[zobristKey % numberOfMaxEntries];
     if(entry.zobristKey != zobristKey) return POS_NOT_FOUND;
+    entry.eval = convertEvalFromTT(entry.eval, depthFromRoot);
 
     if(entry.depth >= depth){
         switch (entry.flag)
         {
         case HASH_EXACT:
-            return entry.eval;
+            return entry.eval; 
         case HASH_ALPHA:
             if(entry.eval <= alpha) {
                 return alpha;
@@ -52,5 +54,24 @@ HashEntry* TranspositionTable::fetchEntry(u64 zobristKey) {
     HashEntry* entry = &entries[zobristKey % numberOfMaxEntries];
     if(entry->zobristKey == zobristKey) return entry;
     return NULL;
+}
+
+int TranspositionTable::convertEvalToTT(int eval, int depthFromRoot) {
+    if(eval > 99000) {
+        return (eval + depthFromRoot);
+    } else if(eval < -99000) {
+        return (eval - depthFromRoot);
+    } else {
+        return eval;
+    }
+}
+int TranspositionTable::convertEvalFromTT(int eval, int depthFromRoot) {
+    if(eval > 99000) {
+        return (eval - depthFromRoot); 
+    } else if(eval < -99000) {
+        return (eval + depthFromRoot);
+    } else {
+        return eval;
+    }
 }
 

@@ -39,7 +39,7 @@ void Search::iterativeDeepening(float timeInS) {
         if(this->getSearchIsCancelled()) break;
 
         int eval = alphaBeta(negativeInfinity, positiveInfinity, currentSearchDepth, 0);
-
+        
         if(this->getSearchIsCancelled()) {
             this->bestMove = bestMoveThisIteration;
             this->bestScore = bestScoreThisIteration;
@@ -52,11 +52,6 @@ void Search::iterativeDeepening(float timeInS) {
             this->prevBestScore = this->bestScoreThisIteration;
             this->minDepth++;
         }
-
-        //if(eval > 99000 || eval < -99000) {
-        //    break;
-        //}
-
     }
 }
 
@@ -88,7 +83,6 @@ int Search::negaMax(int depth, int depthFromRoot) {
 }
 
 int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
-    //NOTE: should be implemented in another thread
     checkTimeLimit();
 
     if(this->getSearchIsCancelled()) {
@@ -100,7 +94,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     if(this->board.halfMoveClock >= 100) return 0;
 
     //check if position was already evaluated and return according evaluation
-    int ttEval = TranspositionTable::getTtEvaluation(this->board.zobristKey, depth, alpha, beta);
+    int ttEval = TranspositionTable::getTtEvaluation(this->board.zobristKey, depth, alpha, beta, depthFromRoot);
     if(ttEval != POS_NOT_FOUND && ttEval != POS_NOT_DEEP_ENOUGH) {
         if(depthFromRoot == 0) {
             this->bestMoveThisIteration = TranspositionTable::fetchEntry(this->board.zobristKey)->move;
@@ -135,6 +129,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
             //stalemate
             return 0;
         }
+        return 0;
     }
 
     Move bestMoveInPos = Move(); //creates NULL move
@@ -153,7 +148,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
 
         // Beta-cutoff: opponent will have chosen a different path down the tree as the move is too good
         if(score >= beta) {
-            TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, beta, HASH_BETA, moves.at(i));
+            TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, beta, HASH_BETA, moves.at(i), depthFromRoot);
             return beta;
         }
 
@@ -171,7 +166,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
         }
     }
 
-    TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, alpha, eFlag, bestMoveInPos);
+    TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, alpha, eFlag, bestMoveInPos, depthFromRoot);
     return alpha;
 }
 
@@ -181,6 +176,7 @@ int Search::quiescenceSearch(int alpha, int beta) {
     }    
 
     int eval = this->evaluation.evaluatePosition(this->board);
+
     this->visitedNodes++;
     //non-capture moves can be better than bad captures. It might not be necessary to continue search
     //when there are good non-capture alternatives
@@ -199,6 +195,7 @@ int Search::quiescenceSearch(int alpha, int beta) {
         Board copyBoard = this->board;
         this->board.makeMove(captures.at(i));
         int score = -this->quiescenceSearch(-beta, -alpha);
+
         this->board = copyBoard;
 
         //beta-cutoff
