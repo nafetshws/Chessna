@@ -2,9 +2,9 @@
 This is a simple chess engine that is decent.
 
 ## Features
-##### Move Generation:
+#### Move Generation:
 - Bitboards
-##### Search:
+#### Search:
 - Iterative deepening in combination with Alpha-Beta Search
 - Quiescence Search
 - Transposition Table

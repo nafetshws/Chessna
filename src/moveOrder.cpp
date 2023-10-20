@@ -36,9 +36,9 @@ void MoveOrder::orderMoves(Board board, std::vector<Move>& moves, Move prevBestM
         } else if(move.moveType == KNIGHT_PROMOTION) {
             score += 220; 
         } else if(move.moveType == KING_CASTLE) {
-            score += 30;
+            score += 80;
         } else if(move.moveType == QUEEN_CASTLE) {
-            score += 25;
+            score += 75;
         } else if(move.moveType == CAPTURE_QUEEN_PROMOTION) {
             score += 1000;
         } else if(move.moveType == CAPTURE_KNIGHT_PROMOTION) {
