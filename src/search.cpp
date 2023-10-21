@@ -106,7 +106,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
 
     if(depth == 0) {
         this->visitedNodes++;
-        return this->quiescenceSearch(alpha, beta);
+        return this->quiescenceSearch(alpha, beta, depthFromRoot+1);
     }
 
     //prev best move is always from
@@ -118,7 +118,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     }
 
     std::vector<Move> moves = moveGeneration.generateMoves(this->board, this->board.sideToMove, false);
-    moveOrder.orderMoves(this->board, moves, possibleBestMove);
+    moveOrder.orderMoves(this->board, moves, possibleBestMove, depthFromRoot);
 
     if(moves.size() == 0) {
         if(moveGeneration.check_info.numberOfChecks != 0) {
@@ -148,6 +148,11 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
 
         // Beta-cutoff: opponent will have chosen a different path down the tree as the move is too good
         if(score >= beta) {
+            //record killer move
+            if(moves.at(i).moveType == QUIET) {
+                this->moveOrder.insertKillerMove(Killermove(moves.at(i), depthFromRoot, score), depthFromRoot);
+            }
+
             TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, beta, HASH_BETA, moves.at(i), depthFromRoot);
             return beta;
         }
@@ -170,7 +175,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     return alpha;
 }
 
-int Search::quiescenceSearch(int alpha, int beta) {
+int Search::quiescenceSearch(int alpha, int beta, int depthFromRoot) {
     if(this->getSearchIsCancelled()) {
         return 0;
     }    
@@ -189,12 +194,12 @@ int Search::quiescenceSearch(int alpha, int beta) {
     }
 
     std::vector<Move> captures = this->moveGeneration.generateMoves(this->board, this->board.sideToMove, true);
-    moveOrder.orderMoves(this->board, captures, EMPTY_MOVE); 
+    moveOrder.orderMoves(this->board, captures, EMPTY_MOVE, depthFromRoot); 
 
     for(int i = 0; i < captures.size(); i++) {
         Board copyBoard = this->board;
         this->board.makeMove(captures.at(i));
-        int score = -this->quiescenceSearch(-beta, -alpha);
+        int score = -this->quiescenceSearch(-beta, -alpha, depthFromRoot+1);
 
         this->board = copyBoard;
 

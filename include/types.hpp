@@ -76,6 +76,15 @@ struct Move {
     }
 };
 
+struct Killermove {
+    Move move;
+    int depthFromRoot;
+    int score;
+
+    Killermove(Move _move, int _depthFromRoot, int _score) : move(_move), depthFromRoot(_depthFromRoot), score(_score) {}
+    Killermove() : depthFromRoot(-1) {} 
+};
+
 struct Attack_Info {
     int numberOfAttacks;
     std::vector<Move> moves;

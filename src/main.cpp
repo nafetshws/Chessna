@@ -106,7 +106,7 @@ int main(int argc, char *argv[]){
     //playAgainstEngine();
 
     //depth = time in seconds
-    //runIterativeDeepening(fen, depth);
+    runIterativeDeepening(fen, depth);
     //runIterativeDeepening("r1bqkb1r/pppppppp/2n2n2/8/4P3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq - 4 3", 5);
 
     //Board board("rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1");

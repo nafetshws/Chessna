@@ -38,7 +38,7 @@ class Search {
         void iterativeDeepening(float timeInS);
 
         int alphaBeta(int alpha, int beta, int depth, int depthFromRoot);
-        int quiescenceSearch(int alpha, int beta);
+        int quiescenceSearch(int alpha, int beta, int depthFromRoot);
         int negaMax(int depth, int depthFromRoot);
 
         void cancelSearch();

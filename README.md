@@ -22,4 +22,5 @@ This is a simple chess engine that is decent.
 - better evaluation (king safety, mobility, pawn structure, ...)
 - improve move generation (use array instead of vector, magic bitboards etc.)
 - UCI (Universal chess interface): create lichess bot account
+- Late Move Reduction
 

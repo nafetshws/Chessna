@@ -4,8 +4,12 @@
 #include "../include/board.hpp"
 #include "../include/functions.hpp"
 
-void MoveOrder::orderMoves(Board board, std::vector<Move>& moves, Move prevBestMove) {
+void MoveOrder::orderMoves(Board board, std::vector<Move>& moves, Move prevBestMove, int depthFromRoot) {
     std::vector<int> moveScores;
+
+    Killermove kMove1 = this->killerMoves[0][depthFromRoot]; 
+    Killermove kMove2 = this->killerMoves[1][depthFromRoot]; 
+
     for(int i = 0; i < moves.size(); i++) {
         Move move = moves.at(i);
         int score = 0;
@@ -17,7 +21,7 @@ void MoveOrder::orderMoves(Board board, std::vector<Move>& moves, Move prevBestM
         }
 
         if(move.moveType == QUIET) {
-            moveScores.push_back(score);
+            moveScores.push_back(this->getKillerMoveScore(move, kMove1, kMove2));
             continue;
         };
 
@@ -88,4 +92,30 @@ void MoveOrder::swap(Move* a, Move* b) {
     *a = *b;
     *b = t;
 } 
+
+void MoveOrder::insertKillerMove(Killermove killerMove, int depthFromRoot) {
+    std::map<int, Killermove>::iterator k1 = this->killerMoves[0].find(depthFromRoot);
+
+    //if the new killer move is the best killer so far, insert it in the first slot
+    if(k1 != this->killerMoves[0].end() && killerMove.score > k1->second.score) {
+        this->killerMoves[1][depthFromRoot] = this->killerMoves[0][depthFromRoot];
+        this->killerMoves[0][depthFromRoot] = killerMove; 
+        return;
+    } 
+    std::map<int, Killermove>::iterator k2 = this->killerMoves[1].find(depthFromRoot);
+    
+    if(k2 != this->killerMoves[1].end() && killerMove.score > k2->second.score) {
+        this->killerMoves[1][depthFromRoot] = killerMove;
+    }
+
+}
+
+int MoveOrder::getKillerMoveScore(Move &move, Killermove &k1, Killermove& k2) {
+    if(move.checkIfEqual(k1.move)) {
+        return KILLER_SCORE_1;
+    } else if(move.checkIfEqual(k2.move)) {
+        return KILLER_SCORE_2;
+    }
+    return 0;
+}
 
