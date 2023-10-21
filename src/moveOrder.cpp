@@ -104,7 +104,8 @@ void MoveOrder::insertKillerMove(Killermove killerMove, int depthFromRoot) {
     } 
     std::map<int, Killermove>::iterator k2 = this->killerMoves[1].find(depthFromRoot);
     
-    if(k2 != this->killerMoves[1].end() && killerMove.score > k2->second.score) {
+    //if new killer moves is better than the second, and isn't the same as the first
+    if(k2 != this->killerMoves[1].end() && killerMove.score > k2->second.score && !killerMove.move.checkIfEqual(k1->second.move)) {
         this->killerMoves[1][depthFromRoot] = killerMove;
     }
 
