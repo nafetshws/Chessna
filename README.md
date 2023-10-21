@@ -1,5 +1,5 @@
-# Chess engine
-This is a simple chess engine that is decent.
+# Chessna 
+Chessna is a simple chess engine that is designed to beat most human players.
 
 ## Features
 #### Move Generation:
@@ -8,7 +8,7 @@ This is a simple chess engine that is decent.
 - Iterative deepening in combination with Alpha-Beta Search
 - Quiescence Search
 - Transposition Table
-- Move ordering (MVV-LVA, Promotions, Castleing, best move from last iteration)
+- Move ordering (MVV-LVA, Killer moves, Promotions, Castleing, best move from last iteration)
 #### Evaluation:
 - material difference
 - position score (slightly different for endgame)
