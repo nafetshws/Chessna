@@ -40,7 +40,7 @@ void GameInterface::play(Color playerColor) {
             std::cout << "Your move: ";
             std::cin >> moveNotation;
             //make player move
-            if(this->moveIsLegal(moveNotation, playerColor)) {
+            if(this->moveIsLegal(moveNotation)) {
                 this->playMove(moveNotation);
             } else {
                 std::cout << "\nError: Invalid move. Try again!\n" << std::endl;
@@ -67,7 +67,7 @@ Move GameInterface::getBestEngineMove() {
     //float time = 30;
     search.iterativeDeepening(maxTime);
     this->lastMinDepth = search.minDepth;
-    std::cout << "score : " << search.bestScore << " ";
+    //std::cout << "score : " << search.bestScore << " ";
     Move engineMove = search.bestMove;
     return engineMove;
 }
@@ -101,9 +101,9 @@ GameStatus GameInterface::getGameStatus() {
    return ACTIVE; 
 }
 
-bool GameInterface::moveIsLegal(std::string moveNotation, Color playerColor) {
+bool GameInterface::moveIsLegal(std::string moveNotation) {
     MoveGeneration mg;
-    std::vector<Move> moves = mg.generateMoves(this->board, playerColor);
+    std::vector<Move> moves = mg.generateMoves(this->board, this->board.sideToMove);
     bool moveIsLegal = false;
 
     for(Move move : moves) {
@@ -167,4 +167,6 @@ void GameInterface::playMove(std::string moveNotation) {
     Move move(origin, destination, piece.type, this->board.sideToMove, moveType);
 
     this->board.makeMove(move);
+    //std::cout << "*****Made move*******" << std::endl;
+    //this->board.prettyPrintBoard();
 }

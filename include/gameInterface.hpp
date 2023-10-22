@@ -17,7 +17,7 @@ class GameInterface {
         Move getBestEngineMove();
         void playMove(std::string moveNotation);
         void play(Color playerColor);
-        bool moveIsLegal(std::string moveNotation, Color playerColor); 
+        bool moveIsLegal(std::string moveNotation); 
         GameStatus getGameStatus(); 
     
     private:
