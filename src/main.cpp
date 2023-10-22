@@ -92,12 +92,7 @@ std::vector<std::string> readCin() {
     return args;
 }
 
-
-
-int main(int argc, char *argv[]){
-    Zobrist::init();
-    TranspositionTable::init(1000);
-
+void runUCI() {
     UCI uci;
 
     std::string command = "";
@@ -107,7 +102,15 @@ int main(int argc, char *argv[]){
         command = args.at(0);;
         uci.processCommand(args);
     }
+}
 
+
+
+int main(int argc, char *argv[]){
+    Zobrist::init();
+    TranspositionTable::init(1000);
+
+    runUCI();
 
     //std::string fen; 
     //int depth; 

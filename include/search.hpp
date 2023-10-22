@@ -30,6 +30,8 @@ class Search {
         u64 startTime;
         float maxSearchTime;
         
+        bool isTimeLimit;
+
         int minDepth;
         u64 visitedNodes;
 

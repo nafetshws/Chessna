@@ -25,6 +25,7 @@ Search::Search(Board board) {
     this->startTime = 0;
     this->maxSearchTime = 0;
     this->minDepth = 0;
+    this->isTimeLimit = false;
 }
 
 void Search::iterativeDeepening(float timeInS) {
@@ -32,9 +33,12 @@ void Search::iterativeDeepening(float timeInS) {
     this->startTime = getCurrentTime();
     this->maxSearchTime = timeInS;
     this->minDepth = 0;
+    this->isTimeLimit = true;
 
     for(int currentSearchDepth = 1; currentSearchDepth < 200; currentSearchDepth++) {
         checkTimeLimit();
+
+        if(!this->isTimeLimit && currentSearchDepth) this->cancelSearch();
 
         if(this->getSearchIsCancelled()) break;
 
@@ -224,5 +228,5 @@ bool Search::getSearchIsCancelled() {
 }
 
 void Search::checkTimeLimit() {
-    if(getTimeDifference(this-> startTime, getCurrentTime()) >= this->maxSearchTime) this->cancelSearch(); 
+    if(this->isTimeLimit && getTimeDifference(this-> startTime, getCurrentTime()) >= this->maxSearchTime) this->cancelSearch(); 
 }

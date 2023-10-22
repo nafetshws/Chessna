@@ -27,8 +27,8 @@ void UCI::processCommand(std::vector<std::string> args) {
         //stop programm
         exit(-1);
     } else if(command == "ucinewgame") {
-        Zobrist::init();
-        TranspositionTable::init(1024);
+        //Zobrist::init();
+        //TranspositionTable::init(1024);
     }
 }
 
@@ -106,13 +106,43 @@ void UCI::setUpBoard(std::vector<std::string> args) {
             }
         }
     }
-
-    //this->gameInterface.board.prettyPrintBoard();
 }
 
 void UCI::searchBoard(std::vector<std::string> args) {
     //TODO::time management
-    GameInterface::maxTime = 3;
+    //GameInterface::maxTime = 3;
+    
+    float maxTimeForMove = 0.1f; 
+
+    //check if movetime parameter was set
+    if(std::find(args.begin(), args.end(), "movetime") != args.end()) {
+        unsigned int moveTime = std::stoi(args.at(2)); 
+        //take 90% of movetime to make move
+        maxTimeForMove = (moveTime / 1000) * 0.9f;
+    } else if(std::find(args.begin(), args.end(), "wtime") != args.end()) {
+        float wtime = std::stoi(args.at(2)) / 1000;
+        float btime = std::stoi(args.at(4)) / 1000;
+
+        float engineMovetime = (this->gameInterface.board.sideToMove == WHITE) ? wtime : btime;  
+        maxTimeForMove = engineMovetime / 35;
+
+        //take increment into account
+        if(std::find(args.begin(), args.end(), "winc") != args.end()) {
+            float winc = std::stoi(args.at(6)) / 1000;
+            float binc = std::stoi(args.at(8)) / 1000;
+
+            float engineIncrement = (this->gameInterface.board.sideToMove == WHITE) ? winc : binc; 
+
+            if(maxTimeForMove + (engineIncrement/2) < engineMovetime) {
+                maxTimeForMove += (engineIncrement / 2);
+            } else {
+                maxTimeForMove = engineMovetime * 0.8;
+            }
+        }
+    }
+
+    GameInterface::maxTime = maxTimeForMove;
+
     Move bestMove = this->gameInterface.getBestEngineMove();
 
     //print best move 

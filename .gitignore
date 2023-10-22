@@ -2,6 +2,7 @@
 *.swp*
 *.obj
 *.lib
+.DS_Store
 build/
 .vscode/
 test.txt

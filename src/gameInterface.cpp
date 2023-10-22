@@ -64,10 +64,8 @@ void GameInterface::play(Color playerColor) {
 
 Move GameInterface::getBestEngineMove() {
     Search search(this->board);
-    //float time = 30;
     search.iterativeDeepening(maxTime);
     this->lastMinDepth = search.minDepth;
-    //std::cout << "score : " << search.bestScore << " ";
     Move engineMove = search.bestMove;
     return engineMove;
 }
