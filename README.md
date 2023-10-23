@@ -8,7 +8,7 @@ Chessna is a simple chess engine that is designed to beat most human players.
 - Iterative deepening in combination with Alpha-Beta Search
 - Quiescence Search
 - Transposition Table
-- Move ordering (MVV-LVA, Killer moves, Promotions, Castleing, best move from last iteration)
+- Move ordering (MVV-LVA, Killer moves, Promotions, Castling, best move from last iteration)
 #### Evaluation:
 - material difference
 - position score (slightly different for endgame)
