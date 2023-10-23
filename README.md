@@ -13,6 +13,8 @@ Chessna is a simple chess engine that is designed to beat most human players.
 - material difference
 - position score (slightly different for endgame)
 - Mop-up evaluation 
+#### Other:
+- UCI (Universal chess interface): needed to communicate with lichess 
 
 ## Features to implement in the future:
 - LAZY SMP: multithreading
@@ -21,6 +23,5 @@ Chessna is a simple chess engine that is designed to beat most human players.
 - Opening Book
 - better evaluation (king safety, mobility, pawn structure, ...)
 - improve move generation (use array instead of vector, magic bitboards etc.)
-- UCI (Universal chess interface): create lichess bot account
 - Late Move Reduction
 
