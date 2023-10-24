@@ -29,6 +29,7 @@ class Search {
         bool searchIsCancelled;
         u64 startTime;
         float maxSearchTime;
+        int maxDepth;
         
         bool isTimeLimit;
 
@@ -37,7 +38,8 @@ class Search {
 
         Search(Board board);
 
-        void iterativeDeepening(float timeInS);
+        void startIterativeDeepening(int depth);
+        void startIterativeDeepening(float timeInS);
 
         int alphaBeta(int alpha, int beta, int depth, int depthFromRoot);
         int quiescenceSearch(int alpha, int beta, int depthFromRoot);
@@ -46,6 +48,9 @@ class Search {
         void cancelSearch();
         bool getSearchIsCancelled();
         void checkTimeLimit();
+
+    private:
+        void iterativeDeepening();
 
 };
 

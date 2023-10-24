@@ -58,7 +58,7 @@ void runIterativeDeepening(std::string fen, float timeInS) {
     Search search(board);
 
     u64 before = getCurrentTime();
-    search.iterativeDeepening(timeInS);
+    search.startIterativeDeepening(timeInS);
     u64 after = getCurrentTime();
 
     float dt = getTimeDifference(before, after);
@@ -108,36 +108,36 @@ void runUCI() {
 
 int main(int argc, char *argv[]){
     Zobrist::init();
-    TranspositionTable::init(1000);
+    TranspositionTable::init();
 
-    //runUCI();
+    runUCI();
 
-    std::string fen; 
-    int depth; 
+    //std::string fen; 
+    //int secondArg; 
 
-    if(argc == 3) {
-        std::string input = argv[1];
-        if(input.compare("default") == 0) {
-            fen = DEFAULT_FEN;
-        } else if(input.compare("middle") == 0) {
-            fen = "r3k2r/pppq1pp1/2np1n1p/2b1p1B1/2B1P1b1/2NP1N1P/PPPQ1PP1/R3K2R w KQkq - 0 1";
-        } else {
-            fen = argv[1];
-        }
-        depth = std::stoi(argv[2]);
-    } else {
-        depth = 10;
-        //fen = "rnb1kbnr/p1qppppp/1pp5/8/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 0 1"; 
-        fen = "6k1/5p2/6p1/8/7p/8/6PP/6K1 b - - 0 1";
-    }
+    //if(argc == 3) {
+    //    std::string input = argv[1];
+    //    if(input.compare("default") == 0) {
+    //        fen = DEFAULT_FEN;
+    //    } else if(input.compare("middle") == 0) {
+    //        fen = "r3k2r/pppq1pp1/2np1n1p/2b1p1B1/2B1P1b1/2NP1N1P/PPPQ1PP1/R3K2R w KQkq - 0 1";
+    //    } else {
+    //        fen = argv[1];
+    //    }
+    //    secondArg = std::stoi(argv[2]);
+    //} else {
+    //    secondArg = 10;
+    //    //fen = "rnb1kbnr/p1qppppp/1pp5/8/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 0 1"; 
+    //    fen = "6k1/5p2/6p1/8/7p/8/6PP/6K1 b - - 0 1";
+    //}
 
     //runMoveGeneration(fen, depth);
-    runSearch(fen, depth);
+    //runSearch(fen, depth);
 
     //playAgainstEngine();
 
-    //depth = time in seconds
-    //runIterativeDeepening(fen, depth);
+    //secondArg = time in seconds
+    //runIterativeDeepening(fen, secondArg);
     //runIterativeDeepening("r1bqkb1r/pppppppp/2n2n2/8/4P3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq - 4 3", 5);
 
     //Board board("rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1");

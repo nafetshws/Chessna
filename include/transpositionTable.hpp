@@ -31,7 +31,7 @@ class TranspositionTable {
         static long numberOfCurrentEntries;
         static long numberOfMaxEntries; 
 
-        static void init(int sizeMB);
+        static void init();
 
         static int getTtEvaluation(u64 zobristKey, int depth, int alpha, int beta, int depthFromRoot);
         static void storeTtEvaluation(u64 zobristKey, int depth, int eval, EvalFlag flag, Move move, int depthFromRoot);

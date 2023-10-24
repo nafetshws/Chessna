@@ -64,7 +64,15 @@ void GameInterface::play(Color playerColor) {
 
 Move GameInterface::getBestEngineMove() {
     Search search(this->board);
-    search.iterativeDeepening(maxTime);
+    search.startIterativeDeepening(maxTime);
+    this->lastMinDepth = search.minDepth;
+    Move engineMove = search.bestMove;
+    return engineMove;
+}
+
+Move GameInterface::getBestEngineMoveForDepth(int depth) {
+    Search search(this->board);
+    search.startIterativeDeepening(depth);
     this->lastMinDepth = search.minDepth;
     Move engineMove = search.bestMove;
     return engineMove;

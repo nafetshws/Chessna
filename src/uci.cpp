@@ -24,6 +24,7 @@ void UCI::processCommand(std::vector<std::string> args) {
         this->searchBoard(args);
     } else if(command == "stop") {
         //need to implement thread
+        std::cout << "recieved stop" << std::endl;
     } else if(command == "quit") {
         //stop programm
         exit(-1);
@@ -140,6 +141,14 @@ void UCI::searchBoard(std::vector<std::string> args) {
                 maxTimeForMove = engineMovetime * 0.8;
             }
         }
+    } else if(std::find(args.begin(), args.end(), "depth") != args.end()) {
+        int depth = std::stoi(args.at(2));
+
+        Move bestMove = this->gameInterface.getBestEngineMoveForDepth(depth);
+
+        //print best move 
+        std::cout << "bestmove " << printableMove(bestMove) << std::endl;
+        return; 
     }
 
     GameInterface::maxTime = maxTimeForMove;
