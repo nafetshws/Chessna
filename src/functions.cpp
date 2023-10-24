@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <chrono>
+#include <bitset>
 #include "../include/functions.hpp"
 #include "../include/types.hpp"
 #include "../include/evaluation.hpp"
@@ -187,5 +188,5 @@ float getTimeDifference(u64 before, u64 after) {
 }
 
 int popcount(Bitboard bitboard) {
-    return std::__libcpp_popcount(bitboard);
+    return std::bitset<64>(bitboard).count();
 }

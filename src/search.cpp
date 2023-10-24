@@ -107,7 +107,6 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
         return ttEval;
     }
 
-
     if(depth == 0) {
         this->visitedNodes++;
         return this->quiescenceSearch(alpha, beta, depthFromRoot+1);

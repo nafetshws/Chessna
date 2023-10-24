@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "../include/functions.hpp"
 #include "../include/zobrist.hpp"
 #include "../include/transpositionTable.hpp"

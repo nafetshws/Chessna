@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "../include/board.hpp"
 #include "../include/types.hpp"
 #include "../include/functions.hpp"
@@ -499,6 +500,7 @@ void Board::makeMove(Move move) {
         this->removeQueenSideCastleAbillity(move.color);
     }
 
+
     //switch side to move
     this->sideToMove = getOppositeColor(this->sideToMove);
     //set half move counter
@@ -573,12 +575,12 @@ void Board::castleQueenSide(Color color) {
 
 void Board::removeKingSideCastleAbillity(Color color) {
     char charToremove = (color == WHITE) ? 'K' : 'k';
-    this->castlingAbillity.erase(std::remove(this->castlingAbillity.begin(), this->castlingAbillity.end(), charToremove));
+    this->castlingAbillity.erase(std::remove(this->castlingAbillity.begin(), this->castlingAbillity.end(), charToremove), this->castlingAbillity.end());
 }
 
 void Board::removeQueenSideCastleAbillity(Color color) {
     char charToremove = (color == WHITE) ? 'Q' : 'q';
-    this->castlingAbillity.erase(std::remove(this->castlingAbillity.begin(), this->castlingAbillity.end(), charToremove));
+    this->castlingAbillity.erase(std::remove(this->castlingAbillity.begin(), this->castlingAbillity.end(), charToremove), this->castlingAbillity.end());
 }
 
 

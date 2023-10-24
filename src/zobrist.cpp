@@ -23,7 +23,7 @@ void Zobrist::init() {
     }
 
     //generate castling rights
-    for(int i = 0; i < 16; i++) {
+    for(int i = 0; i < 4; i++) {
         castlingRights[i] = generateRandom64BitNumber();
     }
 

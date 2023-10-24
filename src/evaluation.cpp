@@ -3,6 +3,7 @@
 #include "../include/functions.hpp"
 #include <iostream>
 #include <cmath>
+#include <bitset>
 
 Evaluation::Evaluation() {
     this->perspective = 0;
@@ -115,5 +116,5 @@ int Evaluation::lookupCMD(int square) {
 }
 
 int Evaluation::popcount(Bitboard bitboard) {
-    return std::__libcpp_popcount(bitboard);
+    return std::bitset<64>(bitboard).count();
 }
