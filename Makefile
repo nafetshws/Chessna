@@ -3,9 +3,9 @@ CC = g++
 TEST_FILES = test/test.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/search.cpp src/evaluation.cpp src/gameInterface.cpp src/moveOrder.cpp src/transpositionTable.cpp src/zobrist.cpp src/uci.cpp
 FILES = src/main.cpp src/board.cpp src/moveGeneration.cpp src/functions.cpp src/search.cpp src/evaluation.cpp src/gameInterface.cpp src/moveOrder.cpp src/transpositionTable.cpp src/zobrist.cpp src/uci.cpp
 
-TEST_OUT = build/test.obj
-OUT = build/main.obj
-DEBUG_OUT = build/debug.obj
+TEST_OUT = build/test
+OUT = build/chessna
+DEBUG_OUT = build/debug
 
 CC_FLAGS = -std=c++11 -O3
 
