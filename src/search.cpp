@@ -26,13 +26,16 @@ Search::Search(Board board) {
     this->maxSearchTime = 0;
     this->minDepth = 0;
     this->isTimeLimit = false;
+    this->isDebugMode = true;
 }
 
 void Search::startIterativeDeepening(int depth) {
     this->searchIsCancelled = false;
     this->minDepth = 0;
+    this->visitedNodes = 0;
     this->maxDepth = depth;
     this->isTimeLimit = false;
+    this->isDebugMode = true;
 
     this->iterativeDeepening();
 }
@@ -42,7 +45,9 @@ void Search::startIterativeDeepening(float timeInS) {
     this->startTime = getCurrentTime();
     this->maxSearchTime = timeInS;
     this->minDepth = 0;
+    this->visitedNodes = 0;
     this->isTimeLimit = true;
+    this->isDebugMode = true;
 
     this->iterativeDeepening();
 }
@@ -50,6 +55,10 @@ void Search::startIterativeDeepening(float timeInS) {
 void Search::iterativeDeepening() {
     for(int currentSearchDepth = 1; currentSearchDepth < 200; currentSearchDepth++) {
         checkTimeLimit();
+
+        //necessary for debug info
+        this->visitedNodes = 0;
+        this->iterationStartTime = getCurrentTime();
 
         //time in s can be interpreted as depth
         if(!this->isTimeLimit && (currentSearchDepth > this->maxDepth)) this->cancelSearch();
@@ -70,34 +79,9 @@ void Search::iterativeDeepening() {
             this->prevBestScore = this->bestScoreThisIteration;
             this->minDepth++;
         }
+        //send info
+        if(this->isDebugMode) this->sendDebugInfo();
     }
-}
-
-int Search::negaMax(int depth, int depthFromRoot) {
-    if(depth == 0) {
-        this->visitedNodes++;
-        return this->evaluation.evaluatePosition(this->board);
-    }
-
-    std::vector<Move> moves = moveGeneration.generateMoves(this->board, this->board.sideToMove, false);
-
-    int maxScore = negativeInfinity;
-
-    for(int i = 0; i < moves.size(); i++) {
-        Board copyBoard = this->board;
-        this->board.makeMove(moves.at(i));
-        int score = -this->negaMax(depth-1, depthFromRoot+1);
-        this->board = copyBoard;
-
-        if(score > maxScore) {
-            maxScore = score;
-
-            if(depthFromRoot == 0) {
-                this->bestMove = moves.at(i);
-            }
-        }
-    }
-    return maxScore;
 }
 
 int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
@@ -242,4 +226,10 @@ bool Search::getSearchIsCancelled() {
 
 void Search::checkTimeLimit() {
     if(this->isTimeLimit && getTimeDifference(this-> startTime, getCurrentTime()) >= this->maxSearchTime) this->cancelSearch(); 
+}
+
+
+void Search::sendDebugInfo() {
+    int nps = this->visitedNodes / getTimeDifference(this->iterationStartTime, getCurrentTime()); 
+    std::cout << "info depth " << this->minDepth << " score cp " << this->bestScoreThisIteration << " nodes " << this->visitedNodes << " nps " <<nps << " pv " << printableMove(this->bestMoveThisIteration) << std::endl;
 }

@@ -28,10 +28,12 @@ class Search {
 
         bool searchIsCancelled;
         u64 startTime;
+        u64 iterationStartTime;
         float maxSearchTime;
         int maxDepth;
         
         bool isTimeLimit;
+        bool isDebugMode;
 
         int minDepth;
         u64 visitedNodes;
@@ -51,6 +53,7 @@ class Search {
 
     private:
         void iterativeDeepening();
+        void sendDebugInfo();
 
 };
 
