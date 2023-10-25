@@ -144,7 +144,22 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
         Board copyBoard = this->board;
 
         this->board.makeMove(moves.at(i)); 
-        int score = -this->alphaBeta(-beta, -alpha, depth-1, depthFromRoot + 1);
+
+        int score = 0;
+        bool fullSearch = true;
+
+        /*
+        LMR (Late Move Reductions)
+        Assuming move ordering does a fine job, later moves in the vector will probably be worse
+        and therefore not be worth searching them to the same depth. Though if the search with a lower
+        depth returns an unexpectedly high eval, another full search is done. 
+        */
+        if(i >= 3 && depth >= 3 && moves.at(i).moveType != CAPTURE) {
+            score = -this->alphaBeta(-alpha-1, -alpha, depth-2, depthFromRoot + 1);
+            if(score <= alpha) fullSearch = false; 
+        }
+
+        if(fullSearch) score = -this->alphaBeta(-beta, -alpha, depth-1, depthFromRoot + 1);
         this->board = copyBoard;
 
         if(this->getSearchIsCancelled()) {
