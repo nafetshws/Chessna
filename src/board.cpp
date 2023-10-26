@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include <algorithm>
 #include "../include/board.hpp"
 #include "../include/types.hpp"
@@ -509,6 +510,9 @@ void Board::makeMove(Move move) {
     else halfMoveClock++;
     //set full move counter
     if(move.color == BLACK) fullMoveCounter++;
+
+    //add occurence of position
+    this->incrementPositionOccurence(this->zobristKey);
 }
 
 Piece Board::findPiece(Square s) {
@@ -806,4 +810,13 @@ void Board::updateZobristEnPassent(Square prevEnPassentSquare) {
 void Board::updateZobristSideToMove() {
     //update side to move
     this->zobristKey ^= Zobrist::sideToMove;
+}
+
+
+bool Board::checkFor3FoldRepetition(u64 zobristKey) {
+    if(this->repetitionTable[zobristKey] >= 3) return true;
+    return false;
+}
+void Board::incrementPositionOccurence(u64 zobristKey) {
+    this->repetitionTable[zobristKey] = this->repetitionTable[zobristKey]+1; 
 }
