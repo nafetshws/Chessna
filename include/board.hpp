@@ -19,7 +19,6 @@ struct Board {
     int fullMoveCounter;
 
     u64 zobristKey;
-    std::map<u64, unsigned char> repetitionTable;
 
     Board(const std::string &fen);
     Board();
@@ -67,10 +66,6 @@ struct Board {
     void updateZobristEnPassent(Square prevEnPassentSquare); 
     void updateZobristSideToMove();
     void updateZobristPromotion(Move move);
-
-    bool checkFor3FoldRepetition(u64 zobristKey);
-    void incrementPositionOccurence(u64 zobristKey);
-
 };
 
 

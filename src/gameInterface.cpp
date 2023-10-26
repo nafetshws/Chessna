@@ -6,6 +6,7 @@
 #include "../include/search.hpp"
 #include "../include/functions.hpp"
 #include "../include/evaluation.hpp"
+#include "../include/repetitionTable.hpp"
 
 float GameInterface::maxTime;
 
@@ -165,14 +166,11 @@ void GameInterface::playMove(std::string moveNotation) {
         else if(piece.type == PAWN && std::abs(destination - origin) != 8) moveType = EN_PASSENT_CAPTURE;
         else moveType = QUIET;
     }
-    
-    //check if move is legal
-
-
 
     Move move(origin, destination, piece.type, this->board.sideToMove, moveType);
 
     this->board.makeMove(move);
-    //std::cout << "*****Made move*******" << std::endl;
-    //this->board.prettyPrintBoard();
+    
+    //add position to repetition table
+    RepetitionTable::incrementPositionOccurence(this->board.zobristKey);
 }

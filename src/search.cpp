@@ -6,7 +6,8 @@
 #include "../include/evaluation.hpp"
 #include "../include/functions.hpp"
 #include "../include/transpositionTable.hpp"
-#include "../include/transpositionTable.hpp"
+#include "../include/repetitionTable.hpp"
+
 
 Search::Search(Board board) {
     this->board = board;
@@ -94,8 +95,9 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
     EvalFlag eFlag = HASH_ALPHA;
     //draw by 50 move rule
     if(this->board.halfMoveClock >= 100) return 0;
+
     //check for 3-fold repetition
-    if(this->board.checkFor3FoldRepetition(this->board.zobristKey)) return 0;
+    if(depthFromRoot > 0 && RepetitionTable::checkForDrawByRepetition(this->board.zobristKey)) return 0;
 
     //check if position was already evaluated and return according evaluation
     int ttEval = TranspositionTable::getTtEvaluation(this->board.zobristKey, depth, alpha, beta, depthFromRoot);

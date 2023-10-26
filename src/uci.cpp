@@ -7,6 +7,7 @@
 #include "../include/functions.hpp"
 #include "../include/zobrist.hpp"
 #include "../include/transpositionTable.hpp"
+#include "../include/repetitionTable.hpp"
 
 void UCI::processCommand(std::vector<std::string> args) {
     //std::vector<std::string> args = this->convertInputToArgs(input);
@@ -80,8 +81,12 @@ void UCI::setOption(std::vector<std::string> args) {
 }
 
 void UCI::setUpBoard(std::vector<std::string> args) {
+    //clear repetition table
+    RepetitionTable::init();
+
     if(args.at(1) == "startpos") {
         this->gameInterface = GameInterface(DEFAULT_FEN);
+        RepetitionTable::incrementPositionOccurence(this->gameInterface.board.zobristKey);
 
         //play moves
         if(args.size() >= 4 && args.at(2) == "moves") {
@@ -100,6 +105,7 @@ void UCI::setUpBoard(std::vector<std::string> args) {
             }
         }
         this->gameInterface = GameInterface(fen);
+        RepetitionTable::incrementPositionOccurence(this->gameInterface.board.zobristKey);
 
         //play moves
         if(args.size() >= 9 && args.at(7) == "moves") {

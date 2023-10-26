@@ -15,6 +15,7 @@
 #include "../include/transpositionTable.hpp"
 #include "../include/zobrist.hpp"
 #include "../include/uci.hpp"
+#include "../include/repetitionTable.hpp"
 
 void runMoveGeneration(std::string fen, int depth) {
     Board board(fen);
@@ -109,6 +110,7 @@ void runUCI() {
 int main(int argc, char *argv[]){
     Zobrist::init();
     TranspositionTable::init();
+    RepetitionTable::init();
 
     runUCI();
 
