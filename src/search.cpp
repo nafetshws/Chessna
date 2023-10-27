@@ -122,7 +122,9 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot, bool al
         possibleBestMove = TranspositionTable::fetchEntry(this->board.zobristKey)->move; 
     }
 
-    std::vector<Move> moves = moveGeneration.generateMoves(this->board, this->board.sideToMove, false);
+    bool isInCheck = false;
+
+    std::vector<Move> moves = moveGeneration.generateMoves(this->board, isInCheck, this->board.sideToMove, false);
     moveOrder.orderMoves(this->board, moves, possibleBestMove, depthFromRoot);
 
     if(moves.size() == 0) {
@@ -141,7 +143,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot, bool al
 
     //NOTE: missing condition for pv
     int R = 2;
-    if(allowNullMove && !isPV && !this->board.isInCheck && depth > 2) {
+    if(allowNullMove && !isPV && !isInCheck && depth > 2) {
         Board copyBoard = this->board;
         this->board.makeNullMove();
         //search with a reduced depth and a smaller window (only check whether opponent can catch up)
@@ -225,7 +227,9 @@ int Search::quiescenceSearch(int alpha, int beta, int depthFromRoot) {
         alpha = eval;
     }
 
-    std::vector<Move> captures = this->moveGeneration.generateMoves(this->board, this->board.sideToMove, true);
+    bool isInCheck = false;
+
+    std::vector<Move> captures = this->moveGeneration.generateMoves(this->board, isInCheck,this->board.sideToMove, true);
     moveOrder.orderMoves(this->board, captures, EMPTY_MOVE, depthFromRoot); 
 
     for(int i = 0; i < captures.size(); i++) {

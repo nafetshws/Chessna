@@ -81,7 +81,8 @@ Move GameInterface::getBestEngineMoveForDepth(int depth) {
 
 GameStatus GameInterface::getGameStatus() {
     MoveGeneration mg;
-    std::vector<Move> moves = mg.generateMoves(this->board, this->board.sideToMove);
+    bool isInCheck = false;
+    std::vector<Move> moves = mg.generateMoves(this->board, isInCheck, this->board.sideToMove);
 
     //check for draw / stalemate
     if(moves.size() == 0) {
@@ -110,7 +111,8 @@ GameStatus GameInterface::getGameStatus() {
 
 bool GameInterface::moveIsLegal(std::string moveNotation) {
     MoveGeneration mg;
-    std::vector<Move> moves = mg.generateMoves(this->board, this->board.sideToMove);
+    bool isInCheck = false;
+    std::vector<Move> moves = mg.generateMoves(this->board, isInCheck, this->board.sideToMove);
     bool moveIsLegal = false;
 
     for(Move move : moves) {

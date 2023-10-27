@@ -186,6 +186,7 @@ void UCI::makeMoveOnBoard(std::string move) {
     if(this->gameInterface.moveIsLegal(move)) {
         this->gameInterface.playMove(move);
     } else {
+        this->gameInterface.board.prettyPrintBoard();
         std::cout << "Error: Invalid move (" << move << ")" << std::endl;
     }
 }
