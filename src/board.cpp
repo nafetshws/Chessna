@@ -181,6 +181,12 @@ void Board::initBoard(const std::string &fen){
 
     //generate zobrist key
     this->zobristKey = Zobrist::createZobristKey(*this);
+    this->isInCheck = false;
+}
+
+void Board::makeNullMove() {
+    this->sideToMove = getOppositeColor(this->sideToMove);
+    this->updateZobristSideToMove();
 }
 
 void Board::makeMove(Move move) {

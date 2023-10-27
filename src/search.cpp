@@ -66,7 +66,7 @@ void Search::iterativeDeepening() {
 
         if(this->getSearchIsCancelled()) break;
 
-        int eval = alphaBeta(negativeInfinity, positiveInfinity, currentSearchDepth, 0);
+        int eval = alphaBeta(negativeInfinity, positiveInfinity, currentSearchDepth, 0, true, true);
         
         if(this->getSearchIsCancelled()) {
             this->bestMove = bestMoveThisIteration;
@@ -85,7 +85,7 @@ void Search::iterativeDeepening() {
     }
 }
 
-int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
+int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot, bool allowNullMove, bool isPV) {
     checkTimeLimit();
 
     if(this->getSearchIsCancelled()) {
@@ -139,6 +139,18 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
 
     Move bestMoveInPos = Move(); //creates NULL move
 
+    //NOTE: missing condition for pv
+    int R = 2;
+    if(allowNullMove && !isPV && !this->board.isInCheck && depth > 2) {
+        Board copyBoard = this->board;
+        this->board.makeNullMove();
+        //search with a reduced depth and a smaller window (only check whether opponent can catch up)
+        int score = -this->alphaBeta(-beta, -beta+1, depth - 1 - R, depthFromRoot + 1, false, isPV);
+        this->board = copyBoard;
+
+        if(score >= beta) return score;
+    }
+
     for(int i = 0; i < moves.size(); i++) {
         //copy board to undo move
         Board copyBoard = this->board;
@@ -155,11 +167,11 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
         depth returns an unexpectedly high eval, another full search is done. 
         */
         if(i >= 3 && depth >= 3 && moves.at(i).moveType != CAPTURE) {
-            score = -this->alphaBeta(-alpha-1, -alpha, depth-2, depthFromRoot + 1);
+            score = -this->alphaBeta(-alpha-1, -alpha, depth-2, depthFromRoot + 1, false, isPV);
             if(score <= alpha) fullSearch = false; 
         }
 
-        if(fullSearch) score = -this->alphaBeta(-beta, -alpha, depth-1, depthFromRoot + 1);
+        if(fullSearch) score = -this->alphaBeta(-beta, -alpha, depth-1, depthFromRoot + 1, true, (isPV && i==0));
         this->board = copyBoard;
 
         if(this->getSearchIsCancelled()) {

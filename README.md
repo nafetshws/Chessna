@@ -9,6 +9,7 @@ Chessna is a simple chess engine that is designed to beat most human players.
 - Quiescence Search
 - Transposition Table
 - Move ordering (MVV-LVA, Killer moves, Promotions, Castling, best move from last iteration)
+- Late Move Reduction
 #### Evaluation:
 - material difference
 - position score (slightly different for endgame)
@@ -62,5 +63,4 @@ You can also use a GUI to run Chessna. So far I've only tested that it works wit
 - Opening Book
 - better evaluation (king safety, mobility, pawn structure, ...)
 - improve move generation (use array instead of vector, magic bitboards etc.)
-- Late Move Reduction
-
+- pondering

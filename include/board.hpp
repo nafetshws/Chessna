@@ -19,6 +19,7 @@ struct Board {
     int fullMoveCounter;
 
     u64 zobristKey;
+    bool isInCheck;
 
     Board(const std::string &fen);
     Board();
@@ -27,6 +28,7 @@ struct Board {
     Piece findPiece(Square s);
 
     void makeMove(Move move);
+    void makeNullMove();
 
     Bitboard getOccupied();
     Bitboard getOccupiedByWhite();
