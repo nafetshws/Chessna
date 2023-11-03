@@ -191,7 +191,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
         }
     }
 
-    TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, alpha, eFlag, bestMoveInPos, depthFromRoot);
+    if(printableMove(bestMoveInPos) != "errorerror") TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, alpha, eFlag, bestMoveInPos, depthFromRoot);
     return alpha;
 }
 
