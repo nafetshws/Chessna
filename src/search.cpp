@@ -169,7 +169,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot, bool al
         depth returns an unexpectedly high eval, another full search is done. 
         */
         if(i >= 3 && depth >= 3 && moves.at(i).moveType != CAPTURE) {
-            score = -this->alphaBeta(-alpha-1, -alpha, depth-2, depthFromRoot + 1, false, isPV);
+            score = -this->alphaBeta(-alpha-1, -alpha, depth-2, depthFromRoot + 1, true, isPV);
             if(score <= alpha) fullSearch = false; 
         }
 
@@ -205,7 +205,7 @@ int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot, bool al
         }
     }
 
-    TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, alpha, eFlag, bestMoveInPos, depthFromRoot);
+    if(printableMove(bestMoveInPos) != "errorerror") TranspositionTable::storeTtEvaluation(this->board.zobristKey, depth, alpha, eFlag, bestMoveInPos, depthFromRoot);
     return alpha;
 }
 
