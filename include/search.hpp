@@ -39,6 +39,7 @@ class Search {
         u64 visitedNodes;
 
         Search(Board board);
+        Search();
 
         void startIterativeDeepening(int depth);
         void startIterativeDeepening(float timeInS);

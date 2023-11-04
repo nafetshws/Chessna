@@ -7,7 +7,7 @@ TEST_OUT = build/test
 OUT = build/chessna
 DEBUG_OUT = build/debug
 
-CC_FLAGS = -std=c++11 -O3
+CC_FLAGS = -std=c++11 -O3 -pthread
 
 BUILD_DIR = ./build
 

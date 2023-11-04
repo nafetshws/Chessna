@@ -25,7 +25,7 @@ void UCI::processCommand(std::vector<std::string> args) {
         this->searchBoard(args);
     } else if(command == "stop") {
         //need to implement thread
-        std::cout << "recieved stop" << std::endl;
+        //std::cout << "recieved stop" << std::endl;
     } else if(command == "quit") {
         //stop programm
         exit(-1);

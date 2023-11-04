@@ -30,6 +30,27 @@ Search::Search(Board board) {
     this->isDebugMode = true;
 }
 
+Search::Search() {
+    this->board = Board(DEFAULT_FEN);
+    this->bestMove = Move(); 
+    this->bestMoveThisIteration = Move(); 
+    this->prevBestMove = Move(); 
+    this->bestScore = 0;
+    this->bestScoreThisIteration = 0;
+    this->prevBestScore = 0;
+    this->moveGeneration = MoveGeneration(this->board);
+    this->evaluation = Evaluation();
+    this->moveOrder = MoveOrder();
+    this->sideToMove = WHITE;
+    this->visitedNodes = 0;
+    this->searchIsCancelled = false;
+    this->startTime = 0;
+    this->maxSearchTime = 0;
+    this->minDepth = 0;
+    this->isTimeLimit = false;
+    this->isDebugMode = true;
+}
+
 void Search::startIterativeDeepening(int depth) {
     this->searchIsCancelled = false;
     this->minDepth = 0;

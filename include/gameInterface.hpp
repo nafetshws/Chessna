@@ -8,6 +8,7 @@
 class GameInterface {
     public:
         Board board;
+        Search search;
         int lastMinDepth;
         static float maxTime;
 
@@ -20,6 +21,7 @@ class GameInterface {
         void play(Color playerColor);
         bool moveIsLegal(std::string moveNotation); 
         GameStatus getGameStatus(); 
+        void endSearch();
     
     private:
         bool isPlaying;

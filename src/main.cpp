@@ -4,6 +4,7 @@
 #include <chrono>
 #include <climits>
 #include <sstream>
+#include <thread>
 
 #include "../include/board.hpp"
 #include "../include/moveGeneration.hpp"
@@ -16,6 +17,8 @@
 #include "../include/zobrist.hpp"
 #include "../include/uci.hpp"
 #include "../include/repetitionTable.hpp"
+
+bool searchHasEnded = false;;
 
 void runMoveGeneration(std::string fen, int depth) {
     Board board(fen);
@@ -93,6 +96,20 @@ std::vector<std::string> readCin() {
     return args;
 }
 
+void listenForStopSearch(UCI *uci) {
+    while(!searchHasEnded) {
+        std::vector<std::string> input = readCin();
+        if(input.size() == 1 && input.at(0) == "stop") {
+            //stop search
+            uci->gameInterface.endSearch();
+            searchHasEnded = true;
+            return;
+        }
+        //sleep for 100ms
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
+
 void runUCI() {
     UCI uci;
 
@@ -101,7 +118,20 @@ void runUCI() {
     while(command != "quit") {
         std::vector<std::string> args = readCin();
         command = args.at(0);;
-        uci.processCommand(args);
+
+        //start thread to listen for stop
+        if(command == "go") {
+            searchHasEnded = false;
+            std::thread endSearchWorker(listenForStopSearch, &uci);
+
+            uci.processCommand(args);
+            searchHasEnded = true;
+
+            endSearchWorker.join();
+        } else {
+            uci.processCommand(args);
+        }
+        
     }
 }
 
@@ -113,39 +143,6 @@ int main(int argc, char *argv[]){
     RepetitionTable::init();
 
     runUCI();
-
-    //std::string fen; 
-    //int secondArg; 
-
-    //if(argc == 3) {
-    //    std::string input = argv[1];
-    //    if(input.compare("default") == 0) {
-    //        fen = DEFAULT_FEN;
-    //    } else if(input.compare("middle") == 0) {
-    //        fen = "r3k2r/pppq1pp1/2np1n1p/2b1p1B1/2B1P1b1/2NP1N1P/PPPQ1PP1/R3K2R w KQkq - 0 1";
-    //    } else {
-    //        fen = argv[1];
-    //    }
-    //    secondArg = std::stoi(argv[2]);
-    //} else {
-    //    secondArg = 10;
-    //    //fen = "rnb1kbnr/p1qppppp/1pp5/8/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 0 1"; 
-    //    fen = "6k1/5p2/6p1/8/7p/8/6PP/6K1 b - - 0 1";
-    //}
-
-    //runMoveGeneration(fen, depth);
-    //runSearch(fen, depth);
-
-    //playAgainstEngine();
-
-    //secondArg = time in seconds
-    //runIterativeDeepening(fen, secondArg);
-    //runIterativeDeepening("r1bqkb1r/pppppppp/2n2n2/8/4P3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq - 4 3", 5);
-
-    //Board board("rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq - 0 1");
-    //MoveGeneration mg(board);
-
-    //printMoves(mg.generateMoves(board, BLACK));
 
     return 0;
 }

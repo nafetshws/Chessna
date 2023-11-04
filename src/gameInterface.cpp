@@ -15,6 +15,7 @@ GameInterface::GameInterface() {
     this->isPlaying = false;
     this->lastMinDepth = 0;
     maxTime = 30;
+    this->search = Search(this->board);
 }
 
 GameInterface::GameInterface(std::string fen) {
@@ -22,6 +23,7 @@ GameInterface::GameInterface(std::string fen) {
     this->isPlaying = false;
     this->lastMinDepth = 0;
     maxTime = 30;
+    this->search = Search(this->board);
 }
 
 void GameInterface::play(Color playerColor) {
@@ -64,18 +66,18 @@ void GameInterface::play(Color playerColor) {
 }
 
 Move GameInterface::getBestEngineMove() {
-    Search search(this->board);
-    search.startIterativeDeepening(maxTime);
+    this->search = Search(this->board);
+    this->search.startIterativeDeepening(maxTime);
     this->lastMinDepth = search.minDepth;
-    Move engineMove = search.bestMove;
+    Move engineMove = this->search.bestMove;
     return engineMove;
 }
 
 Move GameInterface::getBestEngineMoveForDepth(int depth) {
-    Search search(this->board);
-    search.startIterativeDeepening(depth);
-    this->lastMinDepth = search.minDepth;
-    Move engineMove = search.bestMove;
+    this->search = Search(this->board);
+    this->search.startIterativeDeepening(depth);
+    this->lastMinDepth = this->search.minDepth;
+    Move engineMove = this->search.bestMove;
     return engineMove;
 }
 
@@ -173,4 +175,8 @@ void GameInterface::playMove(std::string moveNotation) {
     
     //add position to repetition table
     RepetitionTable::incrementPositionOccurence(this->board.zobristKey);
+}
+
+void GameInterface::endSearch() {
+    this->search.cancelSearch();
 }
