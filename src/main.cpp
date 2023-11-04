@@ -99,11 +99,18 @@ std::vector<std::string> readCin() {
 void listenForStopSearch(UCI *uci) {
     while(!searchHasEnded) {
         std::vector<std::string> input = readCin();
+        std::cout << input.at(0) << std::endl;
         if(input.size() == 1 && input.at(0) == "stop") {
             //stop search
             uci->gameInterface.endSearch();
+            std::terminate();
             searchHasEnded = true;
             return;
+        } else if(input.size() == 1 && input.at(0) == "ponderhit") {
+            uci->ponderhit();
+            //uci->gameInterface.endSearch();
+            //searchHasEnded = true;
+            //return;
         }
         //sleep for 100ms
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -128,6 +135,7 @@ void runUCI() {
             searchHasEnded = true;
 
             endSearchWorker.join();
+            endSearchWorker.~thread();
         } else {
             uci.processCommand(args);
         }

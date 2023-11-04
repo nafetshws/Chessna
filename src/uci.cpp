@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <limits>
 #include "../include/functions.hpp"
 #include "../include/zobrist.hpp"
 #include "../include/transpositionTable.hpp"
@@ -121,48 +122,71 @@ void UCI::searchBoard(std::vector<std::string> args) {
     //GameInterface::maxTime = 3;
     
     float maxTimeForMove = 0.1f; 
+    bool ponder = false;
 
     //check if movetime parameter was set
     if(std::find(args.begin(), args.end(), "movetime") != args.end()) {
         unsigned int moveTime = std::stoi(args.at(2)); 
         //take 90% of movetime to make move
-        maxTimeForMove = (moveTime / 1000) * 0.9f;
+        maxTimeForMove = (moveTime / 1000) * 0.90f;
     } else if(std::find(args.begin(), args.end(), "wtime") != args.end()) {
-        float wtime = std::stoi(args.at(2)) / 1000;
-        float btime = std::stoi(args.at(4)) / 1000;
+        int offset = 0;
+        if(std::find(args.begin(), args.end(), "ponder") != args.end()) {
+            offset++;
+            ponder = true;
+            //ponder until stop or ponderhit is received
+            maxTimeForMove = std::numeric_limits<float>::max(); 
 
-        float engineMovetime = (this->gameInterface.board.sideToMove == WHITE) ? wtime : btime;  
-        maxTimeForMove = engineMovetime / 35;
+            float wtime = std::stoi(args.at(2+offset)) / 1000;
+            float btime = std::stoi(args.at(4+offset)) / 1000;
+            //set 
+            this->extraMoveTime = (this->gameInterface.board.sideToMove == WHITE) ? (wtime / 70) : (btime / 70);  
 
-        //take increment into account
-        if(std::find(args.begin(), args.end(), "winc") != args.end()) {
-            float winc = std::stoi(args.at(6)) / 1000;
-            float binc = std::stoi(args.at(8)) / 1000;
+        } else {
+            float wtime = std::stoi(args.at(2+offset)) / 1000;
+            float btime = std::stoi(args.at(4+offset)) / 1000;
 
-            float engineIncrement = (this->gameInterface.board.sideToMove == WHITE) ? winc : binc; 
+            float engineMovetime = (this->gameInterface.board.sideToMove == WHITE) ? wtime : btime;  
+            maxTimeForMove = engineMovetime / 35;
 
-            if(maxTimeForMove + (engineIncrement/2) < engineMovetime) {
-                maxTimeForMove += (engineIncrement / 2);
-            } else {
-                maxTimeForMove = engineMovetime * 0.8;
+            //take increment into account
+            if(std::find(args.begin(), args.end(), "winc") != args.end()) {
+                float winc = std::stoi(args.at(6+offset)) / 1000;
+                float binc = std::stoi(args.at(8+offset)) / 1000;
+
+                float engineIncrement = (this->gameInterface.board.sideToMove == WHITE) ? winc : binc; 
+
+                if(maxTimeForMove + (engineIncrement/2) < engineMovetime) {
+                    maxTimeForMove += (engineIncrement / 2);
+                } else {
+                    maxTimeForMove = engineMovetime * 0.8;
+                }
             }
         }
+
     } else if(std::find(args.begin(), args.end(), "depth") != args.end()) {
         int depth = std::stoi(args.at(2));
 
         Move bestMove = this->gameInterface.getBestEngineMoveForDepth(depth);
 
-        //print best move 
-        std::cout << "bestmove " << printableMove(bestMove) << std::endl;
+        if(this->gameInterface.search.bestResponse.moveType != NULL_MOVE) {
+            std::cout << "bestmove " << printableMove(bestMove) << " ponder " << printableMove(this->gameInterface.search.bestResponse) << std::endl;
+        } else {
+            std::cout << "bestmove " << printableMove(bestMove) << std::endl;
+        }
         return; 
     }
 
     GameInterface::maxTime = maxTimeForMove;
 
-    Move bestMove = this->gameInterface.getBestEngineMove();
+    Move bestMove = this->gameInterface.getBestEngineMove(ponder);
 
     //print best move 
-    std::cout << "bestmove " << printableMove(bestMove) << std::endl;
+    if(this->gameInterface.search.bestResponse.moveType != NULL_MOVE) {
+        std::cout << "bestmove " << printableMove(bestMove) << " ponder " << printableMove(this->gameInterface.search.bestResponse) << std::endl;
+    } else {
+        std::cout << "bestmove " << printableMove(bestMove) << std::endl;
+    }
 }
 
 void UCI::sendID() {
@@ -188,4 +212,10 @@ void UCI::makeMoveOnBoard(std::string move) {
     } else {
         std::cout << "Error: Invalid move (" << move << ")" << std::endl;
     }
+}
+
+void UCI::ponderhit() {
+    //std::vector<std::string> args {"go", "movetime", std::to_string(this->extraMoveTime)};
+    //this->searchBoard(args);
+    this->gameInterface.search.maxSearchTime = getTimeDifference(this->gameInterface.search.startTime, getCurrentTime()) + this->extraMoveTime; 
 }

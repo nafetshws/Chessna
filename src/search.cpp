@@ -28,11 +28,13 @@ Search::Search(Board board) {
     this->minDepth = 0;
     this->isTimeLimit = false;
     this->isDebugMode = true;
+    isPonderSearch = false;
 }
 
 Search::Search() {
     this->board = Board(DEFAULT_FEN);
     this->bestMove = Move(); 
+    this->bestResponse = Move();
     this->bestMoveThisIteration = Move(); 
     this->prevBestMove = Move(); 
     this->bestScore = 0;
@@ -49,6 +51,7 @@ Search::Search() {
     this->minDepth = 0;
     this->isTimeLimit = false;
     this->isDebugMode = true;
+    this->isPonderSearch = false;
 }
 
 void Search::startIterativeDeepening(int depth) {
@@ -92,10 +95,14 @@ void Search::iterativeDeepening() {
         if(this->getSearchIsCancelled()) {
             this->bestMove = bestMoveThisIteration;
             this->bestScore = bestScoreThisIteration;
+            this->setBestResponseEntry();
         } else {
             //save results of this iteration
             this->bestMove = this->bestMoveThisIteration;
             this->prevBestMove = this->bestMoveThisIteration;
+
+            //store best response
+            this->setBestResponseEntry();
 
             this->bestScore = this->bestScoreThisIteration;
             this->prevBestScore = this->bestScoreThisIteration;
@@ -104,6 +111,19 @@ void Search::iterativeDeepening() {
         //send info
         if(this->isDebugMode) this->sendDebugInfo();
     }
+}
+
+void Search::setBestResponseEntry() {
+    Board copyBoard = this->board;
+    this->board.makeMove(this->bestMove);
+
+    HashEntry* responseEntry = TranspositionTable::fetchEntry(this->board.zobristKey);
+    //check if the entry in tt is correct 
+    if(responseEntry != NULL && responseEntry->zobristKey == this->board.zobristKey) {
+        this->bestResponse = responseEntry->move;
+    }
+
+    this->board = copyBoard;
 }
 
 int Search::alphaBeta(int alpha, int beta, int depth, int depthFromRoot) {
@@ -270,6 +290,7 @@ void Search::checkTimeLimit() {
 
 
 void Search::sendDebugInfo() {
+    //if(this->isPonderSearch) return;
     int nps = this->visitedNodes / getTimeDifference(this->iterationStartTime, getCurrentTime()); 
     std::cout << "info depth " << this->minDepth << " score cp " << this->bestScoreThisIteration << " nodes " << this->visitedNodes << " nps " <<nps << " pv " << printableMove(this->bestMoveThisIteration) << std::endl;
 }

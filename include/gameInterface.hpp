@@ -15,7 +15,7 @@ class GameInterface {
         GameInterface();
         GameInterface(std::string fen);
 
-        Move getBestEngineMove();
+        Move getBestEngineMove(bool ponder);
         Move getBestEngineMoveForDepth(int depth);
         void playMove(std::string moveNotation);
         void play(Color playerColor);

@@ -21,8 +21,11 @@ class UCI {
     public:
         GameInterface gameInterface;
 
+        float extraMoveTime;
+
         void processCommand(std::vector<std::string> args); 
         std::vector<std::string> convertInputToArgs(std::string input);
+        void ponderhit();
     private:
         void initUCI();
         void isReady();

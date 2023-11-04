@@ -18,6 +18,7 @@ class Search {
         Move bestMove;
         Move bestMoveThisIteration;
         Move prevBestMove;
+        Move bestResponse;
         int bestScore;
         int bestScoreThisIteration;
         int prevBestScore;
@@ -34,6 +35,7 @@ class Search {
         
         bool isTimeLimit;
         bool isDebugMode;
+        bool isPonderSearch;
 
         int minDepth;
         u64 visitedNodes;
@@ -54,6 +56,7 @@ class Search {
 
     private:
         void iterativeDeepening();
+        void setBestResponseEntry();
         void sendDebugInfo();
 
 };

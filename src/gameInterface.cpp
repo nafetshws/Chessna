@@ -51,7 +51,7 @@ void GameInterface::play(Color playerColor) {
             }
         } else {
             //make engine move
-            Move engineMove = this->getBestEngineMove();
+            Move engineMove = this->getBestEngineMove(false);
             std::cout << "Engine played (" << this->lastMinDepth << "): " << printableMove(engineMove) << std::endl;
             this->board.makeMove(engineMove);
         }
@@ -65,8 +65,9 @@ void GameInterface::play(Color playerColor) {
     }
 }
 
-Move GameInterface::getBestEngineMove() {
+Move GameInterface::getBestEngineMove(bool ponder) {
     this->search = Search(this->board);
+    this->search.isPonderSearch = ponder;
     this->search.startIterativeDeepening(maxTime);
     this->lastMinDepth = search.minDepth;
     Move engineMove = this->search.bestMove;
@@ -75,6 +76,7 @@ Move GameInterface::getBestEngineMove() {
 
 Move GameInterface::getBestEngineMoveForDepth(int depth) {
     this->search = Search(this->board);
+    this->search.isPonderSearch = false;
     this->search.startIterativeDeepening(depth);
     this->lastMinDepth = this->search.minDepth;
     Move engineMove = this->search.bestMove;
