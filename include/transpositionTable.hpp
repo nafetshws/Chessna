@@ -17,6 +17,9 @@ struct HashEntry {
     HashEntry() : zobristKey(0), depth(0), eval(0), flag(HASH_EXACT), move(Move()) {}
 };
 
+const unsigned int TT_SIZE_MB = 1000;
+const unsigned int TT_SIZE = (TT_SIZE_MB * 1024 * 1024) / sizeof(HashEntry);
+
 const int POS_NOT_FOUND = -100000;
 const int POS_NOT_DEEP_ENOUGH = -200000;
 

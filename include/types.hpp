@@ -155,7 +155,6 @@ enum EvalFlag {
     HASH_BETA
 };
 
-const unsigned int TT_SIZE = 26214400;
 const unsigned int BEST_MOVE_SCORE = 5000000;
 
 const Bitboard H1 = 0x80;
