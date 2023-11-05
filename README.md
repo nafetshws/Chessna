@@ -17,6 +17,7 @@ Chessna is a simple chess engine that is designed to beat most human players.
 - Mop-up evaluation 
 #### Other:
 - UCI (Universal chess interface): needed to communicate with lichess 
+- Pondering (think on opponent's time)
 
 ## How to test the engine
 Compile the engine and run it:
@@ -63,4 +64,3 @@ You can also use a GUI to run Chessna. So far I've only tested that it works wit
 - Opening Book
 - better evaluation (king safety, mobility, pawn structure, ...)
 - improve move generation (use array instead of vector, magic bitboards etc.)
-- pondering
