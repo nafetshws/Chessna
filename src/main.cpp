@@ -96,50 +96,46 @@ std::vector<std::string> readCin() {
     return args;
 }
 
-void listenForStopSearch(UCI *uci) {
-    while(!searchHasEnded) {
-        std::vector<std::string> input = readCin();
-        std::cout << input.at(0) << std::endl;
-        if(input.size() == 1 && input.at(0) == "stop") {
-            //stop search
-            uci->gameInterface.endSearch();
-            std::terminate();
-            searchHasEnded = true;
-            return;
-        } else if(input.size() == 1 && input.at(0) == "ponderhit") {
-            uci->ponderhit();
-            //uci->gameInterface.endSearch();
-            //searchHasEnded = true;
-            //return;
-        }
-        //sleep for 100ms
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-}
-
 void runUCI() {
     UCI uci;
 
     std::string command = "";
 
-    while(command != "quit") {
+    std::thread worker1;
+    bool isProcessing = false;
+    bool threadIsInitialized = false;
+
+    /*
+    Main thread is continuously checking for user input.
+    If it receives a "go" command it starts a seperate thread that handles the calculation.
+    Otherwise it exectues the command in the main thread.
+    */
+
+    while(command != "quit") { 
         std::vector<std::string> args = readCin();
         command = args.at(0);;
 
-        //start thread to listen for stop
-        if(command == "go") {
-            searchHasEnded = false;
-            std::thread endSearchWorker(listenForStopSearch, &uci);
-
-            uci.processCommand(args);
-            searchHasEnded = true;
-
-            endSearchWorker.join();
-            endSearchWorker.~thread();
-        } else {
-            uci.processCommand(args);
+        if(command == "stop") {
+            uci.gameInterface.endSearch();
+            worker1.join(); //wait for thread to finish calculation (shouldn't take long)
+            isProcessing = false; //calc is done
+            threadIsInitialized = false; //thread is finished -> it isn't initialized anymore
+        } else if(command == "ponderhit") {
+            uci.ponderhit();
+            worker1.join(); //wait for thread to finish
+            isProcessing = false; //calc is done
+            threadIsInitialized = false; //thread isn't initialized anymore
         }
-        
+
+        if(!isProcessing && command == "go") {
+            if(threadIsInitialized) worker1.join(); //wait for thread to finish if it didn't receive the stop/ponderhit command but finished calculating
+            worker1 = std::thread(&UCI::processCommand, &uci, args, &isProcessing); //start new thread
+            isProcessing = true;
+            threadIsInitialized = true;
+        } else if(!isProcessing) {
+            uci.processCommand(args, &isProcessing); //handle other commands like "position" etc.
+        }
+         
     }
 }
 

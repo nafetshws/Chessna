@@ -23,7 +23,7 @@ class UCI {
 
         float extraMoveTime;
 
-        void processCommand(std::vector<std::string> args); 
+        void processCommand(std::vector<std::string> args, bool *isProcessing); 
         std::vector<std::string> convertInputToArgs(std::string input);
         void ponderhit();
     private:

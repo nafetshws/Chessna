@@ -10,8 +10,9 @@
 #include "../include/transpositionTable.hpp"
 #include "../include/repetitionTable.hpp"
 
-void UCI::processCommand(std::vector<std::string> args) {
-    //std::vector<std::string> args = this->convertInputToArgs(input);
+void UCI::processCommand(std::vector<std::string> args, bool* isProcessing) {
+    //std::vector<std::string> args = this->convertInputToArgs(input)
+    (*isProcessing) = true;
     std::string command = args.at(0);
 
     if(command == "uci") {
@@ -25,6 +26,7 @@ void UCI::processCommand(std::vector<std::string> args) {
     } else if(command == "go") {
         this->searchBoard(args);
     } else if(command == "stop") {
+        this->gameInterface.endSearch();
         //need to implement thread
         //std::cout << "recieved stop" << std::endl;
     } else if(command == "quit") {
@@ -33,7 +35,11 @@ void UCI::processCommand(std::vector<std::string> args) {
     } else if(command == "ucinewgame") {
         //Zobrist::init();
         //TranspositionTable::init(1024);
+    } else if(command == "ponderhit") {
+        this->ponderhit();
     }
+
+    *isProcessing = false;
 }
 
 std::vector<std::string> UCI::convertInputToArgs(std::string input) {
@@ -199,6 +205,7 @@ void UCI::sendID() {
 void UCI::sendOptions() {
     //hash table size
     std::cout << "option name Hash type spin default 1024 min 16 max 4096" << std::endl;
+    std::cout << "option name Ponder type check default true" << std::endl;
     //NOTE: implement ponder
 }
 
