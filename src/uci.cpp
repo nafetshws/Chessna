@@ -103,24 +103,30 @@ void UCI::setUpBoard(std::vector<std::string> args) {
         }
     } else {
         //fen has 6 args
+        int offset = 0;
+        if(args.at(1) == "fen") {
+            offset++;
+        }
         std::string fen = ""; 
         //position(1) + fen(6) + moves(1) + ...(?)
-        if(args.size() >= 7) {
+        if(args.size() >= 7+offset) {
             for(int i = 1; i < 7; i++) {
-                if(i == 6) fen += args.at(i);
-                else fen += (args.at(i) + " "); 
+                if(i == 6) fen += args.at(i+offset);
+                else fen += (args.at(i+offset) + " "); 
             }
         }
         this->gameInterface = GameInterface(fen);
         RepetitionTable::incrementPositionOccurence(this->gameInterface.board.zobristKey);
 
         //play moves
-        if(args.size() >= 9 && args.at(7) == "moves") {
-            for(int i = 8; i < args.size(); i++) {
+        if(args.size() >= 9+offset && args.at(7+offset) == "moves") {
+            for(int i = 8+offset; i < args.size(); i++) {
                 this->makeMoveOnBoard(args.at(i));
             }
         }
     }
+
+    //this->gameInterface.board.prettyPrintBoard();
 }
 
 void UCI::searchBoard(std::vector<std::string> args) {
@@ -183,7 +189,14 @@ void UCI::searchBoard(std::vector<std::string> args) {
         return; 
     }
 
-    GameInterface::maxTime = maxTimeForMove;
+    //uncomment following lines for engine taking specific amount of time per move
+    if(!ponder) {
+        GameInterface::maxTime = 1; 
+    } else {
+        GameInterface::maxTime = maxTimeForMove;
+    }
+
+    //GameInterface::maxTime = maxTimeForMove;
 
     Move bestMove = this->gameInterface.getBestEngineMove(ponder);
 
@@ -224,5 +237,6 @@ void UCI::makeMoveOnBoard(std::string move) {
 void UCI::ponderhit() {
     //std::vector<std::string> args {"go", "movetime", std::to_string(this->extraMoveTime)};
     //this->searchBoard(args);
-    this->gameInterface.search.maxSearchTime = getTimeDifference(this->gameInterface.search.startTime, getCurrentTime()) + this->extraMoveTime; 
+    //this->gameInterface.search.maxSearchTime = getTimeDifference(this->gameInterface.search.startTime, getCurrentTime()) + this->extraMoveTime; 
+    this->gameInterface.search.maxSearchTime = getTimeDifference(this->gameInterface.search.startTime, getCurrentTime()) + 1; 
 }
