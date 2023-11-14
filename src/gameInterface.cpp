@@ -16,6 +16,9 @@ GameInterface::GameInterface() {
     this->lastMinDepth = 0;
     maxTime = 30;
     this->search = Search(this->board);
+    //custom engine thinking time
+    this->engingeThinkingTimeLimit = ENGINE_TINKING_TIME_LIMIT;
+    this->engineThinkingTime = ENGINE_THINKING_TIME;
 }
 
 GameInterface::GameInterface(std::string fen) {
@@ -24,6 +27,9 @@ GameInterface::GameInterface(std::string fen) {
     this->lastMinDepth = 0;
     maxTime = 30;
     this->search = Search(this->board);
+    //custom engine thinking time
+    this->engingeThinkingTimeLimit = ENGINE_TINKING_TIME_LIMIT;
+    this->engineThinkingTime = ENGINE_THINKING_TIME;
 }
 
 void GameInterface::play(Color playerColor) {
