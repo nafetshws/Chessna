@@ -185,7 +185,6 @@ void Board::initBoard(const std::string &fen){
 
 void Board::makeMove(Move move) {
     Bitboard *pieces; 
-    Bitboard t = move.moveType;
 
     Bitboard originAsBitboard = squareToBitboard(move.origin);
     Bitboard destinationAsBitboard = squareToBitboard(move.destination);
@@ -257,7 +256,7 @@ void Board::makeMove(Move move) {
                     break;
             }
 
-            *pieces = *pieces & (~originAsBitboard) | destinationAsBitboard;
+            *pieces = (*pieces & (~originAsBitboard)) | destinationAsBitboard;
             this->enPassentTargetSquare = -1;
 
             //remove castling rights because of captured piece
@@ -305,7 +304,7 @@ void Board::makeMove(Move move) {
                 Square enPassentSquare = bitboardToSquare(bDestination << NORTH);
                 this->enPassentTargetSquare = enPassentSquare;
             }
-            *pieces = *pieces & (~originAsBitboard) | destinationAsBitboard;
+            *pieces = (*pieces & (~originAsBitboard)) | destinationAsBitboard;
 
             //update zobrist
             this->updateZobristKey(move, prevEnPassentSquare);
@@ -338,7 +337,7 @@ void Board::makeMove(Move move) {
             break;
         }
         case EN_PASSENT_CAPTURE: {
-            *pieces = *pieces & (~originAsBitboard) | destinationAsBitboard;
+            *pieces = (*pieces & (~originAsBitboard)) | destinationAsBitboard;
             if(move.color == WHITE) {
                 Bitboard enPassentSquare = squareToBitboard(this->enPassentTargetSquare);
                 Bitboard target = enPassentSquare >> SOUTH;
@@ -691,23 +690,23 @@ void Board::prettyPrintBoard() {
     std::cout << std::endl;
 }
 
-Bitboard Board::getPawns(Color color) {
+Bitboard Board::getPawns(Color color) const{
     return (color == WHITE) ? this->whitePawns : this->blackPawns;
 }
-Bitboard Board::getRooks(Color color) {
+Bitboard Board::getRooks(Color color) const{
     return (color == WHITE) ? this->whiteRooks : this->blackRooks;
 }
-Bitboard Board::getKnights(Color color) {
+Bitboard Board::getKnights(Color color) const{
     return (color == WHITE) ? this->whiteKnights : this->blackKnights;
 }
 
-Bitboard Board::getBishops(Color color) {
+Bitboard Board::getBishops(Color color) const{
     return (color == WHITE) ? this->whiteBishops : this->blackBishops;
 }
-Bitboard Board::getQueens(Color color) {
+Bitboard Board::getQueens(Color color) const{
     return (color == WHITE) ? this->whiteQueen : this->blackQueen;
 }
-Bitboard Board::getKing(Color color) {
+Bitboard Board::getKing(Color color) const{
     return (color == WHITE) ? this->whiteKing : this->blackKing;
 }
 

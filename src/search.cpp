@@ -90,7 +90,7 @@ void Search::iterativeDeepening() {
 
         if(this->getSearchIsCancelled()) break;
 
-        int eval = alphaBeta(negativeInfinity, positiveInfinity, currentSearchDepth, 0);
+        alphaBeta(negativeInfinity, positiveInfinity, currentSearchDepth, 0);
         
         if(this->getSearchIsCancelled()) {
             this->bestMove = bestMoveThisIteration;

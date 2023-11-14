@@ -44,7 +44,7 @@ void runSearch(std::string fen, int depth) {
     Search search(board);
 
     u64 before = getCurrentTime(); 
-    int eval = search.alphaBeta(negativeInfinity, positiveInfinity, depth, 0);
+    search.alphaBeta(negativeInfinity, positiveInfinity, depth, 0);
     u64 after = getCurrentTime(); 
 
     float dt = getTimeDifference(before, after);

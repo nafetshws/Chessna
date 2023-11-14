@@ -183,7 +183,7 @@ class Evaluation {
 
         Evaluation();
 
-        int evaluatePosition(Board board);
+        int evaluatePosition(const Board &board);
         int popcount(Bitboard bitboard);
         int calculatePositionScore(Bitboard pieces, const std::vector<int>& values);
 

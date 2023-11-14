@@ -50,12 +50,12 @@ struct Board {
     void printBoard(Bitboard board); 
     void prettyPrintBoard();
 
-    Bitboard getPawns(Color color);
-    Bitboard getRooks(Color color);
-    Bitboard getKnights(Color color);
-    Bitboard getBishops(Color color);
-    Bitboard getQueens(Color color);
-    Bitboard getKing(Color color);
+    Bitboard getPawns(Color color) const;
+    Bitboard getRooks(Color color) const;
+    Bitboard getKnights(Color color) const;
+    Bitboard getBishops(Color color) const;
+    Bitboard getQueens(Color color) const;
+    Bitboard getKing(Color color) const;
 
     PieceType getPieceTypeOfSquare(Square square, Color color);
     PieceType getPieceTypeOfSquare(Bitboard b, Color color); 

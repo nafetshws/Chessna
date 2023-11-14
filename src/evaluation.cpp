@@ -9,7 +9,7 @@ Evaluation::Evaluation() {
     this->perspective = 0;
 }
 
-int Evaluation::evaluatePosition(Board board) {
+int Evaluation::evaluatePosition(const Board &board) {
     this->perspective = (board.sideToMove == WHITE) ? 1 : -1;
 
     Bitboard whiteKing = board.getKing(WHITE);

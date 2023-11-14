@@ -127,7 +127,6 @@ std::vector<Move> MoveGeneration::generateMoves(const Board &board, Color color,
                 Bitboard kingAsSlidingPieceMoves; 
                 //there could be multiple queens on the board -> look up pos of checking piece
                 Bitboard enemyMoves;
-                Bitboard bishopIntersection = EMPTY;
                 Bitboard intersection = EMPTY;
 
                 Color oppositeColor = getOppositeColor(color);
@@ -657,8 +656,6 @@ bool MoveGeneration::checkForEnPassenDiscoveredCheck(Bitboard targetPawn, Bitboa
 Bitboard MoveGeneration::generateEnPassentMoves(Bitboard pawns, Color color) {
     if(pawns == (CURRENT_POSITION)) pawns = this->board.getPawns(color) ;
 
-    Color oppositeColor = getOppositeColor(color);
-
     if(color == WHITE) {
         //en passent
         bool enPassentPossible = false;
@@ -761,8 +758,6 @@ Bitboard MoveGeneration::generateKingAttacks(Bitboard king, Color color) {
     Bitboard westAttack = ((king & ~(FILE_A)) >> WEST);
     Bitboard southAttack = ((king & ~(RANK_1)) >> SOUTH);
     Bitboard eastAttack = ((king & ~(FILE_H)) << EAST);
-
-    Bitboard directAttacks = westAttack; 
 
     Bitboard northeastAttack = (king & ~RANK_8 & ~FILE_H) << NORTH_EAST; 
     Bitboard northwestAttack = (king & ~RANK_8 & ~FILE_A) << NORTH_WEST;
@@ -963,8 +958,6 @@ Pins MoveGeneration::getPinnedPieces(Color color){
     Color oppositeColor = getOppositeColor(color);
 
     Pins pins;
-    Bitboard intersection = EMPTY;
-    Bitboard intersection2 = EMPTY;
 
     Bitboard king = this->board.getKing(color);
     Bitboard oppositeBishops = this->board.getBishops(oppositeColor);

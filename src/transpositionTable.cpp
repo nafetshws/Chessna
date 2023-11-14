@@ -11,8 +11,6 @@ HashEntry TranspositionTable::testEntry = HashEntry(0, 0, 0, HASH_EXACT, Move())
 
 
 void TranspositionTable::init() {
-    int entrySize = sizeof(HashEntry);
-    //numberOfMaxEntries = (sizeMB * 1024 * 1024) / entrySize; 
     numberOfMaxEntries = TT_SIZE;
     numberOfCurrentEntries = 0;
 }

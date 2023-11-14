@@ -124,8 +124,8 @@ bool GameInterface::moveIsLegal(std::string moveNotation) {
         } else if(moveNotation.size() == 5) {
             char promPiece = moveNotation.at(4);        
             if(moveNotation.substr(0, 4).compare(coords) == 0
-                && promPiece == 'q' || promPiece == 'r'
-                || promPiece == 'n' || promPiece == 'b') {
+                && (promPiece == 'q' || promPiece == 'r'
+                || promPiece == 'n' || promPiece == 'b')) {
                     moveIsLegal = true;
                 }
         }
@@ -160,6 +160,7 @@ void GameInterface::playMove(std::string moveNotation) {
                 moveType = (capture == EMPTY) ? BISHOP_PROMOTION : CAPTURE_BISHOP_PROMOTION;
                 break;
             default:
+                moveType = NULL_MOVE;
                 break;
         }
     } else {
