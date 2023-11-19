@@ -5,10 +5,74 @@
 #include <string>
 #include <algorithm>
 #include <limits>
+#include <sstream>
+#include <thread>
 #include "../include/functions.hpp"
 #include "../include/zobrist.hpp"
 #include "../include/transpositionTable.hpp"
 #include "../include/repetitionTable.hpp"
+
+void UCI::runUCI() {
+    //UCI uci;
+
+    std::string command = "";
+
+    std::thread worker1;
+    bool isProcessing = false;
+    bool threadIsInitialized = false;
+
+    /*
+    Main thread is continuously checking for user input.
+    If it receives a "go" command it starts a seperate thread that handles the calculation.
+    Otherwise it exectues the command in the main thread.
+    */
+
+    while(command != "quit") { 
+        std::vector<std::string> args = readCin();
+        command = args.at(0);;
+
+        if(command == "stop") {
+            //uci.gameInterface.endSearch();
+            gameInterface.endSearch();
+            worker1.join(); //wait for thread to finish calculation (shouldn't take long)
+            isProcessing = false; //calc is done
+            threadIsInitialized = false; //thread is finished -> it isn't initialized anymore
+        } else if(command == "ponderhit") {
+            //uci.ponderhit();
+            ponderhit();
+            worker1.join(); //wait for thread to finish
+            isProcessing = false; //calc is done
+            threadIsInitialized = false; //thread isn't initialized anymore
+        }
+
+        if(!isProcessing && command == "go") {
+            if(threadIsInitialized) worker1.join(); //wait for thread to finish if it didn't receive the stop/ponderhit command but finished calculating
+            //worker1 = std::thread(&UCI::processCommand, &uci, args, &isProcessing); //start new thread
+            worker1 = std::thread(&UCI::processCommand, this, args, &isProcessing); //start new thread
+            isProcessing = true;
+            threadIsInitialized = true;
+        } else if(!isProcessing) {
+            //uci.processCommand(args, &isProcessing); //handle other commands like "position" etc.
+            processCommand(args, &isProcessing); //handle other commands like "position" etc.
+        }
+         
+    }
+}
+
+std::vector<std::string> UCI::readCin() {
+    std::string inputLine;
+    std::vector<std::string> args;
+    std::getline(std::cin, inputLine);
+    std::istringstream iss(inputLine);
+
+    std::string arg;
+
+    while(iss >> arg) {
+        args.push_back(arg);
+    }
+
+    return args;
+}
 
 void UCI::processCommand(std::vector<std::string> args, bool* isProcessing) {
     //std::vector<std::string> args = this->convertInputToArgs(input)
@@ -69,6 +133,7 @@ void UCI::initUCI() {
     this->sendOptions();
     this->uciOK();
 }
+
 
 void UCI::isReady() {
     std::cout << "readyok" << std::endl;

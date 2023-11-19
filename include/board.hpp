@@ -5,9 +5,6 @@
 #include <string>
 #include <map>
 
-//necessary to avoid circular dependency
-//class Zobrist;
-
 struct Board {
     Bitboard whitePawns, whiteRooks, whiteKnights, whiteBishops, whiteQueen, whiteKing;
     Bitboard blackPawns, blackRooks, blackKnights, blackBishops, blackQueen, blackKing;

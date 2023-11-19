@@ -23,11 +23,14 @@ class UCI {
 
         float extraMoveTime;
 
+		void runUCI();
+
         void processCommand(std::vector<std::string> args, bool *isProcessing); 
         std::vector<std::string> convertInputToArgs(std::string input);
         void ponderhit();
     private:
         void initUCI();
+		std::vector<std::string> readCin();
         void isReady();
         void setOption(std::vector<std::string> args);
         void setUpBoard(std::vector<std::string> args);
