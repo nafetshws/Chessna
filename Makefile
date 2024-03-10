@@ -7,19 +7,18 @@ TEST_OUT = build/test
 OUT = build/chessna
 DEBUG_OUT = build/debug
 
-CC_FLAGS = -std=c++11 -O3 -pthread -Wall
+CC_FLAGS = -std=c++11 -O3 -pthread
 
 BUILD_DIR = ./build
 
 main:
-	[ -d $(BUILD_DIR) ] || mkdir -p $(BUILD_DIR)
 	g++ -o $(OUT) $(FILES) $(CC_FLAGS) 
 tests:
 	g++ -o $(TEST_OUT) $(TEST_FILES) $(CC_FLAGS)
 debug:
-	g++ -g -o $(DEBUG_OUT) $(FILES) $(CC_FLAGS) 
+	g++ -g -o $(DEBUG_OUT) $(FILES) $(CC_FLAGS) -Wall 
 
 
 .PHONY: clean
 clean:
-	rm -rf $(OUT) $(TEST_OUT)
+	rm -rf $(OUT) $(TEST_OUT) $(DEBUG_OUT)

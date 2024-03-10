@@ -3,7 +3,8 @@
 *.obj
 *.lib
 .DS_Store
-build/
+build/*
+!build/.gitkeep
 .vscode/
 test.txt
 games.txt
